@@ -510,7 +510,7 @@ def go(arg):
                                 input = input.cuda()
 
                             # -- encoding
-                            z, n0, n1, n2, n3, n4, n5 = encoder(input)
+                            z, n0, n1, n2, n3, n4, n5 = encoder(input, depth)
 
                             # -- compute KL losses
 
@@ -588,6 +588,14 @@ def go(arg):
                     images = torch.cat([input.cpu(), xout, mixout, mixout2, sample], dim=0)
 
                     utils.save_image(images, f'images.{depth}.{epoch}.png', nrow=24, padding=2)
+                    utils.save_image(images, f'images.{depth}.{epoch}.png', nrow=24, padding=2)
+                    utils.save_image(input.cpu(), f'images_input.{depth}.{epoch}.png', nrow=24, padding=2)
+                    utils.save_image(xout, f'images_xout_recon.{depth}.{epoch}.png', nrow=24, padding=2)
+                    utils.save_image(mixout, f'images_mixout_lv_rn.{depth}.{epoch}.png', nrow=24, padding=2)
+                    utils.save_image(mixout2, f'images_mixout2_rv_sn.{depth}.{epoch}.png', nrow=24, padding=2)
+                    utils.save_image(sample, f'images_sample_total_random.{depth}.{epoch}.png', nrow=24, padding=2)
+
+
 
 if __name__ == "__main__":
 
