@@ -303,9 +303,7 @@ def go(arg):
 
     ## Load the data
     if arg.task == 'mnist':
-        transform = torchvision.transforms.Compose([
-                                transforms.ToTensor(),
-                                transforms.Pad(2, fill=0, padding_mode='constant')])
+        transform = Compose([ToTensor, Pad(2, fill=0, padding_mode='constant')])
 
         trainset = torchvision.datasets.MNIST(root=arg.data_dir, train=True,
                                                 download=True, transform=ToTensor())
