@@ -303,6 +303,10 @@ def go(arg):
 
     ## Load the data
     if arg.task == 'mnist':
+        transform = transforms.Compose([
+                                transforms.ToTensor(),
+                                transforms.Pad(2, fill=0, padding_mode='constant')])
+
         trainset = torchvision.datasets.MNIST(root=arg.data_dir, train=True,
                                                 download=True, transform=ToTensor())
         trainloader = torch.utils.data.DataLoader(trainset, batch_size=arg.batch_size,
@@ -312,7 +316,7 @@ def go(arg):
                                                download=True, transform=ToTensor())
         testloader = torch.utils.data.DataLoader(testset, batch_size=arg.batch_size,
                                                  shuffle=False, num_workers=2)
-        C, H, W = 1, 28, 28
+        C, H, W = 1, 32, 32
 
     elif arg.task == 'cifar10':
         trainset = torchvision.datasets.CIFAR10(root=arg.data_dir, train=True,
