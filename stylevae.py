@@ -303,7 +303,7 @@ def go(arg):
 
     ## Load the data
     if arg.task == 'mnist':
-        transform = trochvision.transforms.Compose([
+        transform = torchvision.transforms.Compose([
                                 transforms.ToTensor(),
                                 transforms.Pad(2, fill=0, padding_mode='constant')])
 
