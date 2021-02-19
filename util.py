@@ -130,7 +130,7 @@ def sample_image(z, eps=None):
 
     return sample.view(b, c//2, h, w)
 
-def latent_sample(b, zsize, outsize, depth, zchannels, dev=DV):
+def latent_sample(b, zsize, outsize, depth, zchannels, dev):
     """
     Samples latents from the normal distribution.
     :param b:
