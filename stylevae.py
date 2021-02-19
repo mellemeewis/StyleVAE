@@ -99,7 +99,6 @@ class StyleEncoder(nn.Module):
             return z, n0, n1, n2, n3, n4, n5
 
         x1 = F.avg_pool2d(self.block1(x0), 2)
-        print("ENCODER x1 ", x1.size())
         z1 = self.affine1(x1.view(b, -1))
         n1 = self.tonoise1(x1)
 
@@ -108,8 +107,6 @@ class StyleEncoder(nn.Module):
             return z, n0, n1, n2, n3, n4, n5
 
         x2 = F.avg_pool2d(self.block2(x1), 2)
-        print("ENCODER x2 ", x2.size())
-
         z2 = self.affine2(x2.view(b, -1))
         n2 = self.tonoise2(x2)
 
