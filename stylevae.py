@@ -41,21 +41,7 @@ DV = 'cuda' if torch.cuda.is_available() else 'cpu'
 #         res = res.cuda()
 #     return res
 
-def adain(y, x):
-    """
-    Adaptive instance normalization
-    :param y: Parameters for the normalization
-    :param x: Input to normalize
-    :return:
-    """
-    b, c, h, w = y.size()
 
-    ys = y[:, :c//2, :, :]
-    yb = y[:, c//2:, :, :]
-
-    x = F.instance_norm(x)
-
-    return (ys + 1.) * x + yb
 
 
 class StyleEncoder(nn.Module):
@@ -257,7 +243,7 @@ class StyleDecoder(nn.Module):
             x5 = self.x5 + self.tonoise5(n5)
             z5 = self.affine5(z).view(-1, 2 * c5, h//32, w//32)
 
-            x5 = adain(z5, x5)
+            x5 = util.adain(z5, x5)
 
         if n4 is not None:
             if x5 is None:
@@ -266,7 +252,7 @@ class StyleDecoder(nn.Module):
             x4 = F.upsample(self.block5(x5), scale_factor=2)
             x4 = x4 + self.tonoise4(n4)
             z4 = self.affine4(z).view(-1, 2 * c4, h//16, w//16)
-            x4 = adain(z4, x4)
+            x4 = util.adain(z4, x4)
 
         if n3 is not None:
             if x4 is None:
@@ -275,16 +261,17 @@ class StyleDecoder(nn.Module):
             x3 = F.upsample(self.block4(x4), scale_factor=2)
             x3 = x3 + self.tonoise3(n3)
             z3 = self.affine3(z).view(-1, 2 * c3, h//8, w//8)
-            x3 = adain(z3, x3)
+            x3 = util.adain(z3, x3)
 
         if n2 is not None:
             if x3 is None:
                 x3 = self.x3
 
             x2 = F.upsample(self.block3(x3), scale_factor=2)
+            print(x2.size(), n2.size())
             x2 = x2 + self.tonoise2(n2)
             z2 = self.affine2(z).view(-1, 2 * c2, h//4, w//4)
-            x2 = adain(z2, x2)
+            x2 = util.adain(z2, x2)
 
         if n1 is not None:
             if x2 is None:
@@ -293,7 +280,7 @@ class StyleDecoder(nn.Module):
             x1 = F.upsample(self.block2(x2), scale_factor=2)
             x1 = x1 + self.tonoise1(n1)
             z1 = self.affine1(z).view(-1, 2 * c1, h//2, w//2)
-            x1 = adain(z1, x1)
+            x1 = util.adain(z1, x1)
 
         if n0 is not None:
             if x1 is None:
@@ -302,7 +289,7 @@ class StyleDecoder(nn.Module):
             x0 = F.upsample(self.block1(x1), scale_factor=2)
             x0 = x0 + self.tonoise0(n0)
             z0 = self.affine0(z).view(-1, 2 * c, h, w)
-            x0 = adain(z0, x0)
+            x0 = util.adain(z0, x0)
 
         return torch.sigmoid(self.conv0(x0))
 
