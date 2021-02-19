@@ -55,6 +55,22 @@ def prod(xs):
 
     return res
 
+def adain(y, x):
+    """
+    Adaptive instance normalization
+    :param y: Parameters for the normalization
+    :param x: Input to normalize
+    :return:
+    """
+    b, c, h, w = y.size()
+
+    ys = y[:, :c//2, :, :]
+    yb = y[:, c//2:, :, :]
+
+    x = F.instance_norm(x)
+
+    return (ys + 1.) * x + yb
+
 
 def kl_loss_image(z):
     if z is None:
@@ -113,6 +129,43 @@ def sample_image(z, eps=None):
     sample = mean + eps * (sig * 0.5).exp()
 
     return sample.view(b, c//2, h, w)
+
+def latent_sample(b, zsize, outsize, depth, zchannels, dev=DV):
+    """
+    Samples latents from the normal distribution.
+    :param b:
+    :param zsize:
+    :param outsize:
+    :param depth:
+    :param zchannels:
+    :param dev:
+    :return:
+    """
+
+    c, h, w = outsize
+    zc0, zc1, zc2, zc3, zc4, zc5 = zchannels
+    n = [None] * 6
+
+    z = torch.randn(b, zsize, device=dev)
+
+    n[0] = torch.randn(b, zc0, h, w, device=dev)
+
+    if depth >=1:
+        n[1] = torch.randn(b, zc1, h // 2, w // 2, device=dev)
+
+    if depth >= 2:
+        n[2] = torch.randn(b, zc2, h // 4, w // 4, device=dev)
+
+    if depth >= 3:
+        n[3] = torch.randn(b, zc3, h // 8, w // 8, device=dev)
+
+    if depth >= 4:
+        n[4] = torch.randn(b, zc4, h // 16, w // 16, device=dev)
+
+    if depth >= 5:
+        n[5] = torch.randn(b, zc5, h // 32, w // 32, device=dev)
+
+    return z, n
 
 
 def batchedn(input, model, batch_size, cuda=torch.cuda.is_available()):
@@ -212,3 +265,4 @@ def nbatched(input, model, batch_size, cuda=torch.cuda.is_available(), **kwargs)
         res.append(None if none(batches) else torch.cat(batches, dim=0))
 
     return res
+

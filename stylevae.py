@@ -57,42 +57,6 @@ def adain(y, x):
 
     return (ys + 1.) * x + yb
 
-def latent_sample(b, zsize, outsize, depth, zchannels, dev=DV):
-    """
-    Samples latents from the normal distribution.
-    :param b:
-    :param zsize:
-    :param outsize:
-    :param depth:
-    :param zchannels:
-    :param dev:
-    :return:
-    """
-
-    c, h, w = outsize
-    zc0, zc1, zc2, zc3, zc4, zc5 = zchannels
-    n = [None] * 6
-
-    z = torch.randn(b, zsize, device=dev)
-
-    n[0] = torch.randn(b, zc0, h, w, device=dev)
-
-    if depth >=1:
-        n[1] = torch.randn(b, zc1, h // 2, w // 2, device=dev)
-
-    if depth >= 2:
-        n[2] = torch.randn(b, zc2, h // 4, w // 4, device=dev)
-
-    if depth >= 3:
-        n[3] = torch.randn(b, zc3, h // 8, w // 8, device=dev)
-
-    if depth >= 4:
-        n[4] = torch.randn(b, zc4, h // 16, w // 16, device=dev)
-
-    if depth >= 5:
-        n[5] = torch.randn(b, zc5, h // 32, w // 32, device=dev)
-
-    return z, n
 
 class StyleEncoder(nn.Module):
 
@@ -559,7 +523,7 @@ def go(arg):
                     # sample 6x12 images
                     b = 6 * 12
 
-                    zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = latent_sample(b,\
+                    zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
                         zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
                         dev='cpu', depth=depth)
 
