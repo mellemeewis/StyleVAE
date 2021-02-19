@@ -306,12 +306,12 @@ def go(arg):
         transform = Compose([ToTensor, Pad(2, fill=0, padding_mode='constant')])
 
         trainset = torchvision.datasets.MNIST(root=arg.data_dir, train=True,
-                                                download=True, transform=ToTensor())
+                                                download=True, transform=transform)
         trainloader = torch.utils.data.DataLoader(trainset, batch_size=arg.batch_size,
                                                   shuffle=True, num_workers=2)
 
         testset = torchvision.datasets.MNIST(root=arg.data_dir, train=False,
-                                               download=True, transform=ToTensor())
+                                               download=True, transform=transform)
         testloader = torch.utils.data.DataLoader(testset, batch_size=arg.batch_size,
                                                  shuffle=False, num_workers=2)
         C, H, W = 1, 32, 32
