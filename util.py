@@ -269,3 +269,9 @@ def nbatched(input, model, batch_size, cuda=torch.cuda.is_available(), **kwargs)
 
     return res
 
+def none(lst):
+    for l in lst:
+        if l is None:
+            return True
+
+    return False
