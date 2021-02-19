@@ -66,10 +66,7 @@ class StyleEncoder(nn.Module):
         self.affine2 = nn.Linear(util.prod((c2, h//4, w//4)), 2 * zs)
         self.affine3 = nn.Linear(util.prod((c3, h//8, w//8)), 2 * zs)
         self.affine4 = nn.Linear(util.prod((c4, h//16, w//16)), 2 * zs)
-        if h >= 32 and w >= 32:
-            self.affine5 = nn.Linear(util.prod((c5, h//32, w//32)), 2 * zs)
-        else:
-            self.affine5 = nn.Linear(util.prod((c5, h//h, w//w)), 2 * zs)
+        self.affine5 = nn.Linear(util.prod((c5, h//32, w//32)), 2 * zs)
 
         self.affinez = nn.Linear(12 * zs, 2 * zs)
 
@@ -177,10 +174,8 @@ class StyleDecoder(nn.Module):
         self.block1 = util.Block(c1, c,  kernel_size=k, batch_norm=batch_norm)
 
         # affine mappings from latent space sample
-        if h>=32 and w>=32:
-            self.affine5 = nn.Linear(zs, 2 * util.prod((c5, h//32, w//32)))
-        else:
-            self.affine5 = nn.Linear(zs, 2 * util.prod((c5, h//h, w//w)))            
+            
+        self.affine5 = nn.Linear(zs, 2 * util.prod((c5, h//32, w//32)))
         self.affine4 = nn.Linear(zs, 2 * util.prod((c4, h//16, w//16)))
         self.affine3 = nn.Linear(zs, 2 * util.prod((c3, h//8, w//8)))
         self.affine2 = nn.Linear(zs, 2 * util.prod((c2, h//4, w//4)))
