@@ -29,4 +29,4 @@ cd o`echo $$`
 
 # Run the actual experiment
 
-python -u /home/mms496/code/StyleVAE/styleVAE.py
+python -u /home/mms496/code/StyleVAE/stylevae.py
