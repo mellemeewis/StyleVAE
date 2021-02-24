@@ -429,6 +429,7 @@ def go(arg):
                 print(dense_input.size())
                 print(dense_output.size())
                 sys.exit(0)
+
                 # m = ds.Normal(xout[:, :C, :, :], xout[:, C:, :, :])
                 # rec_loss = - m.log_prob(target).sum(dim=1).sum(dim=1).sum(dim=1)
                 rec_loss = F.binary_cross_entropy(xout, input, reduction='none').view(b, -1).sum(dim=1)
@@ -560,8 +561,6 @@ def go(arg):
 
 
 if __name__ == "__main__":
-    print('test passed')
-    sys.exit(0)
     ## Parse the command line options
     parser = ArgumentParser()
 
