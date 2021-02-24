@@ -23,6 +23,7 @@ from argparse import ArgumentParser
 from collections import defaultdict, Counter, OrderedDict
 
 import util#, models
+from densenet import DenseNet
 
 from tensorboardX import SummaryWriter
 
@@ -368,12 +369,14 @@ def go(arg):
 
     encoder = StyleEncoder((C, H, W), arg.channels, arg.zchannels, zs=zs, k=arg.kernel_size, unmapping=arg.mapping_layers, batch_norm=arg.batch_norm)
     decoder = StyleDecoder((C, H, W), arg.channels, arg.zchannels, zs=zs, k=arg.kernel_size, mapping=arg.mapping_layers, batch_norm=arg.batch_norm, dropouts=arg.dropouts)
+    densenet = DenseNet()
 
     optimizer = Adam(list(encoder.parameters()) + list(decoder.parameters()), lr=arg.lr)
 
     if torch.cuda.is_available():
         encoder.cuda()
         decoder.cuda()
+        densenet.cuda()
 
     instances_seen = 0
     for depth in range(6):
@@ -420,6 +423,12 @@ def go(arg):
                 # -- decoding
                 xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
 
+                dense_input = densenet(input)
+                dense_output = densenet(xout)
+                print("DENSE")
+                print(dense_input.size())
+                print(dense_output.size())
+                sys.exit(0)
                 # m = ds.Normal(xout[:, :C, :, :], xout[:, C:, :, :])
                 # rec_loss = - m.log_prob(target).sum(dim=1).sum(dim=1).sum(dim=1)
                 rec_loss = F.binary_cross_entropy(xout, input, reduction='none').view(b, -1).sum(dim=1)
