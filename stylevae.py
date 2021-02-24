@@ -430,11 +430,9 @@ def go(arg):
                 # -- decoding
                 xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
 
-                print(1)
                 with torch.no_grad():
                     dense_input = densenet(input)
                     dense_output = densenet(xout)
-                print(2)
 
                 # m = ds.Normal(xout[:, :C, :, :], xout[:, C:, :, :])
                 # rec_loss = - m.log_prob(target).sum(dim=1).sum(dim=1).sum(dim=1)
