@@ -433,8 +433,8 @@ def go(arg):
                 with torch.no_grad():
                     # dense_input = densenet(input)
                     # dense_output = densenet(xout)
-                    dense_input = [1,2]
-                    dense_output = [1,2]
+                    dense_input = torch.tensor([1,2])
+                    dense_output = torch.tensor([1,2])
 
                 # m = ds.Normal(xout[:, :C, :, :], xout[:, C:, :, :])
                 # rec_loss = - m.log_prob(target).sum(dim=1).sum(dim=1).sum(dim=1)
