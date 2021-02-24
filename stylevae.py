@@ -442,7 +442,7 @@ def go(arg):
 
                 br, bz, b0, b1, b2, b3, b4, b5 = arg.betas
 
-                loss = br * rec_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
+                loss = dense_loss + br * rec_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
                 loss = loss.mean(dim=0)
 
                 instances_seen += input.size(0)
