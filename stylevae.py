@@ -432,7 +432,7 @@ def go(arg):
 
                 with torch.no_grad():
                     dense_input = densenet(input)
-                    dense_output = densenet(xout)
+                    # dense_output = densenet(xout)
                
 
                 # m = ds.Normal(xout[:, :C, :, :], xout[:, C:, :, :])
