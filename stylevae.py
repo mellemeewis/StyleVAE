@@ -430,9 +430,11 @@ def go(arg):
                 # -- decoding
                 xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
 
+                if torch.cuda.is_available():
+                    xout = xout.cuda()
                 with torch.no_grad():
                     dense_input = densenet(input)
-                    # dense_output = densenet(xout)
+                    dense_output = densenet(xout)
                
 
                 # m = ds.Normal(xout[:, :C, :, :], xout[:, C:, :, :])
