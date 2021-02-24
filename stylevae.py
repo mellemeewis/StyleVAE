@@ -376,7 +376,7 @@ def go(arg):
     new_state_dict = {key.replace('module.', ''): checkpoint['state_dict'][key] for key in checkpoint['state_dict'].keys()}
     densenet.load_state_dict(new_state_dict)
     densenet.eval()
-    pritn("densenet loaded")
+    print("densenet loaded")
 
     optimizer = Adam(list(encoder.parameters()) + list(decoder.parameters()), lr=arg.lr)
 
