@@ -375,7 +375,7 @@ def go(arg):
     checkpoint = torch.load('models/densenet.pth.tar')
     new_state_dict = {key.replace('module.', ''): checkpoint['state_dict'][key] for key in checkpoint['state_dict'].keys()}
     densenet.load_state_dict(new_state_dict)
-    densenet.eval()
+    # densenet.eval()
     print("densenet loaded")
 
     optimizer = Adam(list(encoder.parameters()) + list(decoder.parameters()), lr=arg.lr)
@@ -430,16 +430,16 @@ def go(arg):
                 # -- decoding
                 xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
 
-                # with torch.no_grad():
-                    # dense_input = densenet(input)
-                    # dense_output = densenet(xout)
+                with torch.no_grad():
+                    dense_input = densenet(input)
+                    dense_output = densenet(xout)
                
 
                 # m = ds.Normal(xout[:, :C, :, :], xout[:, C:, :, :])
                 # rec_loss = - m.log_prob(target).sum(dim=1).sum(dim=1).sum(dim=1)
                 rec_loss = F.binary_cross_entropy(xout, input, reduction='none').view(b, -1).sum(dim=1)
-                # dense_loss = F.mse_loss(dense_input, dense_output, reduction='none').view(b, -1).sum(dim=1)
-                dense_loss = 0
+                dense_loss = F.mse_loss(dense_input, dense_output, reduction='none').view(b, -1).sum(dim=1)
+                # dense_loss = 0
 
 
                 # print("DENSE")
