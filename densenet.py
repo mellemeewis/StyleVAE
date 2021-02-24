@@ -130,12 +130,6 @@ class DenseNet(nn.Module):
         x = self.conv1(x)
 
         x = self.trans1(self.dense1(x)) 
-        x = self.avgpool(x)
-        x = x.view(x.size(0), -1)
-        print(x.size())
-        # x = self.fc(x)
-
-        return x
         x = self.trans2(self.dense2(x)) 
         x = self.dense3(x)
         print(x.size())
