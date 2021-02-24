@@ -374,8 +374,8 @@ def go(arg):
     print(os.listdir())
     checkpoint = torch.load('models/densenet.pth.tar')
     new_state_dict = {key.replace('module.', ''): checkpoint['state_dict'][key] for key in checkpoint['state_dict'].keys()}
-    model.load_state_dict(new_state_dict)
-    model.eval()
+    densenet.load_state_dict(new_state_dict)
+    densenet.eval()
     pritn("densenet loaded")
 
     optimizer = Adam(list(encoder.parameters()) + list(decoder.parameters()), lr=arg.lr)
