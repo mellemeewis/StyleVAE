@@ -13,7 +13,7 @@ from torchvision.datasets import coco
 from torchvision import utils
 
 from torch.nn.functional import binary_cross_entropy, relu, nll_loss, cross_entropy, softmax
-from torch.nn import Embedding, Conv2d, Sequential, BatchNorm2d, ReLU
+from torch.nn import Embedding, Conv2d, Sequential, BatchNorm2d, ReLU, MSELoss
 from torch.optim import Adam
 
 import nltk
@@ -425,14 +425,20 @@ def go(arg):
 
                 dense_input = densenet(input)
                 dense_output = densenet(xout)
-                print("DENSE")
-                print(dense_input.size())
-                print(dense_output.size())
-                sys.exit(0)
 
                 # m = ds.Normal(xout[:, :C, :, :], xout[:, C:, :, :])
                 # rec_loss = - m.log_prob(target).sum(dim=1).sum(dim=1).sum(dim=1)
                 rec_loss = F.binary_cross_entropy(xout, input, reduction='none').view(b, -1).sum(dim=1)
+                dense_loss = F.mse_loss(dense_input, dense_output, reduction='none').view(b, -1).sum(dim=1)
+
+
+
+                print("DENSE")
+                print(dense_input.size())
+                print(dense_output.size())
+                print(rec_loss)
+                print(dense_loss)
+                sys.exit(0)
 
                 br, bz, b0, b1, b2, b3, b4, b5 = arg.betas
 
