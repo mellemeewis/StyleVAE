@@ -433,12 +433,12 @@ def go(arg):
 
 
 
-                print("DENSE")
-                print(dense_input.size())
-                print(dense_output.size())
-                print(rec_loss)
-                print(dense_loss)
-                sys.exit(0)
+                # print("DENSE")
+                # print(dense_input.size())
+                # print(dense_output.size())
+                # print(rec_loss)
+                # print(dense_loss)
+                # sys.exit(0)
 
                 br, bz, b0, b1, b2, b3, b4, b5 = arg.betas
 
