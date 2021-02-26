@@ -1,7 +1,7 @@
 import torch
 import torchvision
 
-from torchvision.transforms import ToTensor, Compose
+from torchvision.transforms import ToTensor, Compose, Pad
 
 
 def return_data(task, data_dir, batch_size):
