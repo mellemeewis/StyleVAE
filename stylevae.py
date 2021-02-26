@@ -378,9 +378,9 @@ def go(arg):
                 perceptual_loss = 0
                 if arg.perceptual_loss:
                     with torch.no_grad():
-                        dense_input = perceptual_loss_model(input)
-                        dense_output = perceptual_loss_model(xout)
-                        perceptual_loss = F.mse_loss(dense_input, dense_output, reduction='none').view(b, -1).sum(dim=1)
+                        perceptual_input = perceptual_loss_model(input)
+                        perceptual_output = perceptual_loss_model(xout)
+                        perceptual_loss = F.mse_loss(perceptual_input, perceptual_output, reduction='none').view(b, -1).sum(dim=1)
 
                 # m = ds.Normal(xout[:, :C, :, :], xout[:, C:, :, :])
                 # rec_loss = - m.log_prob(target).sum(dim=1).sum(dim=1).sum(dim=1)
@@ -451,12 +451,24 @@ def go(arg):
                             # -- decoding
                             xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
 
+                            perceptual_loss = 0
+                            if arg.perceptual_loss:
+                                perceptual_input = perceptual_loss_model(input)
+                                perceptual_output = perceptual_loss_model(xout)
+                                perceptual_loss = F.mse_loss(perceptual_input, perceptual_output, reduction='none').view(b, -1).sum(dim=1)
+
+
                             # m = ds.Normal(xout[:, :C, :, :], xout[:, C:, :, :])
                             # rec_loss = -m.log_prob(target).sum(dim=1).sum(dim=1).sum(dim=1)
 
                             rec_loss = F.binary_cross_entropy(xout, input)
 
-                            loss = rec_loss + zkl + n0kl + n1kl + n2kl + n3kl + n4kl + n5kl
+                            loss = perceptual_loss + rec_loss + zkl + n0kl + n1kl + n2kl + n3kl + n4kl + n5kl
+                            print("LOSSES: ")
+                            print('PER: ', perceptual_loss)
+                            print('REC: ', rec_loss)
+                            print("Z KL: ", zkl)
+                            print('NO-N5 KL: 'n0kl, n1kl, n2kl, n3kl, n4kl, n5kl)
                             loss = loss.mean(dim=0)
 
                             err_te.append(loss.data.item())
@@ -505,12 +517,11 @@ def go(arg):
                     images = torch.cat([input.cpu(), xout, mixout, mixout2, sample], dim=0)
 
                     utils.save_image(images, f'images.{depth}.{epoch}.png', nrow=24, padding=2)
-                    utils.save_image(images, f'images.{depth}.{epoch}.png', nrow=24, padding=2)
-                    utils.save_image(input.cpu(), f'images_input.{depth}.{epoch}.png', nrow=24, padding=2)
-                    utils.save_image(xout, f'images_xout_recon.{depth}.{epoch}.png', nrow=24, padding=2)
-                    utils.save_image(mixout, f'images_mixout_lv_rn.{depth}.{epoch}.png', nrow=24, padding=2)
-                    utils.save_image(mixout2, f'images_mixout2_rv_sn.{depth}.{epoch}.png', nrow=24, padding=2)
-                    utils.save_image(sample, f'images_sample_total_random.{depth}.{epoch}.png', nrow=24, padding=2)
+                    utils.save_image(input.cpu(), f'images_input.{depth}.{epoch}.png', nrow=3, padding=2)
+                    utils.save_image(xout, f'images_xout_recon.{depth}.{epoch}.png', nrow=3, padding=2)
+                    utils.save_image(mixout, f'images_mixout_lv_rn.{depth}.{epoch}.png', nrow=3, padding=2)
+                    utils.save_image(mixout2, f'images_mixout2_rv_sn.{depth}.{epoch}.png', nrow=3, padding=2)
+                    utils.save_image(sample, f'images_sample_total_random.{depth}.{epoch}.png', nrow=3, padding=2)
 
 
 
