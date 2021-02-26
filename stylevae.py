@@ -455,7 +455,7 @@ def go(arg):
                             if arg.perceptual_loss:
                                 perceptual_input = perceptual_loss_model(input)
                                 perceptual_output = perceptual_loss_model(xout)
-                                perceptual_loss = F.mse_loss(perceptual_input, perceptual_output, reduction='none').view(b, -1).sum(dim=1)
+                                perceptual_loss = F.mse_loss(perceptual_input, perceptual_output, reduction='none').view(b, -1)
 
 
                             # m = ds.Normal(xout[:, :C, :, :], xout[:, C:, :, :])
