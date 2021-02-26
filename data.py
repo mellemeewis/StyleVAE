@@ -1,3 +1,6 @@
+import torchvision
+
+
 def return_data(task):
 	    ## Load the data
     if task == 'mnist':
