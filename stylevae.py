@@ -372,7 +372,7 @@ def go(arg):
                 xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
 
                 perceptual_loss = 0
-                if arg.perceptual_loss_model:
+                if arg.perceptual_loss:
                     with torch.no_grad():
                         dense_input = perceptual_loss_model(input)
                         dense_output = perceptual_loss_model(xout)
