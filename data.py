@@ -1,5 +1,7 @@
 import torchvision
 
+from torchvision.transforms import ToTensor, Compose
+
 
 def return_data(task, data_dir, batch_size):
 	    ## Load the data
