@@ -426,6 +426,8 @@ def go(arg):
                             if torch.cuda.is_available():
                                 input = input.cuda()
 
+                            b = input.size(0)
+
                             # -- encoding
                             z, n0, n1, n2, n3, n4, n5 = encoder(input, depth)
 
@@ -455,7 +457,7 @@ def go(arg):
                             if arg.perceptual_loss:
                                 perceptual_input = perceptual_loss_model(input)
                                 perceptual_output = perceptual_loss_model(xout)
-                                perceptual_loss = F.mse_loss(perceptual_input, perceptual_output, reduction='none').view(b, -1)
+                                perceptual_loss = F.mse_loss(perceptual_input, perceptual_output, reduction='none').view(b, -1).sum(dim=1)
 
 
                             # m = ds.Normal(xout[:, :C, :, :], xout[:, C:, :, :])
