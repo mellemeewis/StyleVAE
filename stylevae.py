@@ -296,7 +296,7 @@ def go(arg):
 
     tbw = SummaryWriter(log_dir=arg.tb_dir)
 
-    C, H, W, trainset, trainloader, testset, testloader = return_data(arg.task)
+    C, H, W, trainset, trainloader, testset, testloader = return_data(arg.task, arg.data_dir, arg.batch_size)
 
     zs = arg.latent_size
 
