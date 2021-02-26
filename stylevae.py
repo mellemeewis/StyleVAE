@@ -24,6 +24,9 @@ from collections import defaultdict, Counter, OrderedDict
 
 import util#, models
 from densenet import DenseNet
+from alexnet import AlexNet
+from data import return_data
+
 
 from tensorboardX import SummaryWriter
 
@@ -289,101 +292,39 @@ class StyleDecoder(nn.Module):
         return torch.sigmoid(self.conv0(x0))
 
 def go(arg):
-
+    print(arg.perceptual_loss)
 
     tbw = SummaryWriter(log_dir=arg.tb_dir)
 
-    ## Load the data
-    if arg.task == 'mnist':
-        transform = Compose([ToTensor(), Pad(2, fill=0, padding_mode='constant')])
-
-        trainset = torchvision.datasets.MNIST(root=arg.data_dir, train=True,
-                                                download=True, transform=transform)
-        trainloader = torch.utils.data.DataLoader(trainset, batch_size=arg.batch_size,
-                                                  shuffle=True, num_workers=2)
-
-        testset = torchvision.datasets.MNIST(root=arg.data_dir, train=False,
-                                               download=True, transform=transform)
-        testloader = torch.utils.data.DataLoader(testset, batch_size=arg.batch_size,
-                                                 shuffle=False, num_workers=2)
-        C, H, W = 1, 32, 32
-
-    elif arg.task == 'cifar10':
-        trainset = torchvision.datasets.CIFAR10(root=arg.data_dir, train=True,
-                                                download=True, transform=ToTensor())
-        trainloader = torch.utils.data.DataLoader(trainset, batch_size=arg.batch_size,
-                                                  shuffle=True, num_workers=2)
-
-        testset = torchvision.datasets.CIFAR10(root=arg.data_dir, train=False,
-                                               download=True, transform=ToTensor())
-        testloader = torch.utils.data.DataLoader(testset, batch_size=arg.batch_size,
-                                                 shuffle=False, num_workers=2)
-        C, H, W = 3, 32, 32
-
-    elif arg.task == 'cifar-gs':
-        transform = Compose([Grayscale(), ToTensor()])
-
-        trainset = torchvision.datasets.CIFAR10(root=arg.data_dir, train=True,
-                                                download=True, transform=transform)
-        trainloader = torch.utils.data.DataLoader(trainset, batch_size=arg.batch_size,
-                                                  shuffle=True, num_workers=2)
-
-        testset = torchvision.datasets.CIFAR10(root=arg.data_dir, train=False,
-                                               download=True, transform=transform)
-        testloader = torch.utils.data.DataLoader(testset, batch_size=arg.batch_size,
-                                                 shuffle=False, num_workers=2)
-        C, H, W = 1, 32, 32
-
-    elif arg.task == 'imagenet64':
-        transform = Compose([ToTensor()])
-
-        trainset = torchvision.datasets.ImageFolder(root=arg.data_dir+os.sep+'train',
-                                                    transform=transform)
-        trainloader = torch.utils.data.DataLoader(trainset, batch_size=arg.batch_size,
-                                                  shuffle=True, num_workers=2)
-
-        testset = torchvision.datasets.ImageFolder(root=arg.data_dir+os.sep+'valid',
-                                                   transform=transform)
-        testloader = torch.utils.data.DataLoader(testset, batch_size=arg.batch_size,
-                                                 shuffle=False, num_workers=2)
-        C, H, W = 3, 64, 64
-
-    elif arg.task == 'ffhq':
-        tftrain = Compose([RandomHorizontalFlip(0.5), ToTensor()])
-        trainset = torchvision.datasets.ImageFolder(root=arg.data_dir+os.sep+'train',
-                                                    transform=tftrain)
-        trainloader = torch.utils.data.DataLoader(trainset, batch_size=arg.batch_size,
-                                                  shuffle=True, num_workers=2)
-
-        tftest = Compose([ToTensor()])
-        testset = torchvision.datasets.ImageFolder(root=arg.data_dir+os.sep+'valid',
-                                                   transform=tftest)
-        testloader = torch.utils.data.DataLoader(testset, batch_size=arg.batch_size,
-                                                 shuffle=False, num_workers=2)
-        C, H, W = 3, 128, 128
-
-    else:
-        raise Exception('Task {} not recognized.'.format(arg.task))
+    C, H, W, trainset, trainloader, testset, testloader = return_data(arg.task)
 
     zs = arg.latent_size
 
     encoder = StyleEncoder((C, H, W), arg.channels, arg.zchannels, zs=zs, k=arg.kernel_size, unmapping=arg.mapping_layers, batch_norm=arg.batch_norm)
     decoder = StyleDecoder((C, H, W), arg.channels, arg.zchannels, zs=zs, k=arg.kernel_size, mapping=arg.mapping_layers, batch_norm=arg.batch_norm, dropouts=arg.dropouts)
     
-    densenet = DenseNet()
-    print(os.listdir())
-    checkpoint = torch.load('models/densenet.pth.tar')
-    new_state_dict = {key.replace('module.', ''): checkpoint['state_dict'][key] for key in checkpoint['state_dict'].keys()}
-    densenet.load_state_dict(new_state_dict)
-    # densenet.eval()
-    print("densenet loaded")
+
+    if arg.perceptual_loss:
+        if arg.perceptual_loss == 'Alexnet':
+            perceptual_loss_model = Alexnet()
+            checkpoint = torch.load('models/alexnet.pth.tar')
+        elif arg.perceptual_loss == 'DenseNet':
+            perceptual_loss_model = DenseNet()
+            checkpoint = torch.load('models/densenet.pth.tar')
+
+        new_state_dict = {key.replace('module.', ''): checkpoint['state_dict'][key] for key in checkpoint['state_dict'].keys()}
+        perceptual_loss_model.load_state_dict(new_state_dict)
+        perceptual_loss_model.eval()
+        print(f"{arg.perceptual_loss} loaded")
 
     optimizer = Adam(list(encoder.parameters()) + list(decoder.parameters()), lr=arg.lr)
 
     if torch.cuda.is_available():
         encoder.cuda()
         decoder.cuda()
-        densenet.cuda()
+
+        if arg.perceptual_loss:
+            perceptual_loss_model.cuda()
 
     instances_seen = 0
     for depth in range(6):
@@ -430,27 +371,23 @@ def go(arg):
                 # -- decoding
                 xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
 
-                with torch.no_grad():
-                    dense_input = densenet(input)
-                    dense_output = densenet(xout)
+                perceptual_loss = 0
+                if arg.perceptual_loss_model:
+                    with torch.no_grad():
+                        dense_input = perceptual_loss_model(input)
+                        dense_output = perceptual_loss_model(xout)
+                        perceptual_loss = F.mse_loss(dense_input, dense_output, reduction='none').view(b, -1).sum(dim=1)
+
 
                 # m = ds.Normal(xout[:, :C, :, :], xout[:, C:, :, :])
                 # rec_loss = - m.log_prob(target).sum(dim=1).sum(dim=1).sum(dim=1)
                 rec_loss = F.binary_cross_entropy(xout, input, reduction='none').view(b, -1).sum(dim=1)
-                dense_loss = F.mse_loss(dense_input, dense_output, reduction='none').view(b, -1).sum(dim=1)
                 # dense_loss = 0
 
 
-                # print("DENSE")
-                # print(dense_input.size())
-                # print(dense_output.size())
-                # print(rec_loss)
-                # print(dense_loss)
-                # sys.exit(0)
-
                 br, bz, b0, b1, b2, b3, b4, b5 = arg.betas
 
-                loss = dense_loss + br * rec_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
+                loss = perceptual_loss + br * rec_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
                 loss = loss.mean(dim=0)
 
                 instances_seen += input.size(0)
@@ -677,6 +614,11 @@ if __name__ == "__main__":
                         dest="tb_dir",
                         help="Tensorboard directory",
                         default='./runs/style', type=str)
+
+    parser.add_argument("-PL", "--perceptual-loss",
+                        dest="perceptual_loss",
+                        help="Use perceptual/feature loss. Options: DenseNet, AlexNet. Default: None",
+                        default=None, type=str)
 
     options = parser.parse_args()
 
