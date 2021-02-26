@@ -25,6 +25,7 @@ from collections import defaultdict, Counter, OrderedDict
 import util#, models
 from models.alexnet import AlexNet
 from models.densenet import DenseNet
+from models import AlexNet
 from data import return_data
 
 
@@ -307,10 +308,10 @@ def go(arg):
     if arg.perceptual_loss:
         if arg.perceptual_loss == 'AlexNet':
             perceptual_loss_model = AlexNet()
-            checkpoint = torch.load('models/alexnet.pth.tar')
+            checkpoint = torch.load('saved_models/alexnet.pth.tar')
         elif arg.perceptual_loss == 'DenseNet':
             perceptual_loss_model = DenseNet()
-            checkpoint = torch.load('models/densenet.pth.tar')
+            checkpoint = torch.load('saved_models/densenet.pth.tar')
 
         else:
             raise Exception('Model for perceptual_loss {} not recognized.'.format(arg.perceptual_loss))
