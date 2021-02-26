@@ -313,7 +313,7 @@ def go(arg):
             checkpoint = torch.load('models/densenet.pth.tar')
 
         else:
-            raise Exception('Model for perceptual_loss {} not recognized.'.format(arg.perceptual-loss))
+            raise Exception('Model for perceptual_loss {} not recognized.'.format(arg.perceptual_loss))
 
 
         new_state_dict = {key.replace('module.', ''): checkpoint['state_dict'][key] for key in checkpoint['state_dict'].keys()}
