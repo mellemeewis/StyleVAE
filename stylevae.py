@@ -25,7 +25,6 @@ from collections import defaultdict, Counter, OrderedDict
 import util#, models
 from models.alexnet import AlexNet
 from models.densenet import DenseNet
-from models import AlexNet
 from data import return_data
 
 
