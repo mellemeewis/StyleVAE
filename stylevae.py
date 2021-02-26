@@ -393,6 +393,13 @@ def go(arg):
                 loss = perceptual_loss + br * rec_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
                 loss = loss.mean(dim=0)
 
+                print("TTRAIN LOSSES: ")
+                print('PER: ', perceptual_loss)
+                print('REC: ', rec_loss)
+                print("Z KL: ", zkl)
+                print('NO-N5 KL: ', n0kl, n1kl, n2kl, n3kl, n4kl, n5kl)
+                print('MEAN: ', loss)
+
                 instances_seen += input.size(0)
 
                 # tbw.add_scalar('style-vae/zkl-loss', float(zkl.data.mean(dim=0).item()), instances_seen)
@@ -466,12 +473,13 @@ def go(arg):
                             rec_loss = F.binary_cross_entropy(xout, input)
 
                             loss = perceptual_loss + rec_loss + zkl + n0kl + n1kl + n2kl + n3kl + n4kl + n5kl
+                            loss = loss.mean(dim=0)
                             print("LOSSES: ")
                             print('PER: ', perceptual_loss)
                             print('REC: ', rec_loss)
                             print("Z KL: ", zkl)
                             print('NO-N5 KL: ', n0kl, n1kl, n2kl, n3kl, n4kl, n5kl)
-                            loss = loss.mean(dim=0)
+                            print('MEAN: ', loss)
 
                             err_te.append(loss.data.item())
 
