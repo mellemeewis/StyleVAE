@@ -306,7 +306,7 @@ def go(arg):
 
     if arg.perceptual_loss:
         if arg.perceptual_loss == 'AlexNet':
-            perceptual_loss_model = Alexnet()
+            perceptual_loss_model = AlexNet()
             checkpoint = torch.load('models/alexnet.pth.tar')
         elif arg.perceptual_loss == 'DenseNet':
             perceptual_loss_model = DenseNet()
