@@ -68,8 +68,7 @@ def return_data(task):
                                                  shuffle=False, num_workers=2)
         C, H, W = 3, 128, 128
 
-
-    return C, H, W, trainset, trainloader, testset, testloader
-
     else:
         raise Exception('Task {} not recognized.'.format(task))
+
+    return C, H, W, trainset, trainloader, testset, testloader
