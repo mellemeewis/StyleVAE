@@ -24,7 +24,8 @@ from collections import defaultdict, Counter, OrderedDict
 
 import util#, models
 from densenet import DenseNet
-from alexnet import AlexNet
+from models.alexnet import AlexNet
+from models.densenet import DenseNet
 from data import return_data
 
 
