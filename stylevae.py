@@ -23,7 +23,6 @@ from argparse import ArgumentParser
 from collections import defaultdict, Counter, OrderedDict
 
 import util#, models
-from densenet import DenseNet
 from models.alexnet import AlexNet
 from models.densenet import DenseNet
 from data import return_data
