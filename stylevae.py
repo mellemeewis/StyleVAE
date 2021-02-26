@@ -305,12 +305,16 @@ def go(arg):
     
 
     if arg.perceptual_loss:
-        if arg.perceptual_loss == 'Alexnet':
+        if arg.perceptual_loss == 'AlexNet':
             perceptual_loss_model = Alexnet()
             checkpoint = torch.load('models/alexnet.pth.tar')
         elif arg.perceptual_loss == 'DenseNet':
             perceptual_loss_model = DenseNet()
             checkpoint = torch.load('models/densenet.pth.tar')
+
+        else:
+            raise Exception('Model for perceptual_loss {} not recognized.'.format(arg.perceptual-loss))
+
 
         new_state_dict = {key.replace('module.', ''): checkpoint['state_dict'][key] for key in checkpoint['state_dict'].keys()}
         perceptual_loss_model.load_state_dict(new_state_dict)
