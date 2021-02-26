@@ -468,7 +468,7 @@ def go(arg):
                             print('PER: ', perceptual_loss)
                             print('REC: ', rec_loss)
                             print("Z KL: ", zkl)
-                            print('NO-N5 KL: 'n0kl, n1kl, n2kl, n3kl, n4kl, n5kl)
+                            print('NO-N5 KL: ', n0kl, n1kl, n2kl, n3kl, n4kl, n5kl)
                             loss = loss.mean(dim=0)
 
                             err_te.append(loss.data.item())
