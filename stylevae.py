@@ -381,6 +381,7 @@ def go(arg):
                         dense_input = perceptual_loss_model(input)
                         dense_output = perceptual_loss_model(xout)
                         perceptual_loss = F.mse_loss(dense_input, dense_output, reduction='none').view(b, -1).sum(dim=1)
+                        print('PERLOSS:  '  , perceptual_loss)
 
 
                 # m = ds.Normal(xout[:, :C, :, :], xout[:, C:, :, :])
