@@ -407,8 +407,10 @@ def go(arg):
 
                 iz, in0, in1, in2, in3, in4, in5 = encoder(i, depth)
 
-
+                print('IZ, ZRAND', iz.size(), zrand.size())
                 iz_loss = util.normal_lt_loss(iz, zrand) 
+                print('In0, n0RAND', in0.size(), n0rand.size())
+
                 in0_loss = util.normal_lt_loss(in0, n0rand)
                 in1_loss = util.normal_lt_loss(in1, n1rand)
                 in2_loss = util.normal_lt_loss(in2, n2rand)
