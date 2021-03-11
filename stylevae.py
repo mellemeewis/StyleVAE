@@ -393,8 +393,8 @@ def go(arg):
 
                 rec_loss = rec_loss.mean(dim=0)
 
-                optd.zero_grad()
                 rec_loss.backward()
+                optd.zero_grad()
                 optd.step()
 
                 zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
@@ -457,9 +457,10 @@ def go(arg):
                 # tbw.add_scalar('style-vae/total-loss', float(loss.data.item()), instances_seen)
 
                 # Backward pass
-                opte.zero_grad()
                 i_loss.backward()
                 opte.step()
+                opte.zero_grad()
+
 
                 # optimizer.zero_grad()
 
