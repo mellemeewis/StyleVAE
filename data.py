@@ -9,7 +9,7 @@ def return_data(task, data_dir, batch_size):
 
 
 	opener = urllib.request.build_opener()
-	opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+	opener.addheaders = [('User-Agent', 'Mozilla/5.0')]
 	urllib.request.install_opener(opener)
 	## Load the data
 
