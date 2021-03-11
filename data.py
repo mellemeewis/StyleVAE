@@ -12,8 +12,9 @@ def return_data(task, data_dir, batch_size):
 	opener.addheaders = [('User-agent', 'Mozilla/5.0')]
 	urllib.request.install_opener(opener)
 	## Load the data
-    
-    if task == 'mnist':
+
+	
+	if task == 'mnist':
         transform = Compose([ToTensor(), Pad(2, fill=0, padding_mode='constant')])
 
         trainset = torchvision.datasets.MNIST(root=data_dir, train=True,
