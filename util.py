@@ -103,6 +103,8 @@ def kl_loss(zmean, zlsig):
 
 
 def normal_lt_loss(output, target):
+    if output == None or target == None:
+        return None
     b, l = output.size()
 
 
