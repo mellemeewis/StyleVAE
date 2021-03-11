@@ -418,7 +418,7 @@ def go(arg):
                 in4_loss = util.normal_lt_loss(in4, n4rand)
                 in5_loss = util.normal_lt_loss(in5, n5rand)
 
-                print(iz_loss.size(), in0_loss.size()
+                print(iz_loss.size(), in0_loss.size())
 
                 i_loss = iz_loss + in0_loss + in1_loss + in2_loss + in3_loss + in4_loss + in5_loss
 
