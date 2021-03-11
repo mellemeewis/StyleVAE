@@ -13,7 +13,7 @@ def return_data(task, data_dir, batch_size):
 	urllib.request.install_opener(opener)
 	## Load the data
 
-	
+
 	if task == 'mnist':
 		transform = Compose([ToTensor(), Pad(2, fill=0, padding_mode='constant')])
 
@@ -28,7 +28,7 @@ def return_data(task, data_dir, batch_size):
 		                                         shuffle=False, num_workers=2)
         C, H, W = 1, 32, 32
 
-    elif task == 'cifar10':
+	elif task == 'cifar10':
 		trainset = torchvision.datasets.CIFAR10(root=data_dir, train=True,
 		                                        download=True, transform=ToTensor())
 		trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
@@ -40,7 +40,7 @@ def return_data(task, data_dir, batch_size):
 		                                         shuffle=False, num_workers=2)
 		C, H, W = 3, 32, 32
 
-    elif task == 'cifar-gs':
+	elif task == 'cifar-gs':
 		transform = Compose([Grayscale(), ToTensor()])
 
 		trainset = torchvision.datasets.CIFAR10(root=data_dir, train=True,
@@ -54,7 +54,7 @@ def return_data(task, data_dir, batch_size):
 		                                         shuffle=False, num_workers=2)
 		C, H, W = 1, 32, 32
 
-    elif task == 'imagenet64':
+	elif task == 'imagenet64':
 		transform = Compose([ToTensor()])
 
 		trainset = torchvision.datasets.ImageFolder(root=data_dir+os.sep+'train',
@@ -68,7 +68,7 @@ def return_data(task, data_dir, batch_size):
 		                                         shuffle=False, num_workers=2)
 		C, H, W = 3, 64, 64
 
-    elif task == 'ffhq':
+	elif task == 'ffhq':
 		tftrain = Compose([RandomHorizontalFlip(0.5), ToTensor()])
 		trainset = torchvision.datasets.ImageFolder(root=data_dir+os.sep+'train',
 		                                            transform=tftrain)
@@ -82,7 +82,7 @@ def return_data(task, data_dir, batch_size):
 		                                         shuffle=False, num_workers=2)
 		C, H, W = 3, 128, 128
 
-    else:
-        raise Exception('Task {} not recognized.'.format(task))
+	else:
+		raise Exception('Task {} not recognized.'.format(task))
 
-    return C, H, W, trainset, trainloader, testset, testloader
+	return C, H, W, trainset, trainloader, testset, testloader
