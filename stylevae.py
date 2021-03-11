@@ -391,6 +391,8 @@ def go(arg):
                 rec_loss = F.binary_cross_entropy(xout, input, reduction='none').view(b, -1).sum(dim=1)
                 # dense_loss = 0
 
+                rec_loss = rec_loss.mean(dim=0)
+                
                 optd.zero_grad()
                 rec_loss.backward()
                 optd.step()
