@@ -404,8 +404,19 @@ def go(arg):
                 with torch.no_grad():
                     i = decoder(zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand)
 
+                if torch.isnan(i).sum()>0:
+                    print("NANS COME FROM DECODER")
+
+                if torch.isinf(i).sum()>0:
+                    print("INFS COME FROM DECODER")
 
                 iz, in0, in1, in2, in3, in4, in5 = encoder(i, depth)
+
+                for it, lis in enumerate([iz, in0, in1, in2, in3, in4, in5]):
+                    if torch.isnan(lis).sum() > 0:
+                        print("NANS COMe FROM ENCODER", it)
+                    if torch.isinf(lis).sum() > 0:
+                        print("NANS COME FROM ENCODER", it)
 
                 iz_loss = util.normal_lt_loss(iz, zrand).mean()
                 in0_loss = util.normal_lt_loss(torch.flatten(in0, start_dim=1), torch.flatten(n0rand, start_dim=1)).mean()
