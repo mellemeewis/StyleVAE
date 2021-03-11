@@ -392,14 +392,14 @@ def go(arg):
                 # dense_loss = 0
 
                 rec_loss = rec_loss.mean(dim=0)
-                
+
                 optd.zero_grad()
                 rec_loss.backward()
                 optd.step()
 
                 zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
                         zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
-                        dev='gpu', depth=depth)
+                        dev='cuda', depth=depth)
 
                 with torch.no_grad():
                     i = decoder(zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand)
