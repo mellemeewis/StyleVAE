@@ -407,7 +407,7 @@ def go(arg):
 
                 iz, in0, in1, in2, in3, in4, in5 = encoder(i, depth)
 
-                iz_loss = util.normal_lt_loss(iz, zrand) 
+                iz_loss = util.normal_lt_loss(iz, zrand).mean()
                 in0_loss = util.normal_lt_loss(torch.flatten(in0, start_dim=1), torch.flatten(n0rand, start_dim=1)).mean()
                 i_loss = iz_loss + in0_loss 
                 if depth >0:
