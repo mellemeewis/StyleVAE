@@ -488,13 +488,13 @@ def go(arg):
 
                             # -- compute KL losses
 
-                            zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
-                            n0kl = util.kl_loss_image(n0)
-                            n1kl = util.kl_loss_image(n1)
-                            n2kl = util.kl_loss_image(n2)
-                            n3kl = util.kl_loss_image(n3)
-                            n4kl = util.kl_loss_image(n4)
-                            n5kl = util.kl_loss_image(n5)
+                            # zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
+                            # n0kl = util.kl_loss_image(n0)
+                            # n1kl = util.kl_loss_image(n1)
+                            # n2kl = util.kl_loss_image(n2)
+                            # n3kl = util.kl_loss_image(n3)
+                            # n4kl = util.kl_loss_image(n4)
+                            # n5kl = util.kl_loss_image(n5)
 
                             # -- take samples
                             zsample  = util.sample(z[:, :zs], z[:, zs:])
@@ -519,9 +519,10 @@ def go(arg):
                             # rec_loss = -m.log_prob(target).sum(dim=1).sum(dim=1).sum(dim=1)
 
                             rec_loss = F.binary_cross_entropy(xout, input)
+                            loss = rec_loss.mean(dim=0)
 
-                            loss = perceptual_loss + rec_loss + zkl + n0kl + n1kl + n2kl + n3kl + n4kl + n5kl
-                            loss = loss.mean(dim=0)
+                            # loss = perceptual_loss + rec_loss + zkl + n0kl + n1kl + n2kl + n3kl + n4kl + n5kl
+                            # loss = loss.mean(dim=0)
                             # print("LOSSES: ")
                             # print('PER: ', perceptual_loss)
                             # print('REC: ', rec_loss)
