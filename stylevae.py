@@ -427,7 +427,7 @@ def go(arg):
                     i_loss += in5_loss
 
 
-                print(i_loss)
+                print(epoch, i_loss.item())
 
 
                 # br, bz, b0, b1, b2, b3, b4, b5 = arg.betas
