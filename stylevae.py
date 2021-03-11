@@ -411,14 +411,14 @@ def go(arg):
                 iz_loss = util.normal_lt_loss(iz, zrand) 
                 print('In0, n0RAND', in0.size(), n0rand.size())
 
-                in0_loss = util.normal_lt_loss(torch.flatten(in0, start_dim=1), torch.flatten(n0rand, start_dim=1))
-                in1_loss = util.normal_lt_loss(in1, n1rand)
-                in2_loss = util.normal_lt_loss(in2, n2rand)
-                in3_loss = util.normal_lt_loss(in3, n3rand)
-                in4_loss = util.normal_lt_loss(in4, n4rand)
-                in5_loss = util.normal_lt_loss(in5, n5rand)
+                in0_loss = util.normal_lt_loss(torch.flatten(in0, start_dim=1), torch.flatten(n0rand, start_dim=1)).mean()
+                in1_loss = util.normal_lt_loss(torch.flatten(in1, start_dim=1), torch.flatten(n1rand, start_dim=1)).mean()
+                in2_loss = util.normal_lt_loss(torch.flatten(in2, start_dim=1), torch.flatten(n2rand, start_dim=1)).mean()
+                in3_loss = util.normal_lt_loss(torch.flatten(in3, start_dim=1), torch.flatten(n3rand, start_dim=1)).mean()
+                in4_loss = util.normal_lt_loss(torch.flatten(in4, start_dim=1), torch.flatten(n4rand, start_dim=1)).mean()
+                in5_loss = util.normal_lt_loss(torch.flatten(in5, start_dim=1), torch.flatten(n5rand, start_dim=1)).mean()
 
-                print(iz_loss.size(), in0_loss.size())
+                # print(iz_loss.size(), in0_loss.size())
 
                 i_loss = iz_loss + in0_loss + in1_loss + in2_loss + in3_loss + in4_loss + in5_loss
 
