@@ -413,6 +413,8 @@ def go(arg):
                 iz, in0, in1, in2, in3, in4, in5 = encoder(i, depth)
 
                 for it, lis in enumerate([iz, in0, in1, in2, in3, in4, in5]):
+                    if not lis:
+                        continue
                     if torch.isnan(lis).sum() > 0:
                         print("NANS COMe FROM ENCODER", it)
                     if torch.isinf(lis).sum() > 0:
