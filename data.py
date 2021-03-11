@@ -26,8 +26,8 @@ def return_data(task, data_dir, batch_size):
 		                                       download=True, transform=transform)
 		testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
 		                                         shuffle=False, num_workers=2)
-        C, H, W = 1, 32, 32
 
+		C, H, W = 1, 32, 32
 	elif task == 'cifar10':
 		trainset = torchvision.datasets.CIFAR10(root=data_dir, train=True,
 		                                        download=True, transform=ToTensor())
