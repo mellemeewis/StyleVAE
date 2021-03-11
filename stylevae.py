@@ -440,7 +440,6 @@ def go(arg):
                 #     i_loss += in5_loss
 
 
-                print(epoch, iz_loss.item())
 
 
                 br, bz, b0, b1, b2, b3, b4, b5 = arg.betas
@@ -449,6 +448,8 @@ def go(arg):
                 # loss = loss.mean(dim=0)
                 loss = br * iz_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
                 loss = loss.mean(dim=0)
+                print(epoch, loss.item())
+
                 # i_loss = iz_loss.mean(dim=0)
                 # print(i_loss)
 
