@@ -447,7 +447,9 @@ def go(arg):
 
                 loss = br * rec_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
                 # loss = loss.mean(dim=0)
-                i_loss = iz_loss.mean(dim=0)
+                loss = br * iz_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
+                loss = loss.mean(dim=0)
+                # i_loss = iz_loss.mean(dim=0)
                 # print(i_loss)
 
                 # if i%720 == 0:
@@ -471,7 +473,7 @@ def go(arg):
                 # tbw.add_scalar('style-vae/total-loss', float(loss.data.item()), instances_seen)
 
                 # Backward pass
-                i_loss.backward()
+                loss.backward()
                 opte.step()
                 opte.zero_grad()
 
