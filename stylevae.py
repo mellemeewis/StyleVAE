@@ -411,7 +411,7 @@ def go(arg):
                 iz_loss = util.normal_lt_loss(iz, zrand) 
                 print('In0, n0RAND', in0.size(), n0rand.size())
 
-                in0_loss = util.normal_lt_loss(torch.flatten(in0, start_dim=1), torch.flatten(n0rand, start_dim=1)
+                in0_loss = util.normal_lt_loss(torch.flatten(in0, start_dim=1), torch.flatten(n0rand, start_dim=1))
                 in1_loss = util.normal_lt_loss(in1, n1rand)
                 in2_loss = util.normal_lt_loss(in2, n2rand)
                 in3_loss = util.normal_lt_loss(in3, n3rand)
