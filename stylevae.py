@@ -407,27 +407,33 @@ def go(arg):
 
                 iz, in0, in1, in2, in3, in4, in5 = encoder(i, depth)
 
-                print('IZ, ZRAND', iz.size(), zrand.size())
                 iz_loss = util.normal_lt_loss(iz, zrand) 
-                print('In0, n0RAND', in0.size(), n0rand.size())
-
                 in0_loss = util.normal_lt_loss(torch.flatten(in0, start_dim=1), torch.flatten(n0rand, start_dim=1)).mean()
-                in1_loss = util.normal_lt_loss(torch.flatten(in1, start_dim=1), torch.flatten(n1rand, start_dim=1)).mean()
-                in2_loss = util.normal_lt_loss(torch.flatten(in2, start_dim=1), torch.flatten(n2rand, start_dim=1)).mean()
-                in3_loss = util.normal_lt_loss(torch.flatten(in3, start_dim=1), torch.flatten(n3rand, start_dim=1)).mean()
-                in4_loss = util.normal_lt_loss(torch.flatten(in4, start_dim=1), torch.flatten(n4rand, start_dim=1)).mean()
-                in5_loss = util.normal_lt_loss(torch.flatten(in5, start_dim=1), torch.flatten(n5rand, start_dim=1)).mean()
+                i_loss = iz_loss + in0_loss 
+                if depth >0:
+                    in1_loss = util.normal_lt_loss(torch.flatten(in1, start_dim=1), torch.flatten(n1rand, start_dim=1)).mean()
+                    i_loss += in1_loss
+                if depth > 1:
+                    in2_loss = util.normal_lt_loss(torch.flatten(in2, start_dim=1), torch.flatten(n2rand, start_dim=1)).mean()
+                    i_loss += in2_loss
+                if depth > 2:
+                    in3_loss = util.normal_lt_loss(torch.flatten(in3, start_dim=1), torch.flatten(n3rand, start_dim=1)).mean()
+                    i_loss += in3_loss
+                if depth > 3:
+                    in4_loss = util.normal_lt_loss(torch.flatten(in4, start_dim=1), torch.flatten(n4rand, start_dim=1)).mean()
+                    i_loss += in4_loss
+                if depth > 4:
+                    in5_loss = util.normal_lt_loss(torch.flatten(in5, start_dim=1), torch.flatten(n5rand, start_dim=1)).mean()
+                    i_loss += in5_loss
 
-                # print(iz_loss.size(), in0_loss.size())
 
-                i_loss = iz_loss + in0_loss + in1_loss + in2_loss + in3_loss + in4_loss + in5_loss
 
 
                 # br, bz, b0, b1, b2, b3, b4, b5 = arg.betas
 
                 # loss = perceptual_loss + br * rec_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
                 # loss = loss.mean(dim=0)
-                i_loss = loss.mean(dim=0)
+                i_loss = i_loss.mean(dim=0)
                 # if i%720 == 0:
                 #     print("TTRAIN LOSSES: ")
                 #     print('PER: ', perceptual_loss)
