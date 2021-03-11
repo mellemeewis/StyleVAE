@@ -356,13 +356,13 @@ def go(arg):
 
                 # -- compute KL losses
 
-                # zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
-                # n0kl = util.kl_loss_image(n0)
-                # n1kl = util.kl_loss_image(n1)
-                # n2kl = util.kl_loss_image(n2)
-                # n3kl = util.kl_loss_image(n3)
-                # n4kl = util.kl_loss_image(n4)
-                # n5kl = util.kl_loss_image(n5)
+                zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
+                n0kl = util.kl_loss_image(n0)
+                n1kl = util.kl_loss_image(n1)
+                n2kl = util.kl_loss_image(n2)
+                n3kl = util.kl_loss_image(n3)
+                n4kl = util.kl_loss_image(n4)
+                n5kl = util.kl_loss_image(n5)
 
                 # -- take samples
                 zsample  = util.sample(z[:, :zs], z[:, zs:])
@@ -443,9 +443,9 @@ def go(arg):
                 print(epoch, iz_loss.item())
 
 
-                # br, bz, b0, b1, b2, b3, b4, b5 = arg.betas
+                br, bz, b0, b1, b2, b3, b4, b5 = arg.betas
 
-                # loss = perceptual_loss + br * rec_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
+                loss = br * rec_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
                 # loss = loss.mean(dim=0)
                 i_loss = iz_loss.mean(dim=0)
                 # print(i_loss)
