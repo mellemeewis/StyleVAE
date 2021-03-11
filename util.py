@@ -101,6 +101,16 @@ def kl_loss(zmean, zlsig):
 
     return kl
 
+
+def normal_lt_loss(output, target):
+    b, l = output.size()
+
+
+    means = T.sigmoid(output[:,  :l//2])
+    vars  = T.sigmoid(output[:,  l//2:])
+
+    return vars.log() + (1.0/(2.0 * vars.pow(2.0))) * (target - means).pow(2.0)
+
 def sample(zmean, zlsig, eps=None):
     b, l = zmean.size()
 

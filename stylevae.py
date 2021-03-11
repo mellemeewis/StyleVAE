@@ -321,8 +321,9 @@ def go(arg):
         perceptual_loss_model.eval()
         print(f"{arg.perceptual_loss} loaded")
 
-    optimizer = Adam(list(encoder.parameters()) + list(decoder.parameters()), lr=arg.lr)
-
+    # optimizer = Adam(list(encoder.parameters()) + list(decoder.parameters()), lr=arg.lr)
+    opte = Adam(list(encoder.parameters()), lr=arg.lr)
+    optd = Adam(list(decoder.parameters()), lr=arg.lr)
     if torch.cuda.is_available():
         encoder.cuda()
         decoder.cuda()
@@ -355,13 +356,13 @@ def go(arg):
 
                 # -- compute KL losses
 
-                zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
-                n0kl = util.kl_loss_image(n0)
-                n1kl = util.kl_loss_image(n1)
-                n2kl = util.kl_loss_image(n2)
-                n3kl = util.kl_loss_image(n3)
-                n4kl = util.kl_loss_image(n4)
-                n5kl = util.kl_loss_image(n5)
+                # zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
+                # n0kl = util.kl_loss_image(n0)
+                # n1kl = util.kl_loss_image(n1)
+                # n2kl = util.kl_loss_image(n2)
+                # n3kl = util.kl_loss_image(n3)
+                # n4kl = util.kl_loss_image(n4)
+                # n5kl = util.kl_loss_image(n5)
 
                 # -- take samples
                 zsample  = util.sample(z[:, :zs], z[:, zs:])
@@ -375,6 +376,9 @@ def go(arg):
                 # -- decoding
                 xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
 
+
+
+
                 perceptual_loss = 0
                 if arg.perceptual_loss:
                     with torch.no_grad():
@@ -387,12 +391,37 @@ def go(arg):
                 rec_loss = F.binary_cross_entropy(xout, input, reduction='none').view(b, -1).sum(dim=1)
                 # dense_loss = 0
 
+                optd.zero_grad()
+                rec_loss.backward()
+                optd.step()
 
-                br, bz, b0, b1, b2, b3, b4, b5 = arg.betas
+                zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
+                        zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
+                        dev='gpu', depth=depth)
 
-                loss = perceptual_loss + br * rec_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
-                loss = loss.mean(dim=0)
+                with torch.no_grad():
+                    i = decoder(zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand)
 
+
+                iz, in0, in1, in2, in3, in4, in5 = encoder(i, depth)
+
+
+                iz_loss = util.normal_lt_loss(iz, zrand) 
+                in0_loss = util.normal_lt_loss(in0, n0rand)
+                in1_loss = util.normal_lt_loss(in1, n1rand)
+                in2_loss = util.normal_lt_loss(in2, n2rand)
+                in3_loss = util.normal_lt_loss(in3, n3rand)
+                in4_loss = util.normal_lt_loss(in4, n4rand)
+                in5_loss = util.normal_lt_loss(in5, n5rand)
+
+                i_loss = iz_loss + in0_loss + in1_loss + in2_loss + in3_loss + in4_loss + in5_loss
+
+
+                # br, bz, b0, b1, b2, b3, b4, b5 = arg.betas
+
+                # loss = perceptual_loss + br * rec_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
+                # loss = loss.mean(dim=0)
+                i_loss = loss.mean(dim=0)
                 # if i%720 == 0:
                 #     print("TTRAIN LOSSES: ")
                 #     print('PER: ', perceptual_loss)
@@ -414,11 +443,15 @@ def go(arg):
                 # tbw.add_scalar('style-vae/total-loss', float(loss.data.item()), instances_seen)
 
                 # Backward pass
-                optimizer.zero_grad()
+                opte.zero_grad()
+                i_loss.backward()
+                opte.step()
 
-                loss.backward()
+                # optimizer.zero_grad()
 
-                optimizer.step()
+                # loss.backward()
+
+                # optimizer.step()
 
             if arg.epochs[depth] <= arg.np or epoch % (arg.epochs[depth]//arg.np) == 0 or epoch == arg.epochs[depth] - 1:
                 with torch.no_grad():
