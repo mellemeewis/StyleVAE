@@ -2,9 +2,15 @@ import torch
 import torchvision
 
 from torchvision.transforms import ToTensor, Compose, Pad
+from six.moves import urllib
 
 
 def return_data(task, data_dir, batch_size):
+
+
+	opener = urllib.request.build_opener()
+	opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+	urllib.request.install_opener(opener)
 	    ## Load the data
     if task == 'mnist':
         transform = Compose([ToTensor(), Pad(2, fill=0, padding_mode='constant')])
