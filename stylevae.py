@@ -434,7 +434,7 @@ def go(arg):
                 # loss = perceptual_loss + br * rec_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
                 # loss = loss.mean(dim=0)
                 i_loss = i_loss.mean(dim=0)
-                print(i_loss)
+                # print(i_loss)
 
                 # if i%720 == 0:
                 #     print("TTRAIN LOSSES: ")
