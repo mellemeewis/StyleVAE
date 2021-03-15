@@ -400,7 +400,7 @@ def go(arg):
 
                 zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
                         zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
-                        dev='cuda', depth=depth)
+                        dev='cpu', depth=depth)
 
                 with torch.no_grad():
                     i = decoder(zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand)
