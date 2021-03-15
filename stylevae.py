@@ -394,8 +394,9 @@ def go(arg):
                 rec_loss = rec_loss.mean(dim=0)
 
                 rec_loss.backward()
-                optd.zero_grad()
                 optd.step()
+                optd.zero_grad()
+
 
                 zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
                         zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
