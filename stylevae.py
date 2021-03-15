@@ -393,7 +393,7 @@ def go(arg):
 
                 rec_loss = rec_loss.mean(dim=0)
 
-                rec_loss.backward(retrain_graph=True)
+                rec_loss.backward(retain_graph=True)
                 optd.step()
                 optd.zero_grad()
 
