@@ -85,6 +85,7 @@ def kl_loss_image(z):
     sig = z[:, c//2:, :, :].view(b, -1)
 
     kl = 0.5 * torch.sum(sig.exp() - sig + mean.pow(2) - 1, dim=1)
+    kl = torch.clamp(kl, min=0.000000001, max=1000000000)
 
     assert kl.size() == (b,)
 
@@ -97,7 +98,9 @@ def kl_loss(zmean, zlsig):
 
     kl = 0.5 * torch.sum(zlsig.exp() - zlsig + zmean.pow(2) - 1, dim=1)
 
+    kl = torch.clamp(kl, min=0.000000001, max=1000000000)
     assert kl.size() == (b,)
+
 
     return kl
 
