@@ -31,11 +31,10 @@ def return_data(task, data_dir, batch_size):
 	elif task == 'cifar10':
 		trainset = torchvision.datasets.CIFAR10(root=data_dir, train=True,
 		                                        download=True, transform=ToTensor())
-		print(trainset.targets)
+		trainset.targets = torch.tensor(trainset.targets)
 		idx = trainset.targets==7
-		print(idx)
-		trainset.targets = trainset.targets[idx]
-		trainset.data = trainset.data[idx]
+		trainset.targets= trainset.targets[idx]
+		trainset.data = trainset.data[idx.numpy().astype(np.bool)]
 
 		trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
 		                                          shuffle=True, num_workers=2)
@@ -43,9 +42,10 @@ def return_data(task, data_dir, batch_size):
 		testset = torchvision.datasets.CIFAR10(root=data_dir, train=False,
 		                                       download=True, transform=ToTensor())
 
+		testset.targets = torch.tensor(testset.targets)
 		idx = testset.targets==7
-		testset.targets = testset.targets[idx]
-		testset.data = testset.data[idx]
+		testset.targets= testset.targets[idx]
+		testset.data = testset.data[idx.numpy().astype(np.bool)]
 
 		testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
 		                                         shuffle=False, num_workers=2)
