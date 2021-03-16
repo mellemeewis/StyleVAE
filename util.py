@@ -111,6 +111,9 @@ def normal_lt_loss(output, target):
     means = torch.sigmoid(output[:,  :l//2])
     vars  = torch.sigmoid(output[:,  l//2:])
 
+    means=torch.clamp(means, min=0.0000000001) 
+    vars=torch.clamp(vars, min=0.0000000001)
+
     return vars.log() + (1.0/(2.0 * vars.pow(2.0))) * (target - means).pow(2.0)
 
 def sample(zmean, zlsig, eps=None):
