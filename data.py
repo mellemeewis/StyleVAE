@@ -33,6 +33,7 @@ def return_data(task, data_dir, batch_size):
 		                                        download=True, transform=ToTensor())
 		print(trainset.targets)
 		idx = trainset.targets==7
+		print(idx)
 		trainset.targets = trainset.targets[idx]
 		trainset.data = trainset.data[idx]
 
