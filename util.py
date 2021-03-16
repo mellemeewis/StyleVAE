@@ -104,7 +104,7 @@ def kl_loss(zmean, zlsig):
 
 def normal_lt_loss(output, target):
     if output == None or target == None:
-        return torch.tensor([0])
+        return torch.tensor([0.])
     b, l = output.size()
 
 

@@ -402,6 +402,8 @@ def go(arg):
                 # dense_loss = 0
                 kl_loss = bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
                 loss = br * rec_loss + kl_loss
+                assert torch.isnan(loss).sum() == 0
+                assert torch.isinf(loss).sum() == 0
 
                 loss = loss.mean(dim=0)
                 with torch.no_grad():
@@ -489,6 +491,10 @@ def go(arg):
                 # tbw.add_scalar('style-vae/total-loss', float(loss.data.item()), instances_seen)
 
                 # Backward pass
+
+                assert torch.isnan(loss).sum() == 0
+                assert torch.isinf(loss).sum() == 0
+                
                 loss.backward()
                 opte.step()
                 opte.zero_grad()
