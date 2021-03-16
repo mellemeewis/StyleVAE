@@ -390,17 +390,18 @@ def go(arg):
                 # rec_loss = - m.log_prob(target).sum(dim=1).sum(dim=1).sum(dim=1)
                 rec_loss = F.binary_cross_entropy(xout, input, reduction='none').view(b, -1).sum(dim=1)
                 # dense_loss = 0
+                loss = br * rec_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
 
-                rec_loss = rec_loss.mean(dim=0)
+                loss = loss.mean(dim=0)
 
-                rec_loss.backward(retain_graph=True)
+                loss.backward()
                 optd.step()
                 optd.zero_grad()
 
 
                 zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
                         zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
-                        dev='cpu', depth=depth)
+                        dev='cuda', depth=depth)
 
                 with torch.no_grad():
                     i = decoder(zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand)
@@ -443,12 +444,11 @@ def go(arg):
 
 
 
-                br, bz, b0, b1, b2, b3, b4, b5 = arg.betas
 
                 # loss = br * rec_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
                 # loss = loss.mean(dim=0)
-                loss = br * i_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
-                loss = loss.mean(dim=0)
+                # loss = br * i_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
+                loss = i_loss.mean(dim=0)
 
                 # i_loss = iz_loss.mean(dim=0)
                 # print(i_loss)
@@ -561,7 +561,7 @@ def go(arg):
 
                     zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
                         zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
-                        dev='cpu', depth=depth)
+                        dev='cuda', depth=depth)
 
                     sample = util.batchedn((zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=8).clamp(0, 1)[:, :C, :, :]
 
