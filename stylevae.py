@@ -398,8 +398,8 @@ def go(arg):
                 loss = br * rec_loss + kl_loss
 
                 loss = loss.mean(dim=0)
-                epoch_loss[0] += rec_loss.mean(dim=0)
-                epoch_loss[1] += kl_loss.mean(dim=0)
+                epoch_loss[0] += rec_loss.mean(dim=0).item()
+                epoch_loss[1] += kl_loss.mean(dim=0).item()
 
                 loss.backward()
                 optd.step()
@@ -455,7 +455,7 @@ def go(arg):
                 # loss = br * rec_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
                 # loss = loss.mean(dim=0)
                 # loss = br * i_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
-                epoch_loss[2] += i_loss.mean(dim=0)
+                epoch_loss[2] += i_loss.mean(dim=0).item()
                 loss = i_loss.mean(dim=0)
 
                 # i_loss = iz_loss.mean(dim=0)
