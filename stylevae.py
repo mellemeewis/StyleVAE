@@ -404,7 +404,7 @@ def go(arg):
                 loss = br * rec_loss + kl_loss
 
                 loss = loss.mean(dim=0)
-                with torch.no_grad(:)
+                with torch.no_grad():
                     epoch_loss[0] += rec_loss.mean(dim=0).item()
                     epoch_loss[1] += kl_loss.mean(dim=0).item()
 
