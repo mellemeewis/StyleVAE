@@ -292,7 +292,6 @@ class StyleDecoder(nn.Module):
         return torch.sigmoid(self.conv0(x0))
 
 def go(arg):
-    print(arg.perceptual_loss)
 
     tbw = SummaryWriter(log_dir=arg.tb_dir)
 
@@ -343,8 +342,9 @@ def go(arg):
             err_tr = []
             encoder.train(True)
             decoder.train(True)
+            for i, (input, _) in enumerate(trainloader):
 
-            for i, (input, _) in enumerate(tqdm.tqdm(trainloader)):
+            # for i, (input, _) in enumerate(tqdm.tqdm(trainloader)):
                 if arg.limit is not None and i * arg.batch_size > arg.limit:
                     break
 
@@ -510,7 +510,7 @@ def go(arg):
                 # loss.backward()
 
                 # optimizer.step()
-            print(epoch_loss)
+            print([int(e) for e in epoch_loss])
 
             if arg.epochs[depth] <= arg.np or epoch % (arg.epochs[depth]//arg.np) == 0 or epoch == arg.epochs[depth] - 1:
                 with torch.no_grad():
