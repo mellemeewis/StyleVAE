@@ -31,7 +31,7 @@ def return_data(task, data_dir, batch_size):
 	elif task == 'cifar10':
 		trainset = torchvision.datasets.CIFAR10(root=data_dir, train=True,
 		                                        download=True, transform=ToTensor())
-
+		print(trainset.targets)
 		idx = trainset.targets=='horse'
 		trainset.targets = trainset.targets[idx]
 		trainset.data = trainset.data[idx]
