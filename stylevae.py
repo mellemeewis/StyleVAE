@@ -337,6 +337,8 @@ def go(arg):
         print(f'starting depth {depth}, for {arg.epochs[depth]} epochs')
         for epoch in range(arg.epochs[depth]):
 
+            epoch_loss = [0,0,0]
+
             # Train
             err_tr = []
             encoder.train(True)
@@ -392,9 +394,12 @@ def go(arg):
                 br, bz, b0, b1, b2, b3, b4, b5 = arg.betas
 
                 # dense_loss = 0
-                loss = br * rec_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
+                kl_loss = bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
+                loss = br * rec_loss + kl_loss
 
                 loss = loss.mean(dim=0)
+                epoch_loss[0] += rec_loss.mean(dim=0)
+                epoch_loss[1] += kl_loss.mean(dim=0)
 
                 loss.backward()
                 optd.step()
@@ -450,6 +455,7 @@ def go(arg):
                 # loss = br * rec_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
                 # loss = loss.mean(dim=0)
                 # loss = br * i_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
+                epoch_loss[2] += i_loss.mean(dim=0)
                 loss = i_loss.mean(dim=0)
 
                 # i_loss = iz_loss.mean(dim=0)
@@ -486,6 +492,7 @@ def go(arg):
                 # loss.backward()
 
                 # optimizer.step()
+            print(epoch_loss)
 
             if arg.epochs[depth] <= arg.np or epoch % (arg.epochs[depth]//arg.np) == 0 or epoch == arg.epochs[depth] - 1:
                 with torch.no_grad():
