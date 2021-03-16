@@ -519,7 +519,8 @@ def go(arg):
                     decoder.train(False)
 
                     if not arg.skip_test:
-                        for i, (input, _) in enumerate(tqdm.tqdm(testloader)):
+                        for i, (input, _) in enumerate(testloader):
+                        # for i, (input, _) in enumerate(tqdm.tqdm(testloader)):
                             if arg.limit is not None and i * arg.batch_size > arg.limit:
                                 break
 
