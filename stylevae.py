@@ -397,10 +397,15 @@ def go(arg):
 
 
                 rec_loss = F.binary_cross_entropy(xout, input, reduction='none').view(b, -1).sum(dim=1)
+                assert torch.isnan(rec_loss).sum() == 0
+                assert torch.isinf(rec_loss).sum() == 0
+
                 br, bz, b0, b1, b2, b3, b4, b5 = arg.betas
 
                 # dense_loss = 0
                 kl_loss = bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
+                assert torch.isnan(kl_loss).sum() == 0
+                assert torch.isinf(kl_loss).sum() == 0
                 loss = br * rec_loss + kl_loss
                 assert torch.isnan(loss).sum() == 0
                 assert torch.isinf(loss).sum() == 0
@@ -494,7 +499,7 @@ def go(arg):
 
                 assert torch.isnan(loss).sum() == 0
                 assert torch.isinf(loss).sum() == 0
-                
+
                 loss.backward()
                 opte.step()
                 opte.zero_grad()
