@@ -1,5 +1,6 @@
 import torch
 import torchvision
+import numpy as np
 
 from torchvision.transforms import ToTensor, Compose, Pad, Grayscale
 from six.moves import urllib
