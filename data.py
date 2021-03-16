@@ -32,7 +32,7 @@ def return_data(task, data_dir, batch_size):
 		trainset = torchvision.datasets.CIFAR10(root=data_dir, train=True,
 		                                        download=True, transform=ToTensor())
 		print(trainset.targets)
-		idx = trainset.targets=='horse'
+		idx = trainset.targets==7
 		trainset.targets = trainset.targets[idx]
 		trainset.data = trainset.data[idx]
 
@@ -42,7 +42,7 @@ def return_data(task, data_dir, batch_size):
 		testset = torchvision.datasets.CIFAR10(root=data_dir, train=False,
 		                                       download=True, transform=ToTensor())
 
-		idx = testset.targets=='horse'
+		idx = testset.targets==7
 		testset.targets = testset.targets[idx]
 		testset.data = testset.data[idx]
 
