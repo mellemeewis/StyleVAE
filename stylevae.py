@@ -392,6 +392,8 @@ def go(arg):
                 # rec_loss = - m.log_prob(target).sum(dim=1).sum(dim=1).sum(dim=1)
 
                 assert torch.isinf(xout).sum() == 0
+                assert torch.isnan(xout).sum() == 0
+
 
 
                 rec_loss = F.binary_cross_entropy(xout, input, reduction='none').view(b, -1).sum(dim=1)
@@ -402,8 +404,9 @@ def go(arg):
                 loss = br * rec_loss + kl_loss
 
                 loss = loss.mean(dim=0)
-                epoch_loss[0] += rec_loss.mean(dim=0).item()
-                epoch_loss[1] += kl_loss.mean(dim=0).item()
+                with torch.no_grad(:)
+                    epoch_loss[0] += rec_loss.mean(dim=0).item()
+                    epoch_loss[1] += kl_loss.mean(dim=0).item()
 
                 loss.backward()
                 optd.step()
