@@ -2,7 +2,7 @@ import torch
 import torchvision
 import numpy as np
 
-from torchvision.transforms import ToTensor, Compose, Pad, Grayscale
+from torchvision.transforms import ToTensor, Compose, Pad, Grayscale, RandomHorizontalFlip
 from six.moves import urllib
 
 
