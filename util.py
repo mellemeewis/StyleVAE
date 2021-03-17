@@ -98,7 +98,7 @@ def kl_loss(zmean, zlsig):
 
     kl = 0.5 * torch.sum(zlsig.exp() - zlsig + zmean.pow(2) - 1, dim=1)
 
-    kl = torch.clamp(kl, min=0.00000000000001, max=00000000000001)
+    kl = torch.clamp(kl, min=0.00000000000001, max=10000000000000)
     assert kl.size() == (b,)
 
 
