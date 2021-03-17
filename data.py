@@ -73,16 +73,14 @@ def return_data(task, data_dir, batch_size):
 	elif task == 'celebA':
 		transform = Compose([ToTensor()])
 
-		trainset = torchvision.datasets.CelebA(root=data_dir, split='train',
-		                                        download=True, transform=transform)
+		trainset = torchvision.datasets.ImageFolder(root=data_dir, transform=ToTensor())
 		trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
 		                                          shuffle=True, num_workers=2)
 
-		testset = torchvision.datasets.CelebA(root=data_dir, split='test',
-		                                       download=True, transform=transform)
+		testset = torchvision.datasets.ImageFolder(root=data_dir+os.sep+'test', transform=ToTensor())
 		testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
 		                                         shuffle=False, num_workers=2)
-		C, H, W = 1, 32, 32
+		C, H, W = 3, 32, 32
 
 	elif task == 'imagenet64':
 		transform = Compose([ToTensor()])
