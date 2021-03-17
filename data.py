@@ -1,7 +1,7 @@
 import torch
 import torchvision
 import numpy as np
-
+import os
 from torchvision.transforms import ToTensor, Compose, Pad, Grayscale, RandomHorizontalFlip
 from six.moves import urllib
 
