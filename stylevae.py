@@ -585,7 +585,7 @@ def go(arg):
                     # take some samples
 
                     # sample 6x12 images
-                    b = 6
+                    b = 6*12
 
                     zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
                         zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
@@ -594,7 +594,7 @@ def go(arg):
                     sample = util.batchedn((zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=8).clamp(0, 1)[:, :C, :, :]
 
                     # reconstruct 6x12 images from the testset
-                    input = util.readn(testloader, n=6)
+                    input = util.readn(testloader, n=6*12)
                     if torch.cuda.is_available():
                         input = input.cuda()
 

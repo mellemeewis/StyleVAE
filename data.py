@@ -106,7 +106,7 @@ def return_data(task, data_dir, batch_size):
 		tftest = Compose([ToTensor()])
 		testset = torchvision.datasets.ImageFolder(root=data_dir+os.sep,
 		                                           transform=tftest)
-		testloader = torch.utils.data.DataLoader(testset, batch_size=8,
+		testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
 		                                         shuffle=False, num_workers=2)
 		C, H, W = 3, 128, 128
 
