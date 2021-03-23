@@ -744,3 +744,4 @@ if __name__ == "__main__":
     print('OPTIONS', options)
 
     go(options)
+    print('Finished succesfully')
