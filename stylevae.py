@@ -16,7 +16,7 @@ from torch.nn.functional import binary_cross_entropy, relu, nll_loss, cross_entr
 from torch.nn import Embedding, Conv2d, Sequential, BatchNorm2d, ReLU, MSELoss
 from torch.optim import Adam
 
-import nltk
+# import nltk
 
 from argparse import ArgumentParser
 
