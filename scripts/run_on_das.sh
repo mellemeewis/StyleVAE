@@ -17,7 +17,7 @@ source /home/mms496/.bashrc
 
 
 # Base directory for the experiment
-cd /home/mms496/
+cd /home/mms496/StyleVAE_Experiments
 
 
 # Simple trick to create a unique directory for each run of the script
