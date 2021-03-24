@@ -28,7 +28,5 @@ cd o`echo $$`
 
 # Run the actual experiment
 
-python -u /home/mms496/StyleVAE_Experiments/code/StyleVAE/stylevae.py --task ffhq --numplots 10 -z 256 -e 1 0 0 0 0 0 -l 0.00005 -b 32 --betas 0.6 1 1 1 1 1 1 1 --dropouts 0.01 0.01 0.01 0.01 0.01 0.01 0.01 --mapping-layers 6 -D /var/scratch/mms496/data/ffhq/partial/thumbnails128x128
+python -u /home/mms496/StyleVAE_Experiments/code/StyleVAE/stylevae.py --task ffhq --numplots 15 -z 256 -e 1 1 1 1 1 1 -l 0.0001 -b 32 --betas 0.4 1 1 1 1 1 1 1 --dropouts 0.01 0.02 0.02 0.02 0.02 0.02 0.02 --mapping-layers 6 -D /var/scratch/mms496/data/ffhq/partial/thumbnails128x128
 
-
-# Simple trick to create a unique directory for each run of the script
