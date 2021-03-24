@@ -18,7 +18,7 @@ def send_message(message):
 
 
 
-def send_image(image, title):
+def send_image(file, title):
 
     try:
         response = client.files_upload(
