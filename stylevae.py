@@ -745,5 +745,6 @@ if __name__ == "__main__":
 
     print('OPTIONS', options)
 
+    slack_util.send_message(f"Run Started.\nOPTIONS:\n{options}")
     go(options)
     print('Finished succesfully')
