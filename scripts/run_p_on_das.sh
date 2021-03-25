@@ -28,7 +28,6 @@ cd o`echo $$`
 
 # Run the actual experiment
 
-python -u /home/mms496/StyleVAE_Experiments/code/StyleVAE/stylevae.py 
 python -u /home/mms496/StyleVAE_Experiments/code/StyleVAE/stylevae.py \
 		--task ffhq --numplots 30 -z 256 -e 0 0 0 0 0 1000 -l 0.000075 -b 32 \
 		--betas 0.4 1 1 1 1 1 1 1 --dropouts 0.01 0.9 0.9 0.9 0.9 0.9 0.9 \
