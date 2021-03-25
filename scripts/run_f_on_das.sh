@@ -28,5 +28,5 @@ cd o`echo $$`
 
 # Run the actual experiment
 
-python -u /home/mms496/StyleVAE_Experiments/code/StyleVAE/stylevae.py --task ffhq --numplots 30 -z 256 -e 0 0 0 0 0 1000 -l 0.0001 -b 32 --betas 0.4 1 1 1 1 1 1 1 --dropouts 0.01 0.02 0.02 0.02 0.02 0.02 0.02 --mapping-layers 6 -D /var/scratch/mms496/data/ffhq/full/thumbnails128x128
+python -u /home/mms496/StyleVAE_Experiments/code/StyleVAE/stylevae.py --task ffhq --numplots 30 -z 256 -e 0 0 0 0 0 1000 -l 0.000075 -b 32 --betas 0.4 1 1 1 1 1 1 1 --dropouts 0.01 0.5 0.5 0.5 0.5 0.5 0.5 --mapping-layers 6 -D /var/scratch/mms496/data/ffhq/full/thumbnails128x128
 
