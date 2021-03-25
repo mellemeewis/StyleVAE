@@ -622,8 +622,8 @@ def go(arg):
                     images = torch.cat([input.cpu(), xout, mixout, mixout2, sample], dim=0)
 
                     utils.save_image(images, f'images.{depth}.{epoch}.png', nrow=24, padding=2)
-                    slack_util.send_message(f'Epoch {epoch} Finished\n Data: {arg.data_dir}')
-                    slack_util.send_image(f'images.{depth}.{epoch}.png', 'Epoch: {epoch}')
+                    slack_util.send_message(f'Epoch {epoch} Depth {depth} Finished\n Data: {arg.data_dir}')
+                    slack_util.send_image(f'images.{depth}.{epoch}.png', f'Epoch: {epoch}')
                     # utils.save_image(input.cpu(), f'images_input.{depth}.{epoch}.png', nrow=3, padding=2)
                     # utils.save_image(xout, f'images_xout_recon.{depth}.{epoch}.png', nrow=3, padding=2)
                     # utils.save_image(mixout, f'images_mixout_lv_rn.{depth}.{epoch}.png', nrow=3, padding=2)
