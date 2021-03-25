@@ -619,7 +619,9 @@ def go(arg):
                     # -- mix a random vector with the sample noise
                     mixout2 = util.batchedn((zrand, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
 
-                    images = torch.cat([input.cpu(), xout, mixout, mixout2, sample], dim=0)
+                    images = torch.cat([input.cpu()[:24,:,:], xout[:24,:,:], mixout[:24,:,:], mixout2[:24,:,:], sample[:24,:,:],
+                                        input.cpu()[24:48,:,:], xout[24:48,:,:], mixout[24:48,:,:], mixout2[24:48,:,:], sample[24:48,:,:],
+                                        input.cpu()[48:,:,:], xout[48:,:,:], mixout[48:,:,:], mixout2[48:,:,:], sample[48:,:,:]], dim=0)
 
                     utils.save_image(images, f'images.{depth}.{epoch}.png', nrow=24, padding=2)
                     slack_util.send_message(f'Epoch {epoch} Depth {depth} Finished\n Data: {arg.data_dir}')
