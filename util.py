@@ -85,7 +85,7 @@ def kl_loss_image(z):
     sig = z[:, c//2:, :, :].view(b, -1)
 
     kl = 0.5 * torch.sum(sig.exp() - sig + mean.pow(2) - 1, dim=1)
-    kl = torch.clamp(kl, min=0.00000000000001, max=10000000000000)
+    kl = torch.clamp(kl, min=0.0000001, max=1000000)
 
     assert kl.size() == (b,)
 
@@ -98,7 +98,7 @@ def kl_loss(zmean, zlsig):
 
     kl = 0.5 * torch.sum(zlsig.exp() - zlsig + zmean.pow(2) - 1, dim=1)
 
-    kl = torch.clamp(kl, min=0.00000000000001, max=10000000000000)
+    kl = torch.clamp(kl, min=0.0000001, max=1000000)
     assert kl.size() == (b,)
 
 
@@ -114,8 +114,8 @@ def normal_lt_loss(output, target):
     means = torch.sigmoid(output[:,  :l//2])
     vars  = torch.sigmoid(output[:,  l//2:])
 
-    means=torch.clamp(means, min=0.00000000000001) 
-    vars=torch.clamp(vars, min=0.00000000000001)
+    means=torch.clamp(means, min=0.0000001) 
+    vars=torch.clamp(vars, min=0.0000001)
 
     return vars.log() + (1.0/(2.0 * vars.pow(2.0))) * (target - means).pow(2.0)
 
