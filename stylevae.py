@@ -404,9 +404,10 @@ def go(arg):
 
                 # dense_loss = 0
                 kl_loss = bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
-                assert torch.isnan(kl_loss).sum() == 0
                 kl_loss[kl_loss != kl_loss] = 0
-                
+
+                assert torch.isnan(kl_loss).sum() == 0
+
                 assert torch.isinf(kl_loss).sum() == 0
                 loss = br * rec_loss + kl_loss
                 assert torch.isnan(loss).sum() == 0
