@@ -121,8 +121,8 @@ def normal_im(output, target):
     print(output.size())
     print(target.size())
     b, c, h, w = output.size()
-    means = output[:, :c//2, :, :].view(b, -1)
-    vars  = output[:, c//2:, :, :].view(b, -1)
+    means = output[:, :c//2, :, :]
+    vars  = output[:, c//2:, :, :]
 
     return vars.log() + (1.0/(2.0 * vars.pow(2.0))) * (target - means).pow(2.0)
 
