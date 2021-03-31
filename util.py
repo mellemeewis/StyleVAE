@@ -118,9 +118,9 @@ def normal_lt_loss(output, target):
     return vars.log() + (1.0/(2.0 * vars.pow(2.0))) * (target - means).pow(2.0)
 
 def normal_im(output, target):
-
+    print(output.size())
+    print(target.size())
     b, c, h, w = output.size()
-    print(c//2)
     means = output[:, :c//2, :, :].view(b, -1)
     vars  = output[:, c//2:, :, :].view(b, -1)
 
