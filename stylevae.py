@@ -422,79 +422,80 @@ def go(arg):
                 optd.step()
                 optd.zero_grad()
 
+                for i in range(arg.encoder_update_per_iteration):
 
-                zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
-                        zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
-                        dev='cuda', depth=depth)
+                    zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
+                            zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
+                            dev='cuda', depth=depth)
 
-                with torch.no_grad():
-                    i = decoder(zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand)
-
-
-                isample = util.sample_image(i)
-
-                iz, in0, in1, in2, in3, in4, in5 = encoder(isample, depth)
-
-                iz_loss = util.normal_lt_loss(iz, zrand).mean()
-                in0_loss = util.normal_lt_loss(torch.flatten(in0, start_dim=1), torch.flatten(n0rand, start_dim=1)).mean()
-                i_loss = iz_loss + in0_loss 
-                if depth >0:
-                    in1_loss = util.normal_lt_loss(torch.flatten(in1, start_dim=1), torch.flatten(n1rand, start_dim=1)).mean()
-                    i_loss += in1_loss
-                if depth > 1:
-                    in2_loss = util.normal_lt_loss(torch.flatten(in2, start_dim=1), torch.flatten(n2rand, start_dim=1)).mean()
-                    i_loss += in2_loss
-                if depth > 2:
-                    in3_loss = util.normal_lt_loss(torch.flatten(in3, start_dim=1), torch.flatten(n3rand, start_dim=1)).mean()
-                    i_loss += in3_loss
-                if depth > 3:
-                    in4_loss = util.normal_lt_loss(torch.flatten(in4, start_dim=1), torch.flatten(n4rand, start_dim=1)).mean()
-                    i_loss += in4_loss
-                if depth > 4:
-                    in5_loss = util.normal_lt_loss(torch.flatten(in5, start_dim=1), torch.flatten(n5rand, start_dim=1)).mean()
-                    i_loss += in5_loss
+                    with torch.no_grad():
+                        i = decoder(zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand)
 
 
+                    isample = util.sample_image(i)
+
+                    iz, in0, in1, in2, in3, in4, in5 = encoder(isample, depth)
+
+                    iz_loss = util.normal_lt_loss(iz, zrand).mean()
+                    in0_loss = util.normal_lt_loss(torch.flatten(in0, start_dim=1), torch.flatten(n0rand, start_dim=1)).mean()
+                    i_loss = iz_loss + in0_loss 
+                    if depth >0:
+                        in1_loss = util.normal_lt_loss(torch.flatten(in1, start_dim=1), torch.flatten(n1rand, start_dim=1)).mean()
+                        i_loss += in1_loss
+                    if depth > 1:
+                        in2_loss = util.normal_lt_loss(torch.flatten(in2, start_dim=1), torch.flatten(n2rand, start_dim=1)).mean()
+                        i_loss += in2_loss
+                    if depth > 2:
+                        in3_loss = util.normal_lt_loss(torch.flatten(in3, start_dim=1), torch.flatten(n3rand, start_dim=1)).mean()
+                        i_loss += in3_loss
+                    if depth > 3:
+                        in4_loss = util.normal_lt_loss(torch.flatten(in4, start_dim=1), torch.flatten(n4rand, start_dim=1)).mean()
+                        i_loss += in4_loss
+                    if depth > 4:
+                        in5_loss = util.normal_lt_loss(torch.flatten(in5, start_dim=1), torch.flatten(n5rand, start_dim=1)).mean()
+                        i_loss += in5_loss
 
 
 
-                # loss = br * rec_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
-                # loss = loss.mean(dim=0)
-                # loss = br * i_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
-                epoch_loss[2] += i_loss.mean(dim=0).item()
-                loss = i_loss.mean(dim=0)
 
-                # i_loss = iz_loss.mean(dim=0)
-                # print(i_loss)
 
-                # if i%720 == 0:
-                #     print("TTRAIN LOSSES: ")
-                #     print('PER: ', perceptual_loss)
-                #     print('REC: ', rec_loss)
-                #     print("Z KL: ", zkl)
-                #     print('NO-N5 KL: ', n0kl, n1kl, n2kl, n3kl, n4kl, n5kl)
-                #     print('MEAN: ', loss)
+                    # loss = br * rec_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
+                    # loss = loss.mean(dim=0)
+                    # loss = br * i_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
+                    epoch_loss[2] += i_loss.mean(dim=0).item()
+                    loss = i_loss.mean(dim=0)
 
-                instances_seen += input.size(0)
+                    # i_loss = iz_loss.mean(dim=0)
+                    # print(i_loss)
 
-                # tbw.add_scalar('style-vae/zkl-loss', float(zkl.data.mean(dim=0).item()), instances_seen)
-                # tbw.add_scalar('style-vae/n0kl-loss', float(n0kl.data.mean(dim=0).item()), instances_seen)
-                # tbw.add_scalar('style-vae/n1kl-loss', float(n1kl.data.mean(dim=0).item()), instances_seen)
-                # tbw.add_scalar('style-vae/n2kl-loss', float(n2kl.data.mean(dim=0).item()), instances_seen)
-                # tbw.add_scalar('style-vae/n3kl-loss', float(n3kl.data.mean(dim=0).item()), instances_seen)
-                # tbw.add_scalar('style-vae/n4kl-loss', float(n4kl.data.mean(dim=0).item()), instances_seen)
-                # tbw.add_scalar('style-vae/n5kl-loss', float(n5kl.data.mean(dim=0).item()), instances_seen)
-                # tbw.add_scalar('style-vae/rec-loss', float(rec_loss.data.mean(dim=0).item()), instances_seen)
-                # tbw.add_scalar('style-vae/total-loss', float(loss.data.item()), instances_seen)
+                    # if i%720 == 0:
+                    #     print("TTRAIN LOSSES: ")
+                    #     print('PER: ', perceptual_loss)
+                    #     print('REC: ', rec_loss)
+                    #     print("Z KL: ", zkl)
+                    #     print('NO-N5 KL: ', n0kl, n1kl, n2kl, n3kl, n4kl, n5kl)
+                    #     print('MEAN: ', loss)
 
-                # Backward pass
+                    instances_seen += input.size(0)
 
-                assert torch.isnan(loss).sum() == 0
-                assert torch.isinf(loss).sum() == 0
+                    # tbw.add_scalar('style-vae/zkl-loss', float(zkl.data.mean(dim=0).item()), instances_seen)
+                    # tbw.add_scalar('style-vae/n0kl-loss', float(n0kl.data.mean(dim=0).item()), instances_seen)
+                    # tbw.add_scalar('style-vae/n1kl-loss', float(n1kl.data.mean(dim=0).item()), instances_seen)
+                    # tbw.add_scalar('style-vae/n2kl-loss', float(n2kl.data.mean(dim=0).item()), instances_seen)
+                    # tbw.add_scalar('style-vae/n3kl-loss', float(n3kl.data.mean(dim=0).item()), instances_seen)
+                    # tbw.add_scalar('style-vae/n4kl-loss', float(n4kl.data.mean(dim=0).item()), instances_seen)
+                    # tbw.add_scalar('style-vae/n5kl-loss', float(n5kl.data.mean(dim=0).item()), instances_seen)
+                    # tbw.add_scalar('style-vae/rec-loss', float(rec_loss.data.mean(dim=0).item()), instances_seen)
+                    # tbw.add_scalar('style-vae/total-loss', float(loss.data.item()), instances_seen)
 
-                loss.backward()
-                opte.step()
-                opte.zero_grad()
+                    # Backward pass
+
+                    assert torch.isnan(loss).sum() == 0
+                    assert torch.isinf(loss).sum() == 0
+
+                    loss.backward()
+                    opte.step()
+                    opte.zero_grad()
 
 
                 # optimizer.zero_grad()
@@ -730,6 +731,13 @@ if __name__ == "__main__":
                         help="Use perceptual/feature loss. Options: DenseNet, AlexNet. Default: None",
                         default=None, type=str)
 
+    parser.add_argument("-EU", "--encoder-update-per-iteration",
+                        dest="encoder_update_per_iteration",
+                        help="Amount of times the encoder is updated each iteration. (sleep phase).",
+                        default=None, type=str)
+
+
+encoder_update_per_decoder_update
     options = parser.parse_args()
 
     print('OPTIONS', options)
