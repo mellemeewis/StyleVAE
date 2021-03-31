@@ -191,7 +191,7 @@ class StyleDecoder(nn.Module):
         self.tonoise1 = nn.Conv2d(z1, c1, kernel_size=1, padding=0)
         self.tonoise0 = nn.Conv2d(z0, c,  kernel_size=1, padding=0)
 
-        self.conv0 = nn.Conv2d(c, c, kernel_size=1)
+        self.conv0 = nn.Conv2d(c, 2*c, kernel_size=1)
 
         m = []
         for _ in range(mapping):
@@ -358,13 +358,13 @@ def go(arg):
 
                 # -- compute KL losses
 
-                zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
-                n0kl = util.kl_loss_image(n0)
-                n1kl = util.kl_loss_image(n1)
-                n2kl = util.kl_loss_image(n2)
-                n3kl = util.kl_loss_image(n3)
-                n4kl = util.kl_loss_image(n4)
-                n5kl = util.kl_loss_image(n5)
+                # zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
+                # n0kl = util.kl_loss_image(n0)
+                # n1kl = util.kl_loss_image(n1)
+                # n2kl = util.kl_loss_image(n2)
+                # n3kl = util.kl_loss_image(n3)
+                # n4kl = util.kl_loss_image(n4)
+                # n5kl = util.kl_loss_image(n5)
 
                 # -- take samples
                 zsample  = util.sample(z[:, :zs], z[:, zs:])
@@ -388,35 +388,35 @@ def go(arg):
                         perceptual_output = perceptual_loss_model(xout)
                         perceptual_loss = F.mse_loss(perceptual_input, perceptual_output, reduction='none').view(b, -1).sum(dim=1)
 
-                # m = ds.Normal(xout[:, :C, :, :], xout[:, C:, :, :])
-                # rec_loss = - m.log_prob(target).sum(dim=1).sum(dim=1).sum(dim=1)
+
 
                 assert torch.isinf(xout).sum() == 0
                 assert torch.isnan(xout).sum() == 0
 
+                rec_loss = util.normal_im(o, images).view(b, c*h*w).sum(dim=1)
 
+                # rec_loss = F.binary_cross_entropy(xout, input, reduction='none').view(b, -1).sum(dim=1)
 
-                rec_loss = F.binary_cross_entropy(xout, input, reduction='none').view(b, -1).sum(dim=1)
                 assert torch.isnan(rec_loss).sum() == 0
                 assert torch.isinf(rec_loss).sum() == 0
 
                 br, bz, b0, b1, b2, b3, b4, b5 = arg.betas
 
                 # dense_loss = 0
-                kl_loss = bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
-                kl_loss[kl_loss != kl_loss] = 0
+                # kl_loss = bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
+                # assert torch.isnan(kl_loss).sum() == 0
+                # assert torch.isinf(kl_loss).sum() == 0
 
-                assert torch.isnan(kl_loss).sum() == 0
+                loss = rec_loss
+                # loss = br * rec_loss + kl_loss
 
-                assert torch.isinf(kl_loss).sum() == 0
-                loss = br * rec_loss + kl_loss
                 assert torch.isnan(loss).sum() == 0
                 assert torch.isinf(loss).sum() == 0
 
                 loss = loss.mean(dim=0)
                 with torch.no_grad():
                     epoch_loss[0] += rec_loss.mean(dim=0).item()
-                    epoch_loss[1] += kl_loss.mean(dim=0).item()
+                    # epoch_loss[1] += kl_loss.mean(dim=0).item()
 
                 loss.backward()
                 optd.step()
@@ -430,21 +430,10 @@ def go(arg):
                 with torch.no_grad():
                     i = decoder(zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand)
 
-                # if torch.isnan(i).sum()>0:
-                #     print("NANS COME FROM DECODER")
 
-                # if torch.isinf(i).sum()>0:
-                #     print("INFS COME FROM DECODER")
+                isample = util.sample_image(i)
 
-                iz, in0, in1, in2, in3, in4, in5 = encoder(i, depth)
-
-                # for it, lis in enumerate([iz, in0, in1, in2, in3, in4, in5]):
-                #     if lis ==  None:
-                #         continue
-                #     if torch.isnan(lis).sum() > 0:
-                #         print("NANS COMe FROM ENCODER", it)
-                #     if torch.isinf(lis).sum() > 0:
-                #         print("NANS COME FROM ENCODER", it)
+                iz, in0, in1, in2, in3, in4, in5 = encoder(isample, depth)
 
                 iz_loss = util.normal_lt_loss(iz, zrand).mean()
                 in0_loss = util.normal_lt_loss(torch.flatten(in0, start_dim=1), torch.flatten(n0rand, start_dim=1)).mean()
@@ -567,17 +556,8 @@ def go(arg):
                             # m = ds.Normal(xout[:, :C, :, :], xout[:, C:, :, :])
                             # rec_loss = -m.log_prob(target).sum(dim=1).sum(dim=1).sum(dim=1)
 
-                            rec_loss = F.binary_cross_entropy(xout, input)
+                            rec_loss = util.normal_im(o, images).view(b, c*h*w).sum(dim=1)
                             loss = rec_loss.mean(dim=0)
-
-                            # loss = perceptual_loss + rec_loss + zkl + n0kl + n1kl + n2kl + n3kl + n4kl + n5kl
-                            # loss = loss.mean(dim=0)
-                            # print("LOSSES: ")
-                            # print('PER: ', perceptual_loss)
-                            # print('REC: ', rec_loss)
-                            # print("Z KL: ", zkl)
-                            # print('NO-N5 KL: ', n0kl, n1kl, n2kl, n3kl, n4kl, n5kl)
-                            # print('MEAN: ', loss)
 
                             err_te.append(loss.data.item())
 
@@ -595,6 +575,7 @@ def go(arg):
                         dev='cuda', depth=depth)
 
                     sample = util.batchedn((zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=8).clamp(0, 1)[:, :C, :, :]
+                    sample = util.sample_image(sample)
 
                     # reconstruct 6x12 images from the testset
                     input = util.readn(testloader, n=6*12)
@@ -615,12 +596,13 @@ def go(arg):
 
                     # -- decoding
                     xout = util.batchedn((zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
-
+                    xout = util.sample_image(xout)
                     # -- mix the latent vector with random noise
                     mixout = util.batchedn((zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
-
+                    mixout = util.sample_image(mixout)
                     # -- mix a random vector with the sample noise
                     mixout2 = util.batchedn((zrand, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
+                    mixout2 = util.sample_image(mixout2)
 
                     images = torch.cat([input.cpu()[:24,:,:], xout[:24,:,:], mixout[:24,:,:], mixout2[:24,:,:], sample[:24,:,:],
                                         input.cpu()[24:48,:,:], xout[24:48,:,:], mixout[24:48,:,:], mixout2[24:48,:,:], sample[24:48,:,:],

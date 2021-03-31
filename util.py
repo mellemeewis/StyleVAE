@@ -106,8 +106,6 @@ def kl_loss(zmean, zlsig):
 
 
 def normal_lt_loss(output, target):
-    if output == None or target == None:
-        return torch.tensor([0.])
     b, l = output.size()
 
 
@@ -116,6 +114,14 @@ def normal_lt_loss(output, target):
 
     means=torch.clamp(means, min=0.0000001) 
     vars=torch.clamp(vars, min=0.0000001)
+
+    return vars.log() + (1.0/(2.0 * vars.pow(2.0))) * (target - means).pow(2.0)
+
+def normal_im(output, target):
+
+    b, c, h, w = output.size()
+    means = output[:, :c/2, :, :].view(b, -1)
+    vars  = output[:, c/2:, :, :].view(b, -1)
 
     return vars.log() + (1.0/(2.0 * vars.pow(2.0))) * (target - means).pow(2.0)
 
