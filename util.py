@@ -143,7 +143,7 @@ def sample_image(z, eps=None):
         return None
 
     b, c, h, w = z.size()
-
+    print(z.size())
     mean = z[:, :c//2, :, :].view(b, -1)
     sig = z[:, c//2:, :, :].view(b, -1)
 
