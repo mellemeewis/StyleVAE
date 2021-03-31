@@ -575,9 +575,6 @@ def go(arg):
                         dev='cuda', depth=depth)
 
                     sample = util.batchedn((zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=8).clamp(0, 1)[:, :C, :, :]
-                    sample_2C = util.batchedn((zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=8).clamp(0, 1)[:, :2*C, :, :]
-
-                    sample_2C = util.sample_image(sample_2C)
 
                     # reconstruct 6x12 images from the testset
                     input = util.readn(testloader, n=6*12)
@@ -598,30 +595,21 @@ def go(arg):
 
                     # -- decoding
                     xout = util.batchedn((zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
-                    xout_2C = util.batchedn((zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample), decoder, batch_size=4).clamp(0, 1)[:, :2*C, :, :]
-                    xout_2C = util.sample_image(xout_2C)
                     # -- mix the latent vector with random noise
 
                     mixout = util.batchedn((zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
-                    mixout_2C = util.batchedn((zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=4).clamp(0, 1)[:, :2*C, :, :]
-                    mixout_2C = util.sample_image(mixout_2C)
+
                     # -- mix a random vector with the sample noise
 
                     mixout2 = util.batchedn((zrand, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
-                    mixout2_2C = util.batchedn((zrand, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample), decoder, batch_size=4).clamp(0, 1)[:, :2*C, :, :]
-                    mixout2_2C = util.sample_image(mixout2_2C)
+
 
                     images = torch.cat([input.cpu()[:24,:,:], xout[:24,:,:], mixout[:24,:,:], mixout2[:24,:,:], sample[:24,:,:],
                                         input.cpu()[24:48,:,:], xout[24:48,:,:], mixout[24:48,:,:], mixout2[24:48,:,:], sample[24:48,:,:],
                                         input.cpu()[48:,:,:], xout[48:,:,:], mixout[48:,:,:], mixout2[48:,:,:], sample[48:,:,:]], dim=0)
 
-                    images_2C = torch.cat([input.cpu()[:24,:,:], xout_2C[:24,:,:], mixout_2C[:24,:,:], mixout2_2C[:24,:,:], sample_2C[:24,:,:],
-                                        input.cpu()[24:48,:,:], xout_2C[24:48,:,:], mixout_2C[24:48,:,:], mixout2_2C[24:48,:,:], sample_2C[24:48,:,:],
-                                        input.cpu()[48:,:,:], xout_2C[48:,:,:], mixout_2C[48:,:,:], mixout2_2C[48:,:,:], sample_2C[48:,:,:]], dim=0)
-
 
                     utils.save_image(images, f'images.{depth}.{epoch}.png', nrow=24, padding=2)
-                    utils.save_image(images, f'images_2C.{depth}.{epoch}.png', nrow=24, padding=2)
 
                     # slack_util.send_message(f'Epoch {epoch} Depth {depth} Finished\n Data: {arg.data_dir}')
                     # slack_util.send_image(f'images.{depth}.{epoch}.png', f'Epoch: {epoch}')
