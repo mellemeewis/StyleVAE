@@ -574,7 +574,7 @@ def go(arg):
                         zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
                         dev='cuda', depth=depth)
 
-                    sample = util.batchedn((zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=8).clamp(0, 1)[:, :C, :, :]
+                    sample = util.batchedn((zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=8).clamp(0, 1)[:, :2*C, :, :]
                     sample = util.sample_image(sample)
 
                     # reconstruct 6x12 images from the testset
@@ -595,14 +595,13 @@ def go(arg):
                     n5sample = util.sample_image(n5)
 
                     # -- decoding
-                    xout = util.batchedn((zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample), decoder, batch_size=4).clamp(0, 1)#[:, :2*C, :, :]
-                    print(xout.size())
+                    xout = util.batchedn((zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample), decoder, batch_size=4).clamp(0, 1)[:, :2*C, :, :]
                     xout = util.sample_image(xout)
                     # -- mix the latent vector with random noise
-                    mixout = util.batchedn((zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=4).clamp(0, 1)#[:, :2*C, :, :]
+                    mixout = util.batchedn((zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=4).clamp(0, 1)[:, :2*C, :, :]
                     mixout = util.sample_image(mixout)
                     # -- mix a random vector with the sample noise
-                    mixout2 = util.batchedn((zrand, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample), decoder, batch_size=4).clamp(0, 1)#[:, :2*C, :, :]
+                    mixout2 = util.batchedn((zrand, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample), decoder, batch_size=4).clamp(0, 1)[:, :2*C, :, :]
                     mixout2 = util.sample_image(mixout2)
 
                     images = torch.cat([input.cpu()[:24,:,:], xout[:24,:,:], mixout[:24,:,:], mixout2[:24,:,:], sample[:24,:,:],
