@@ -737,7 +737,6 @@ if __name__ == "__main__":
                         default=1, type=int)
 
 
-encoder_update_per_decoder_update
     options = parser.parse_args()
 
     print('OPTIONS', options)
