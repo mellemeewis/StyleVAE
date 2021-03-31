@@ -734,7 +734,7 @@ if __name__ == "__main__":
     parser.add_argument("-EU", "--encoder-update-per-iteration",
                         dest="encoder_update_per_iteration",
                         help="Amount of times the encoder is updated each iteration. (sleep phase).",
-                        default=None, type=str)
+                        default=1, type=int)
 
 
 encoder_update_per_decoder_update
