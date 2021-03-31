@@ -393,7 +393,7 @@ def go(arg):
                 assert torch.isinf(xout).sum() == 0
                 assert torch.isnan(xout).sum() == 0
 
-                rec_loss = util.normal_im(o, images).view(b, c*h*w).sum(dim=1)
+                rec_loss = util.normal_im(oxout, images).view(b, c*h*w).sum(dim=1)
 
                 # rec_loss = F.binary_cross_entropy(xout, input, reduction='none').view(b, -1).sum(dim=1)
 
