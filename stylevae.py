@@ -574,8 +574,8 @@ def go(arg):
                         zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
                         dev='cuda', depth=depth)
 
-                    sample_2C = util.batchedn((zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=8).clamp(0, 1)[:, :2*C, :, :]
                     sample = util.batchedn((zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=8).clamp(0, 1)[:, :C, :, :]
+                    sample_2C = util.batchedn((zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=8).clamp(0, 1)[:, :2*C, :, :]
 
                     sample_2C = util.sample_image(sample_2C)
 
