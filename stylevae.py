@@ -599,7 +599,7 @@ def go(arg):
                     # -- decoding
                     xout = util.batchedn((zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
                     xout_2C = util.batchedn((zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample), decoder, batch_size=4).clamp(0, 1)[:, :2*C, :, :]
-                    xout_2C = util.sample_image(xout)
+                    xout_2C = util.sample_image(xout_2C)
                     # -- mix the latent vector with random noise
 
                     mixout = util.batchedn((zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
