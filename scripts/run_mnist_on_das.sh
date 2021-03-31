@@ -17,7 +17,7 @@ source /home/mms496/.bashrc
 
 
 # Base directory for the experiment
-cd /home/mms496/StyleVAE_Experiments/partial
+cd /home/mms496/StyleVAE_Experiments/mnist
 
 # Simple trick to create a unique directory for each run of the script
 
@@ -28,4 +28,4 @@ cd o`echo $$`
 
 # Run the actual experiment
 
-python -u /home/mms496/StyleVAE_Experiments/code/StyleVAE/stylevae.py  --task ffhq --numplots 1000 -z 256 -e 1 1 1 1 1 100000 -l 0.00005 -b 32 --betas 0.4 1 1 1 1 1 1 1 --dropouts 0 0.9 0.9 0.9 0.9 0.9 0.9 --mapping-layers 6 -D /var/scratch/mms496/data/ffhq/partial/thumbnails128x128 # --channels 64 128 256 512 1024 --zchannels 4 8 16 32 64 128 
+python -u /home/mms496/StyleVAE_Experiments/code/StyleVAE/stylevae.py  --task mnist --numplots 1000 -z 32 -e 10 10 10 10 10 100000 -l 0.00001 -b 32 --betas 1 1 1 1 1 1 1 1 --dropouts 0 0.3 0.9 0 0 0 0 --mapping-layers 3 -D /var/scratch/mms496/data/mnist/
