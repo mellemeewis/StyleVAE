@@ -637,9 +637,6 @@ def go(arg):
                                         input.cpu()[24:48,:,:], xout[24:48,:,:], mixout[24:48,:,:], mixout2[24:48,:,:], sample[24:48,:,:],
                                         input.cpu()[48:,:,:], xout[48:,:,:], mixout[48:,:,:], mixout2[48:,:,:], sample[48:,:,:]], dim=0)
 
-
-                    print(input)
-                    print(xout)
                     # sys.exit()
                     utils.save_image(images, f'images.{depth}.{epoch}.png', nrow=24, padding=2)
 
