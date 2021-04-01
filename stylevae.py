@@ -434,23 +434,11 @@ def go(arg):
                             dev='cuda', depth=depth)
 
                     with torch.no_grad():
-                        for n, p in decoder.named_parameters():
-                            if torch.isnan(p).sum() > 0:
-                                print(n)
-                            if torch.isinf(p).sum() > 0:
-                                print(n)
                         i = decoder(zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand)
 
                     # assert torch.isinf(i).sum() == 0
                     # assert torch.isnan(i).sum() == 0
                     isample = util.sample_image(i)
-
-
-                    for n, p in encoder.named_parameters():
-                        if torch.isnan(p).sum() > 0:
-                            print(f'{n} contains nan')
-                        if torch.isinf(p).sum() > 0:
-                            print(f'{n} contains inf')
 
                     iz, in0, in1, in2, in3, in4, in5 = encoder(isample, depth)
 
