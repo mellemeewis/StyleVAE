@@ -110,7 +110,7 @@ def normal_lt_loss(output, target):
 
     assert torch.isnan(output).sum() == 0
     assert torch.isnan(target).sum() == 0
-   assert torch.isinf(output).sum() == 0
+    assert torch.isinf(output).sum() == 0
     assert torch.isinf(target).sum() == 0
 
     means = torch.sigmoid(output[:,  :l//2])
