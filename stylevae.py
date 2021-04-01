@@ -454,27 +454,7 @@ def go(arg):
                     if depth > 4:
                         in5_loss = util.normal_lt_loss(torch.flatten(in5, start_dim=1), torch.flatten(n5rand, start_dim=1)).mean()
                         i_loss += in5_loss
-                    # iz_loss = F.kl_div(iz, zrand, size_average=None, reduce=None, reduction='mean', log_target=False)
-                    # in0_loss = F.kl_div(in0, n0rand, size_average=None, reduce=None, reduction='mean', log_target=False)
-                    # i_loss = iz_loss + in0_loss 
-                    # if depth >0:
-                    #     in1_loss = in0_loss = F.kl_div(in1, n1rand, size_average=None, reduce=None, reduction='mean', log_target=False)
-                    #     i_loss += in1_loss
-                    # if depth > 1:
-                    #     in2_loss = in0_loss = F.kl_div(in2, n2rand, size_average=None, reduce=None, reduction='mean', log_target=False)
-                    #     i_loss += in2_loss
-                    # if depth > 2:
-                    #     in3_loss = in0_loss = F.kl_div(in3, n3rand, size_average=None, reduce=None, reduction='mean', log_target=False)
-                    #     i_loss += in3_loss
-                    # if depth > 3:
-                    #     in4_loss = in0_loss = F.kl_div(in4, n4rand, size_average=None, reduce=None, reduction='mean', log_target=False)
-                    #     i_loss += in4_loss
-                    # if depth > 4:
-                    #     in5_loss = in0_loss = F.kl_div(in5, n5rand, size_average=None, reduce=None, reduction='mean', log_target=False)
-                    #     i_loss += in5_loss
 
-
-                    # F.kl_div(iz, zrand, size_average=None, reduce=None, reduction='mean', log_target=False)
 
 
 
@@ -489,6 +469,7 @@ def go(arg):
                     # print(i_loss)
 
                     # if i%720 == 0:
+                    #     print("TTRAIN LOSSES: ")
                     #     print('PER: ', perceptual_loss)
                     #     print('REC: ', rec_loss)
                     #     print("Z KL: ", zkl)
@@ -620,25 +601,19 @@ def go(arg):
                     mixout = util.batchedn((zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
 
                     # -- mix a random vector with the sample noise
+
                     mixout2 = util.batchedn((zrand, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
-
-
-
-                    # xout = torch.sigmoid(xout)
-                    # mixout = torch.sigmoid(mixout)
-                    # mixout2 = torch.sigmoid(mixout2)
-                    # sample = torch.sigmoid(sample)
 
 
                     images = torch.cat([input.cpu()[:24,:,:], xout[:24,:,:], mixout[:24,:,:], mixout2[:24,:,:], sample[:24,:,:],
                                         input.cpu()[24:48,:,:], xout[24:48,:,:], mixout[24:48,:,:], mixout2[24:48,:,:], sample[24:48,:,:],
                                         input.cpu()[48:,:,:], xout[48:,:,:], mixout[48:,:,:], mixout2[48:,:,:], sample[48:,:,:]], dim=0)
 
-                    # sys.exit()
+
                     utils.save_image(images, f'images.{depth}.{epoch}.png', nrow=24, padding=2)
 
-                    slack_util.send_message(f'Epoch {epoch} Depth {depth} Finished\n options: {arg}')
-                    slack_util.send_image(f'images.{depth}.{epoch}.png', f'Depth {depth, }Epoch: {epoch}')
+                    slack_util.send_message(f'Epoch {epoch} Depth {depth} Finished\n Data: {arg.data_dir}')
+                    slack_util.send_image(f'images.{depth}.{epoch}.png', f'Epoch: {epoch}')
                     # utils.save_image(input.cpu(), f'images_input.{depth}.{epoch}.png', nrow=3, padding=2)
                     # utils.save_image(xout, f'images_xout_recon.{depth}.{epoch}.png', nrow=3, padding=2)
                     # utils.save_image(mixout, f'images_mixout_lv_rn.{depth}.{epoch}.png', nrow=3, padding=2)

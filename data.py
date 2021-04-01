@@ -2,7 +2,7 @@ import torch
 import torchvision
 import numpy as np
 import os
-from torchvision.transforms import ToTensor, Compose, Pad, Grayscale, RandomHorizontalFlip, Normalize, ToPILImage
+from torchvision.transforms import ToTensor, Compose, Pad, Grayscale, RandomHorizontalFlip
 from six.moves import urllib
 
 
@@ -16,21 +16,15 @@ def return_data(task, data_dir, batch_size):
 
 
 	if task == 'mnist':
+		transform = Compose([ToTensor(), Pad(2, fill=0, padding_mode='constant')])
 
-
-
-		transform = Compose([Pad(2, fill=0, padding_mode='constant'), ToTensor()])
-		trainset = torchvision.datasets.MNIST(root=data_dir, train=True,
+		trainset = torchvision.datasets.QMNIST(root=data_dir, train=True,
 		                                        download=True, transform=transform)
-		# trainset.data = trainset.data/255
-
 		trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
 		                                          shuffle=True, num_workers=2)
 
-		testset = torchvision.datasets.MNIST(root=data_dir, train=False,
+		testset = torchvision.datasets.QMNIST(root=data_dir, train=False,
 		                                       download=True, transform=transform)
-		# testset.data = testset.data/255
-
 		testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
 		                                         shuffle=False, num_workers=2)
 
