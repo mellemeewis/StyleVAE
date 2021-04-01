@@ -422,11 +422,7 @@ def go(arg):
                 loss.backward()
                 optd.step()
                 optd.zero_grad()
-                for n, p in decoder.named_parameters():
-                    if torch.isnan(p).sum() > 0:
-                        print(n)
-                    if torch.isinf(p).sum() > 0:
-                        print(n)
+
                 for i in range(arg.encoder_update_per_iteration):
 
                     zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
