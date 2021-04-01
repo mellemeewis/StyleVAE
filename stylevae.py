@@ -625,9 +625,9 @@ def go(arg):
 
 
                     xout = torch.sigmoid(xout)
-                    mixout = torch.simoid(mixout)
-                    mixout2 = torch.simoid(mixout2)
-                    sample = torch.simoid(sample)
+                    mixout = torch.sigmoid(mixout)
+                    mixout2 = torch.sigmoid(mixout2)
+                    sample = torch.sigmoid(sample)
 
                     print(input[input>1], input[input<0])
 
