@@ -354,7 +354,8 @@ def go(arg):
                     input = input.cuda()
 
                 # -- encoding
-                z, n0, n1, n2, n3, n4, n5 = encoder(input, depth)
+                with torch.no_grad():
+                    zs, n0, n1, n2, n3, n4, n5 = encoder(input, depth)
 
                 # -- compute KL losses
 
