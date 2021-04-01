@@ -434,7 +434,11 @@ def go(arg):
 
 
                     isample = util.sample_image(i)
-
+                    if torch.isnan(isample).sum() > 0:
+                            print(f'isample contains nan')
+                    if torch.isinf(isample).sum() > 0:
+                            print(f'isample contains inf')
+                            
                     iz, in0, in1, in2, in3, in4, in5 = encoder(isample, depth)
 
                     iz_loss = util.normal_lt_loss(iz, zrand).mean()
@@ -503,7 +507,8 @@ def go(arg):
                     for n, p in encoder.named_parameters():
                         if torch.isnan(p).sum() > 0:
                             print(f'{n} contains nan')
-
+                        if torch.isinf(p).sum() > 0:
+                            print(f'{n} contains inf')
 
                 # optimizer.zero_grad()
 
