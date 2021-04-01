@@ -16,7 +16,7 @@ def return_data(task, data_dir, batch_size):
 
 
 	if task == 'mnist':
-		transform = Compose([ToTensor(), Pad(2, fill=0, padding_mode='constant'), Normalize((0.5), (0.5))])
+		transform = Compose([ToTensor(), Pad(2, fill=0, padding_mode='constant'), Grayscale()])
 
 		trainset = torchvision.datasets.QMNIST(root=data_dir, train=True,
 		                                        download=True, transform=transform)
