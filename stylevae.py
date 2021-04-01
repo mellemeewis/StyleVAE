@@ -417,7 +417,7 @@ def go(arg):
                 loss = loss.mean(dim=0)
                 with torch.no_grad():
                     epoch_loss[0] += rec_loss.mean(dim=0).item()
-                    # epoch_loss[1] += kl_loss.mean(dim=0).item()
+                    epoch_loss[1] += kl_loss.mean(dim=0).item()
 
                 loss.backward()
                 optd.step()
