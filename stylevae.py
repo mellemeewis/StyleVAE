@@ -90,7 +90,9 @@ class StyleEncoder(nn.Module):
         self.unmapping = nn.Sequential(*um)
 
     def forward(self, x0, depth):
-
+        assert torch.isinf(x0).sum() == 0
+        assert torch.isnan(x0).sum() == 0
+        
         b = x0.size(0)
 
         n0 = n1 = n2 = n3 = n4 = n5 = None
@@ -452,7 +454,8 @@ def go(arg):
                         if torch.isinf(p).sum() > 0:
                             print(f'{n} contains inf')
 
-
+                    assert torch.isinf(isample).sum() == 0
+                    assert torch.isnan(isample).sum() == 0
                     iz, in0, in1, in2, in3, in4, in5 = encoder(isample, depth)
 
                     iz_loss = util.normal_lt_loss(iz, zrand).mean()
