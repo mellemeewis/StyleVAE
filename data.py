@@ -18,10 +18,12 @@ def return_data(task, data_dir, batch_size):
 	if task == 'mnist':
 
 
+
 		transform = Compose([Pad(2, fill=0, padding_mode='constant'), ToTensor()])
 		trainset = torchvision.datasets.MNIST(root=data_dir, train=True,
 		                                        download=True, transform=transform)
 		trainset.data = trainset.data/255
+
 		trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
 		                                          shuffle=True, num_workers=2)
 
@@ -31,6 +33,16 @@ def return_data(task, data_dir, batch_size):
 
 		testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
 		                                         shuffle=False, num_workers=2)
+		
+		print('Min Pixel Value: {} \nMax Pixel Value: {}'.format(trainset.data.min(), trainset.data.max()))
+		print('Mean Pixel Value {} \nPixel Values Std: {}'.format(trainset.data.float().mean(), trainset.data.float().std()))
+		print('Scaled Mean Pixel Value {} \nScaled Pixel Values Std: {}'.format(trainset.data.float().mean() / 255, trainset.data.float().std() / 255))
+
+
+		print('Min Pixel Value: {} \nMax Pixel Value: {}'.format(testset.data.min(), testset.data.max()))
+		print('Mean Pixel Value {} \nPixel Values Std: {}'.format(testset.data.float().mean(), testset.data.float().std()))
+		print('Scaled Mean Pixel Value {} \nScaled Pixel Values Std: {}'.format(testset.data.float().mean() / 255, testset.data.float().std() / 255))
+
 
 		C, H, W = 1, 32, 32
 	elif task == 'cifar10':
