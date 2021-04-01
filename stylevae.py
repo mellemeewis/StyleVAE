@@ -436,25 +436,46 @@ def go(arg):
 
                     iz, in0, in1, in2, in3, in4, in5 = encoder(isample, depth)
 
-                    iz_loss = util.normal_lt_loss(iz, zrand).mean()
-                    in0_loss = util.normal_lt_loss(torch.flatten(in0, start_dim=1), torch.flatten(n0rand, start_dim=1)).mean()
+                    # iz_loss = util.normal_lt_loss(iz, zrand).mean()
+                    # in0_loss = util.normal_lt_loss(torch.flatten(in0, start_dim=1), torch.flatten(n0rand, start_dim=1)).mean()
+                    # i_loss = iz_loss + in0_loss 
+                    # if depth >0:
+                    #     in1_loss = util.normal_lt_loss(torch.flatten(in1, start_dim=1), torch.flatten(n1rand, start_dim=1)).mean()
+                    #     i_loss += in1_loss
+                    # if depth > 1:
+                    #     in2_loss = util.normal_lt_loss(torch.flatten(in2, start_dim=1), torch.flatten(n2rand, start_dim=1)).mean()
+                    #     i_loss += in2_loss
+                    # if depth > 2:
+                    #     in3_loss = util.normal_lt_loss(torch.flatten(in3, start_dim=1), torch.flatten(n3rand, start_dim=1)).mean()
+                    #     i_loss += in3_loss
+                    # if depth > 3:
+                    #     in4_loss = util.normal_lt_loss(torch.flatten(in4, start_dim=1), torch.flatten(n4rand, start_dim=1)).mean()
+                    #     i_loss += in4_loss
+                    # if depth > 4:
+                    #     in5_loss = util.normal_lt_loss(torch.flatten(in5, start_dim=1), torch.flatten(n5rand, start_dim=1)).mean()
+                    #     i_loss += in5_loss
+
+                    iz_loss = F.kl_div(iz, zrand, size_average=None, reduce=None, reduction='mean', log_target=False)
+                    in0_loss = F.kl_div(in0, n0rand, size_average=None, reduce=None, reduction='mean', log_target=False)
                     i_loss = iz_loss + in0_loss 
                     if depth >0:
-                        in1_loss = util.normal_lt_loss(torch.flatten(in1, start_dim=1), torch.flatten(n1rand, start_dim=1)).mean()
+                        in1_loss = in0_loss = F.kl_div(in1, n1rand, size_average=None, reduce=None, reduction='mean', log_target=False)
                         i_loss += in1_loss
                     if depth > 1:
-                        in2_loss = util.normal_lt_loss(torch.flatten(in2, start_dim=1), torch.flatten(n2rand, start_dim=1)).mean()
+                        in2_loss = in0_loss = F.kl_div(in2, n2rand, size_average=None, reduce=None, reduction='mean', log_target=False)
                         i_loss += in2_loss
                     if depth > 2:
-                        in3_loss = util.normal_lt_loss(torch.flatten(in3, start_dim=1), torch.flatten(n3rand, start_dim=1)).mean()
+                        in3_loss = in0_loss = F.kl_div(in3, n3rand, size_average=None, reduce=None, reduction='mean', log_target=False)
                         i_loss += in3_loss
                     if depth > 3:
-                        in4_loss = util.normal_lt_loss(torch.flatten(in4, start_dim=1), torch.flatten(n4rand, start_dim=1)).mean()
+                        in4_loss = in0_loss = F.kl_div(in4, n4rand, size_average=None, reduce=None, reduction='mean', log_target=False)
                         i_loss += in4_loss
                     if depth > 4:
-                        in5_loss = util.normal_lt_loss(torch.flatten(in5, start_dim=1), torch.flatten(n5rand, start_dim=1)).mean()
+                        in5_loss = in0_loss = F.kl_div(in5, n5rand, size_average=None, reduce=None, reduction='mean', log_target=False)
                         i_loss += in5_loss
 
+
+                    F.kl_div(iz, zrand, size_average=None, reduce=None, reduction='mean', log_target=False)
 
 
 
@@ -469,7 +490,6 @@ def go(arg):
                     # print(i_loss)
 
                     # if i%720 == 0:
-                    #     print("TTRAIN LOSSES: ")
                     #     print('PER: ', perceptual_loss)
                     #     print('REC: ', rec_loss)
                     #     print("Z KL: ", zkl)
