@@ -493,7 +493,6 @@ def go(arg):
 
                     # Backward pass
 
-                    if rch.isnan(loss).sum()
                     assert torch.isnan(loss).sum() == 0
                     assert torch.isinf(loss).sum() == 0
 
