@@ -289,7 +289,7 @@ class StyleDecoder(nn.Module):
             z0 = self.affine0(z).view(-1, 2 * c, h, w)
             x0 = util.adain(z0, x0)
 
-        return torch.sigmoid(self.conv0(x0))
+        return self.conv0(x0)
 
 def go(arg):
 
