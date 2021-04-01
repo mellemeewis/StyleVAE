@@ -119,8 +119,8 @@ def normal_lt_loss(output, target):
 def normal_im(output, target):
 
     b, c, h, w = output.size()
-    means = torch.sigmoid(output[:, :c//2, :, :])
-    vars  = torch.sigmoid(output[:, c//2:, :, :])
+    means = output[:, :c//2, :, :]
+    vars  = output[:, c//2:, :, :]
 
     return vars.log() + (1.0/(2.0 * vars.pow(2.0))) * (target - means).pow(2.0)
 
