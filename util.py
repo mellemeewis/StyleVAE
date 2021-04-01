@@ -108,7 +108,7 @@ def kl_loss(zmean, zlsig):
 def normal_lt_loss(output, target):
     b, l = output.size()
 
-    print(target[target <= 0])
+    print(target[target <= -1])
     print(target[target >= 1])
 
     means = torch.sigmoid(output[:,  :l//2])
