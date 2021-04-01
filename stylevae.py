@@ -620,9 +620,16 @@ def go(arg):
                     mixout = util.batchedn((zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
 
                     # -- mix a random vector with the sample noise
-
                     mixout2 = util.batchedn((zrand, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
 
+
+
+                    xout = torch.sigmoid(xout)
+                    mixout = torch.simoid(mixout)
+                    mixout2 = torch.simoid(mixout2)
+                    sample = torch.simoid(sample)
+
+                    print(input[input>1], input[input<1])
 
                     images = torch.cat([input.cpu()[:24,:,:], xout[:24,:,:], mixout[:24,:,:], mixout2[:24,:,:], sample[:24,:,:],
                                         input.cpu()[24:48,:,:], xout[24:48,:,:], mixout[24:48,:,:], mixout2[24:48,:,:], sample[24:48,:,:],
@@ -631,7 +638,7 @@ def go(arg):
 
                     print(input)
                     print(xout)
-                    sys.exit()
+                    # sys.exit()
                     utils.save_image(images, f'images.{depth}.{epoch}.png', nrow=24, padding=2)
 
                     slack_util.send_message(f'Epoch {epoch} Depth {depth} Finished\n options: {arg}')
