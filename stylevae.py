@@ -629,9 +629,6 @@ def go(arg):
                     mixout2 = torch.sigmoid(mixout2)
                     sample = torch.sigmoid(sample)
 
-                    print(input[input>1])
-                    print(input[input<0])
-
 
                     images = torch.cat([input.cpu()[:24,:,:], xout[:24,:,:], mixout[:24,:,:], mixout2[:24,:,:], sample[:24,:,:],
                                         input.cpu()[24:48,:,:], xout[24:48,:,:], mixout[24:48,:,:], mixout2[24:48,:,:], sample[24:48,:,:],
