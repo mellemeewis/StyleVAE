@@ -442,6 +442,8 @@ def go(arg):
                     i_loss = iz_loss + in0_loss 
                     if depth >0:
                         in1_loss = util.normal_lt_loss(torch.flatten(in1, start_dim=1), torch.flatten(n1rand, start_dim=1)).mean()
+                        assert torch.isnan(in1_loss).sum() == 0
+                        assert torch.isinf(in1_loss).sum() == 0
                         i_loss += in1_loss
                     if depth > 1:
                         in2_loss = util.normal_lt_loss(torch.flatten(in2, start_dim=1), torch.flatten(n2rand, start_dim=1)).mean()
@@ -491,6 +493,7 @@ def go(arg):
 
                     # Backward pass
 
+                    if rch.isnan(loss).sum()
                     assert torch.isnan(loss).sum() == 0
                     assert torch.isinf(loss).sum() == 0
 
