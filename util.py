@@ -122,10 +122,16 @@ def normal_lt_loss(output, target):
     return vars.log() + (1.0/(2.0 * vars.pow(2.0))) * (target - means).pow(2.0)
 
 def normal_im(output, target):
+    assert torch.isnan(output).sum() == 0
+    assert torch.isnan(target).sum() == 0
+    assert torch.isinf(output).sum() == 0
+    assert torch.isinf(target).sum() == 0
 
     b, c, h, w = output.size()
     means = output[:, :c//2, :, :]
     vars  = output[:, c//2:, :, :]
+    means=torch.clamp(means, min=0.001) 
+    vars=torch.clamp(vars, min=0.001)
 
     return vars.log() + (1.0/(2.0 * vars.pow(2.0))) * (target - means).pow(2.0)
 
