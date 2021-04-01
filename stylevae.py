@@ -500,6 +500,9 @@ def go(arg):
                     opte.step()
                     opte.zero_grad()
 
+                    for n, p in encoder.named_parameters():
+                        print(n, torch.isnan(p).sum())
+
 
                 # optimizer.zero_grad()
 
