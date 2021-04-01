@@ -16,7 +16,7 @@ def return_data(task, data_dir, batch_size):
 
 
 	if task == 'mnist':
-		transform = Compose([ToTensor(), Pad(2, fill=0, padding_mode='constant')])
+		transform = Compose([ToTensor()])
 		trainset = torchvision.datasets.MNIST(root=data_dir, train=True,
 		                                        download=True, transform=transform)
 		trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
@@ -27,7 +27,7 @@ def return_data(task, data_dir, batch_size):
 		testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
 		                                         shuffle=False, num_workers=2)
 
-		C, H, W = 1, 32, 32
+		C, H, W = 1, 28, 28
 	elif task == 'cifar10':
 		trainset = torchvision.datasets.CIFAR10(root=data_dir, train=True,
 		                                        download=True, transform=ToTensor())
