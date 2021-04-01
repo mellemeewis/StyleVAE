@@ -16,7 +16,7 @@ def return_data(task, data_dir, batch_size):
 
 
 	if task == 'mnist':
-		transform = Compose([Pad(2, fill=0, padding_mode='constant')])
+		transform = Compose([Pad(2, fill=0, padding_mode='constant'), ToTensor()])
 		trainset = torchvision.datasets.MNIST(root=data_dir, train=True,
 		                                        download=True, transform=transform)
 		trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
