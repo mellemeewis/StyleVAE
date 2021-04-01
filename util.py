@@ -142,10 +142,10 @@ def sample(zmean, zlsig, eps=None):
 
 
 def sample_image(z, eps=None):
-    assert torch.isinf(z).sum() == 0
-    assert torch.isnan(z).sum() == 0
     if z  is None:
         return None
+    assert torch.isinf(z).sum() == 0
+    assert torch.isnan(z).sum() == 0
 
     b, c, h, w = z.size()
     mean = z[:, :c//2, :, :].view(b, -1)
