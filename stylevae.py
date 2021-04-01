@@ -101,7 +101,8 @@ class StyleEncoder(nn.Module):
         if depth <= 0:
             z = self.unmapping(z0)
             return z, n0, n1, n2, n3, n4, n5
-
+        assert torch.isinf(x0).sum() == 0
+        assert torch.isnan(x0).sum() == 0
         x1 = F.avg_pool2d(self.block1(x0), 2)
         z1 = self.affine1(x1.view(b, -1))
         n1 = self.tonoise1(x1)
