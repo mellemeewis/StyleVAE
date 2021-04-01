@@ -359,13 +359,13 @@ def go(arg):
 
                 # -- compute KL losses
 
-                # zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
-                # n0kl = util.kl_loss_image(n0)
-                # n1kl = util.kl_loss_image(n1)
-                # n2kl = util.kl_loss_image(n2)
-                # n3kl = util.kl_loss_image(n3)
-                # n4kl = util.kl_loss_image(n4)
-                # n5kl = util.kl_loss_image(n5)
+                zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
+                n0kl = util.kl_loss_image(n0)
+                n1kl = util.kl_loss_image(n1)
+                n2kl = util.kl_loss_image(n2)
+                n3kl = util.kl_loss_image(n3)
+                n4kl = util.kl_loss_image(n4)
+                n5kl = util.kl_loss_image(n5)
 
                 # -- take samples
                 zsample  = util.sample(z[:, :zs], z[:, zs:])
@@ -404,12 +404,12 @@ def go(arg):
                 br, bz, b0, b1, b2, b3, b4, b5 = arg.betas
 
                 # dense_loss = 0
-                # kl_loss = bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
+                kl_loss = bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
                 # assert torch.isnan(kl_loss).sum() == 0
                 # assert torch.isinf(kl_loss).sum() == 0
 
-                loss = rec_loss
-                # loss = br * rec_loss + kl_loss
+                # loss = rec_loss
+                loss = br * rec_loss + kl_loss
 
                 # assert torch.isnan(loss).sum() == 0
                 # assert torch.isinf(loss).sum() == 0
