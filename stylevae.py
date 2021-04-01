@@ -105,11 +105,10 @@ class StyleEncoder(nn.Module):
         x1 = F.avg_pool2d(self.block1(x0), 2)
         z1 = self.affine1(x1.view(b, -1))
         n1 = self.tonoise1(x1)
-
+        assert torch.isinf(x1).sum() == 0
         assert torch.isnan(x1).sum() == 0
         assert torch.isnan(z1).sum() == 0
         assert torch.isnan(n1).sum() == 0
-        assert torch.isinf(x1).sum() == 0
         assert torch.isinf(z1).sum() == 0
         assert torch.isinf(n1).sum() == 0
         assert torch.isnan(z0).sum() == 0
