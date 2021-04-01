@@ -90,9 +90,6 @@ class StyleEncoder(nn.Module):
         self.unmapping = nn.Sequential(*um)
 
     def forward(self, x0, depth):
-        assert torch.isinf(x0).sum() == 0
-        assert torch.isnan(x0).sum() == 0
-
         b = x0.size(0)
 
         n0 = n1 = n2 = n3 = n4 = n5 = None
@@ -103,23 +100,14 @@ class StyleEncoder(nn.Module):
         if depth <= 0:
             z = self.unmapping(z0)
             return z, n0, n1, n2, n3, n4, n5
-        assert torch.isinf(x0).sum() == 0
-        assert torch.isnan(x0).sum() == 0
+
         x1 = F.avg_pool2d(self.block1(x0), 2)
         z1 = self.affine1(x1.view(b, -1))
         n1 = self.tonoise1(x1)
-        assert torch.isinf(x1).sum() == 0
-        assert torch.isnan(x1).sum() == 0
-        assert torch.isnan(z1).sum() == 0
-        assert torch.isnan(n1).sum() == 0
-        assert torch.isinf(z1).sum() == 0
-        assert torch.isinf(n1).sum() == 0
-        assert torch.isnan(z0).sum() == 0
-        assert torch.isinf(z0).sum() == 0
+
         if depth <= 1:
             z = self.unmapping(z0 + z1)
-            assert torch.isnan(z).sum() == 0
-            assert torch.isinf(z).sum() == 0
+
             return z, n0, n1, n2, n3, n4, n5
 
         x2 = F.avg_pool2d(self.block2(x1), 2)
@@ -434,7 +422,11 @@ def go(arg):
                 loss.backward()
                 optd.step()
                 optd.zero_grad()
-
+                for n, p in decoder.named_parameters():
+                    if torch.isnan(p).sum() > 0:
+                        print(n)
+                    if torch.isinf(p).sum() > 0:
+                        print(n)
                 for i in range(arg.encoder_update_per_iteration):
 
                     zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
@@ -442,6 +434,11 @@ def go(arg):
                             dev='cuda', depth=depth)
 
                     with torch.no_grad():
+                        for n, p in decoder.named_parameters():
+                            if torch.isnan(p).sum() > 0:
+                                print(n)
+                            if torch.isinf(p).sum() > 0:
+                                print(n)
                         i = decoder(zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand)
 
                     assert torch.isinf(i).sum() == 0
@@ -455,8 +452,6 @@ def go(arg):
                         if torch.isinf(p).sum() > 0:
                             print(f'{n} contains inf')
 
-                    assert torch.isinf(isample).sum() == 0
-                    assert torch.isnan(isample).sum() == 0
                     iz, in0, in1, in2, in3, in4, in5 = encoder(isample, depth)
 
                     iz_loss = util.normal_lt_loss(iz, zrand).mean()
@@ -464,8 +459,6 @@ def go(arg):
                     i_loss = iz_loss + in0_loss 
                     if depth >0:
                         in1_loss = util.normal_lt_loss(torch.flatten(in1, start_dim=1), torch.flatten(n1rand, start_dim=1)).mean()
-                        assert torch.isnan(in1_loss).sum() == 0
-                        assert torch.isinf(in1_loss).sum() == 0
                         i_loss += in1_loss
                     if depth > 1:
                         in2_loss = util.normal_lt_loss(torch.flatten(in2, start_dim=1), torch.flatten(n2rand, start_dim=1)).mean()
@@ -513,10 +506,7 @@ def go(arg):
                     # tbw.add_scalar('style-vae/rec-loss', float(rec_loss.data.mean(dim=0).item()), instances_seen)
                     # tbw.add_scalar('style-vae/total-loss', float(loss.data.item()), instances_seen)
 
-                    # Backward pass
-
-                    assert torch.isnan(loss).sum() == 0
-                    assert torch.isinf(loss).sum() == 0
+                    # Backward pas
 
                     loss.backward()
                     opte.step()
