@@ -454,7 +454,7 @@ def go(arg):
                     # if depth > 4:
                     #     in5_loss = util.normal_lt_loss(torch.flatten(in5, start_dim=1), torch.flatten(n5rand, start_dim=1)).mean()
                     #     i_loss += in5_loss
-
+                    print(iz.size(), zrand.size())
                     iz_loss = F.kl_div(iz, zrand, size_average=None, reduce=None, reduction='mean', log_target=False)
                     in0_loss = F.kl_div(in0, n0rand, size_average=None, reduce=None, reduction='mean', log_target=False)
                     i_loss = iz_loss + in0_loss 
