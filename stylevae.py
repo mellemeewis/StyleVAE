@@ -629,6 +629,7 @@ def go(arg):
                                         input.cpu()[48:,:,:], xout[48:,:,:], mixout[48:,:,:], mixout2[48:,:,:], sample[48:,:,:]], dim=0)
 
 
+                    images = torch.sigmoid(images*255)
                     utils.save_image(images, f'images.{depth}.{epoch}.png', nrow=24, padding=2)
 
                     slack_util.send_message(f'Epoch {epoch} Depth {depth} Finished\n options: {arg}')

@@ -22,14 +22,14 @@ def return_data(task, data_dir, batch_size):
 		transform = Compose([Pad(2, fill=0, padding_mode='constant'), ToTensor()])
 		trainset = torchvision.datasets.MNIST(root=data_dir, train=True,
 		                                        download=True, transform=transform)
-		# trainset.data = trainset.data/255
+		trainset.data = trainset.data/255
 
 		trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
 		                                          shuffle=True, num_workers=2)
 
 		testset = torchvision.datasets.MNIST(root=data_dir, train=False,
 		                                       download=True, transform=transform)
-		# testset.data = testset.data/255
+		testset.data = testset.data/255
 
 		testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
 		                                         shuffle=False, num_workers=2)
