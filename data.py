@@ -17,8 +17,9 @@ def return_data(task, data_dir, batch_size):
 
 	if task == 'mnist':
 
+		transform = Compose([Pad(2, fill=0, padding_mode='constant'), ToTensor()])
 
-		trainset = torchvision.datasets.MNIST(root='./data', train=True, download=True, transform=ToTensor())
+		trainset = torchvision.datasets.MNIST(root='./data', train=True, download=True, transform=transform)
 		print('Min Pixel Value: {} \nMax Pixel Value: {}'.format(trainset.data.min(), trainset.data.max()))
 		print('Mean Pixel Value {} \nPixel Values Std: {}'.format(trainset.data.float().mean(), trainset.data.float().std()))
 		print('Scaled Mean Pixel Value {} \nScaled Pixel Values Std: {}'.format(trainset.data.float().mean() / 255, trainset.data.float().std() / 255))
