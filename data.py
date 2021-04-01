@@ -27,7 +27,7 @@ def return_data(task, data_dir, batch_size):
 
 		testset = torchvision.datasets.MNIST(root=data_dir, train=False,
 		                                       download=True, transform=transform)
-		testset.data = trainset.data/255
+		testset.data = testset.data/255
 
 		testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
 		                                         shuffle=False, num_workers=2)
