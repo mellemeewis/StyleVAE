@@ -92,7 +92,7 @@ class StyleEncoder(nn.Module):
     def forward(self, x0, depth):
         assert torch.isinf(x0).sum() == 0
         assert torch.isnan(x0).sum() == 0
-        
+
         b = x0.size(0)
 
         n0 = n1 = n2 = n3 = n4 = n5 = None
@@ -444,7 +444,8 @@ def go(arg):
                     with torch.no_grad():
                         i = decoder(zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand)
 
-
+                    assert torch.isinf(i).sum() == 0
+                    assert torch.isnan(i).sum() == 0
                     isample = util.sample_image(i)
 
 
