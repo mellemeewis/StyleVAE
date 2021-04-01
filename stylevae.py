@@ -501,7 +501,8 @@ def go(arg):
                     opte.zero_grad()
 
                     for n, p in encoder.named_parameters():
-                        print(n, torch.isnan(p).sum())
+                        if torch.isnan(p).sum() > 0:
+                            print(f'{n} contains nan')
 
 
                 # optimizer.zero_grad()
