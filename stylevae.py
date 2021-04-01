@@ -391,15 +391,15 @@ def go(arg):
 
 
 
-                assert torch.isinf(xout).sum() == 0
-                assert torch.isnan(xout).sum() == 0
+                # assert torch.isinf(xout).sum() == 0
+                # assert torch.isnan(xout).sum() == 0
 
                 rec_loss = util.normal_im(xout, input).view(b, c*h*w).sum(dim=1)
 
                 # rec_loss = F.binary_cross_entropy(xout, input, reduction='none').view(b, -1).sum(dim=1)
 
-                assert torch.isnan(rec_loss).sum() == 0
-                assert torch.isinf(rec_loss).sum() == 0
+                # assert torch.isnan(rec_loss).sum() == 0
+                # assert torch.isinf(rec_loss).sum() == 0
 
                 br, bz, b0, b1, b2, b3, b4, b5 = arg.betas
 
@@ -411,8 +411,8 @@ def go(arg):
                 loss = rec_loss
                 # loss = br * rec_loss + kl_loss
 
-                assert torch.isnan(loss).sum() == 0
-                assert torch.isinf(loss).sum() == 0
+                # assert torch.isnan(loss).sum() == 0
+                # assert torch.isinf(loss).sum() == 0
 
                 loss = loss.mean(dim=0)
                 with torch.no_grad():
@@ -441,8 +441,8 @@ def go(arg):
                                 print(n)
                         i = decoder(zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand)
 
-                    assert torch.isinf(i).sum() == 0
-                    assert torch.isnan(i).sum() == 0
+                    # assert torch.isinf(i).sum() == 0
+                    # assert torch.isnan(i).sum() == 0
                     isample = util.sample_image(i)
 
 

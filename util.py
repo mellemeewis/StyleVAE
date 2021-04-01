@@ -98,7 +98,7 @@ def kl_loss(zmean, zlsig):
 
     kl = 0.5 * torch.sum(zlsig.exp() - zlsig + zmean.pow(2) - 1, dim=1)
 
-    kl = torch.clamp(kl, min=0.0000001, max=1000000)
+    kl = torch.clamp(kl, min=0.001, max=100)
     assert kl.size() == (b,)
 
 
@@ -108,10 +108,10 @@ def kl_loss(zmean, zlsig):
 def normal_lt_loss(output, target):
     b, l = output.size()
 
-    assert torch.isnan(output).sum() == 0
-    assert torch.isnan(target).sum() == 0
-    assert torch.isinf(output).sum() == 0
-    assert torch.isinf(target).sum() == 0
+    # assert torch.isnan(output).sum() == 0
+    # assert torch.isnan(target).sum() == 0
+    # assert torch.isinf(output).sum() == 0
+    # assert torch.isinf(target).sum() == 0
 
     means = torch.sigmoid(output[:,  :l//2])
     vars  = torch.sigmoid(output[:,  l//2:])
@@ -122,10 +122,10 @@ def normal_lt_loss(output, target):
     return vars.log() + (1.0/(2.0 * vars.pow(2.0))) * (target - means).pow(2.0)
 
 def normal_im(output, target):
-    assert torch.isnan(output).sum() == 0
-    assert torch.isnan(target).sum() == 0
-    assert torch.isinf(output).sum() == 0
-    assert torch.isinf(target).sum() == 0
+    # assert torch.isnan(output).sum() == 0
+    # assert torch.isnan(target).sum() == 0
+    # assert torch.isinf(output).sum() == 0
+    # assert torch.isinf(target).sum() == 0
 
     b, c, h, w = output.size()
     means = output[:, :c//2, :, :]
@@ -150,17 +150,11 @@ def sample(zmean, zlsig, eps=None):
 def sample_image(z, eps=None):
     if z  is None:
         return None
-    assert torch.isinf(z).sum() == 0
-    assert torch.isnan(z).sum() == 0
+
 
     b, c, h, w = z.size()
     mean = z[:, :c//2, :, :].view(b, -1)
     sig = z[:, c//2:, :, :].view(b, -1)
-
-    assert torch.isinf(mean).sum() == 0
-    assert torch.isnan(mean).sum() == 0
-    assert torch.isinf(sig).sum() == 0
-    assert torch.isnan(sig).sum() == 0
 
     if eps is None:
         eps = torch.randn(b, c//2, h, w).view(b, -1)
@@ -169,9 +163,6 @@ def sample_image(z, eps=None):
         eps = Variable(eps)
 
     sample = mean + eps * (sig * 0.5).exp()
-
-    assert torch.isinf(sample).sum() == 0
-    assert torch.isnan(sample).sum() == 0
 
     return sample.view(b, c//2, h, w)
 
