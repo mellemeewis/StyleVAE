@@ -383,7 +383,7 @@ def go(arg):
                 # n4sample = util.sample_image(n4)
                 # n5sample = util.sample_image(n5)
 
-                with torch.nograd():
+                with torch.no_grad():
 
                     _, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
                                 zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
