@@ -135,6 +135,21 @@ def normal_im(output, target):
 
     return vars.log() + (1.0/(2.0 * vars.pow(2.0))) * (target - means).pow(2.0)
 
+
+def siglaplace(output, target):
+          mus = output[:, :1, :, :]
+          sgs, lsgs  = T.exp(output[:, 1:, :, :] * VARMULT), output[:, 1:, :, :] * VARMULT
+
+          y = target
+
+          lny = torch.log(y + EPS)
+          ln1y = torch.log(1 - y + EPS)
+
+          x = lny - ln1y
+
+          rec = lny + ln1y + lsgs + math.log(2.0) + \
+              (x - mus).abs() / sgs
+
 def sample(zmean, zlsig, eps=None):
     b, l = zmean.size()
 

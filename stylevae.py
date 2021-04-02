@@ -289,7 +289,7 @@ class StyleDecoder(nn.Module):
             z0 = self.affine0(z).view(-1, 2 * c, h, w)
             x0 = util.adain(z0, x0)
 
-        return torch.sigmoid(self.conv0(x0))
+        return self.conv0(x0)
 
 def go(arg):
 
@@ -619,16 +619,28 @@ def go(arg):
 
                     mixout2 = util.batchedn((zrand, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
 
+                    xout_sigmoid = torch.sigmoid(xout)
+                    mixout_sigmoid = torch.sigmoid(mixout)
+                    mixout2_sigmoid = torch.sigmoid(mixout2_sigmoid)
+                    sample_sigmoid = torch.sigmoid(sample)
+
 
                     images = torch.cat([input.cpu()[:24,:,:], xout[:24,:,:], mixout[:24,:,:], mixout2[:24,:,:], sample[:24,:,:],
                                         input.cpu()[24:48,:,:], xout[24:48,:,:], mixout[24:48,:,:], mixout2[24:48,:,:], sample[24:48,:,:],
                                         input.cpu()[48:,:,:], xout[48:,:,:], mixout[48:,:,:], mixout2[48:,:,:], sample[48:,:,:]], dim=0)
 
+                    images_sigmoid = torch.cat([input.cpu()[:24,:,:], xout_sigmoid[:24,:,:], mixout_sigmoid[:24,:,:], mixout2_sigmoid[:24,:,:], sample_sigmoid[:24,:,:],
+                                        input.cpu()[24:48,:,:], xout_sigmoid[24:48,:,:], mixout_sigmoid[24:48,:,:], mixout2_sigmoid[24:48,:,:], sample_sigmoid[24:48,:,:],
+                                        input.cpu()[48:,:,:], xout_sigmoid[48:,:,:], mixout_sigmoid[48:,:,:], mixout2_sigmoid[48:,:,:], sample_sigmoid[48:,:,:]], dim=0)
+
 
                     utils.save_image(images, f'images.{depth}.{epoch}.png', nrow=24, padding=2)
+                    utils.save_image(images_sigmoid, f'images_sigmoid.{depth}.{epoch}.png', nrow=24, padding=2)
 
-                    slack_util.send_message(f'Epoch {epoch} Depth {depth} Finished\n Data: {arg.data_dir}')
-                    slack_util.send_image(f'images.{depth}.{epoch}.png', f'Epoch: {epoch}')
+                    slack_util.send_message(f'Epoch {epoch} Depth {depth} Finished\n Options: {arg}')
+                    slack_util.send_image(f'images.{depth}.{epoch}.png', f'Depth {depth}, Epoch: {epoch}')
+                    slack_util.send_image(f'images_sigmoid.{depth}.{epoch}.png', f'Sigmoid_Depth {depth}, Epoch: {epoch}')
+
                     # utils.save_image(input.cpu(), f'images_input.{depth}.{epoch}.png', nrow=3, padding=2)
                     # utils.save_image(xout, f'images_xout_recon.{depth}.{epoch}.png', nrow=3, padding=2)
                     # utils.save_image(mixout, f'images_mixout_lv_rn.{depth}.{epoch}.png', nrow=3, padding=2)
