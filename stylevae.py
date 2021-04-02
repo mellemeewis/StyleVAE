@@ -360,7 +360,7 @@ def go(arg):
                 # -- compute KL losses
 
                 zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
-                loss = zkl
+                loss = zkl.mean()
                 loss.backward()
                 opte.step()
                 opte.zero_grad()
