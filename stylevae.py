@@ -623,7 +623,7 @@ def go(arg):
 
                     xout_sigmoid = torch.sigmoid(xout)
                     mixout_sigmoid = torch.sigmoid(mixout)
-                    mixout2_sigmoid = torch.sigmoid(mixout2_sigmoid)
+                    mixout2_sigmoid = torch.sigmoid(mixout2)
                     sample_sigmoid = torch.sigmoid(sample)
 
 
