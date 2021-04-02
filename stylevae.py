@@ -375,7 +375,7 @@ def go(arg):
                 # n5kl = util.kl_loss_image(n5)
 
                 # -- take samples
-                zsample  = util.sample(z[:, :zs], z[:, zs:])
+                # zsample  = util.sample(z[:, :zs], z[:, zs:])
                 # n0sample = util.sample_image(n0)
                 # n1sample = util.sample_image(n1)
                 # n2sample = util.sample_image(n2)
@@ -388,7 +388,8 @@ def go(arg):
                     _, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
                                 zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
                                 dev='cuda', depth=depth)
-                    zsample_nograd = zsample
+                    zsample  = util.sample(z[:, :zs], z[:, zs:])
+
 
                 # -- decoding
                 # xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
