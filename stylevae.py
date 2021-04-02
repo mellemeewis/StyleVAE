@@ -354,17 +354,17 @@ def go(arg):
                     input = input.cuda()
 
                 # -- encoding
-                # with torch.no_grad():
-                z, n0, n1, n2, n3, n4, n5 = encoder(input, depth)
+                with torch.no_grad():
+                    z, n0, n1, n2, n3, n4, n5 = encoder(input, depth)
 
                 # -- compute KL losses
 
-                zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
-                kl_loss = zkl
-                loss = kl_loss.mean()
-                loss.backward()
-                opte.step()
-                opte.zero_grad()
+                # zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
+                # kl_loss = zkl
+                # loss = kl_loss.mean()
+                # loss.backward()
+                # opte.step()
+                # opte.zero_grad()
 
 
                 # n0kl = util.kl_loss_image(n0)
@@ -375,7 +375,7 @@ def go(arg):
                 # n5kl = util.kl_loss_image(n5)
 
                 # -- take samples
-                # zsample  = util.sample(z[:, :zs], z[:, zs:])
+                    zsample  = util.sample(z[:, :zs], z[:, zs:])
                 # n0sample = util.sample_image(n0)
                 # n1sample = util.sample_image(n1)
                 # n2sample = util.sample_image(n2)
@@ -383,13 +383,10 @@ def go(arg):
                 # n4sample = util.sample_image(n4)
                 # n5sample = util.sample_image(n5)
 
-                with torch.no_grad():
 
                     _, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
                                 zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
                                 dev='cuda', depth=depth)
-                    zsample  = util.sample(z[:, :zs], z[:, zs:])
-
 
                 # -- decoding
                 # xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
@@ -435,7 +432,7 @@ def go(arg):
                 loss = loss.mean(dim=0)
                 with torch.no_grad():
                     epoch_loss[0] += rec_loss.mean(dim=0).item()
-                    epoch_loss[1] += kl_loss.mean(dim=0).item()
+                    # epoch_loss[1] += kl_loss.mean(dim=0).item()
 
                 loss.backward()
                 optd.step()
