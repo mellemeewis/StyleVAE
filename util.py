@@ -139,6 +139,8 @@ def normal_im(output, target):
 def siglaplace(output, target):
     mus = output[:, :1, :, :]
     VARMULT = 1e-5
+    EPS = 1e-5
+
     sgs, lsgs  = torch.exp(output[:, 1:, :, :] * VARMULT), output[:, 1:, :, :] * VARMULT
 
     y = target
