@@ -407,7 +407,8 @@ def go(arg):
                 # assert torch.isinf(xout).sum() == 0
                 # assert torch.isnan(xout).sum() == 0
 
-                rec_loss = util.normal_im(xout, input).view(b, c*h*w).sum(dim=1)
+                # rec_loss = util.normal_im(xout, input).view(b, c*h*w).sum(dim=1)
+                rec_loss = util.siglaplace(xout, input).view(b, c*h*w).sum(dim=1)
 
 
                 # rec_loss = F.binary_cross_entropy(xout, input, reduction='none').view(b, -1).sum(dim=1)
@@ -572,7 +573,8 @@ def go(arg):
                             # m = ds.Normal(xout[:, :C, :, :], xout[:, C:, :, :])
                             # rec_loss = -m.log_prob(target).sum(dim=1).sum(dim=1).sum(dim=1)
 
-                            rec_loss = util.normal_im(xout, input).view(b, c*h*w).sum(dim=1)
+                            # rec_loss = util.normal_im(xout, input).view(b, c*h*w).sum(dim=1)
+                            rec_loss = util.siglaplace(xout, input).view(b, c*h*w).sum(dim=1)
                             loss = rec_loss.mean(dim=0)
 
                             err_te.append(loss.data.item())
