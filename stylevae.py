@@ -354,8 +354,8 @@ def go(arg):
                     input = input.cuda()
 
                 # -- encoding
-                with torch.no_grad():
-                    z, n0, n1, n2, n3, n4, n5 = encoder(input, depth)
+                # with torch.no_grad():
+                z, n0, n1, n2, n3, n4, n5 = encoder(input, depth)
 
                 # -- compute KL losses
 
@@ -375,7 +375,7 @@ def go(arg):
                 # n5kl = util.kl_loss_image(n5)
 
                 # -- take samples
-                    zsample  = util.sample(z[:, :zs], z[:, zs:])
+                zsample  = util.sample(z[:, :zs], z[:, zs:])
                 # n0sample = util.sample_image(n0)
                 # n1sample = util.sample_image(n1)
                 # n2sample = util.sample_image(n2)
@@ -384,9 +384,9 @@ def go(arg):
                 # n5sample = util.sample_image(n5)
 
 
-                    _, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
-                                zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
-                                dev='cuda', depth=depth)
+                _, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
+                            zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
+                            dev='cuda', depth=depth)
 
                 # -- decoding
                 # xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
@@ -408,7 +408,7 @@ def go(arg):
                 # assert torch.isnan(xout).sum() == 0
 
                 # rec_loss = util.normal_im(xout, input).view(b, c*h*w).sum(dim=1)
-                rec_loss = util.signorm(xout, input).view(b, c*h*w).sum(dim=1)
+                rec_loss = util.normal_im(xout, input).view(b, c*h*w).sum(dim=1)
 
 
                 # rec_loss = F.binary_cross_entropy(xout, input, reduction='none').view(b, -1).sum(dim=1)
@@ -438,6 +438,8 @@ def go(arg):
                 loss.backward()
                 optd.step()
                 optd.zero_grad()
+                opte.step()
+                opte.zero_grad()
 
                 for i in range(arg.encoder_update_per_iteration):
 
@@ -574,7 +576,7 @@ def go(arg):
                             # rec_loss = -m.log_prob(target).sum(dim=1).sum(dim=1).sum(dim=1)
 
                             # rec_loss = util.normal_im(xout, input).view(b, c*h*w).sum(dim=1)
-                            rec_loss = util.signorm(xout, input).view(b, c*h*w).sum(dim=1)
+                            rec_loss = util.normal_im(xout, input).view(b, c*h*w).sum(dim=1)
                             loss = rec_loss.mean(dim=0)
 
                             err_te.append(loss.data.item())
@@ -639,7 +641,7 @@ def go(arg):
                     utils.save_image(images, f'images.{depth}.{epoch}.png', nrow=24, padding=2)
                     utils.save_image(images_sigmoid, f'images_sigmoid.{depth}.{epoch}.png', nrow=24, padding=2)
 
-                    slack_util.send_message(f'Epoch {epoch} Depth {depth} Finished\n Options: {arg}')
+                    slack_util.send_message(f'Epoch {epoch} Depth {depth} Finished NORMAL IM ENCODE RECON UPDATE\n Options: {arg}')
                     slack_util.send_image(f'images.{depth}.{epoch}.png', f'Depth {depth}, Epoch: {epoch}')
                     slack_util.send_image(f'images_sigmoid.{depth}.{epoch}.png', f'Sigmoid_Depth {depth}, Epoch: {epoch}')
 
