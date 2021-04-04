@@ -173,7 +173,7 @@ def signorm(output, target):
     EPS = 1e-5
     VARMULT = 1e-5
     mus = output[:, :1, :, :]
-    sgs, lsgs  = T.exp(output[:, 1:, :, :] * VARMULT), output[:, 1:, :, :] * VARMULT
+    sgs, lsgs  = torch.exp(output[:, 1:, :, :] * VARMULT), output[:, 1:, :, :] * VARMULT
 
     y = target
 
