@@ -154,6 +154,20 @@ def siglaplace(output, target):
     return rec
 
 
+def bce_corr(output, target): # xent + correction
+    WEIGHT = 0.1
+    EPS = 1e-5
+
+    out = output[:, :1, :, :]
+    rloss = F.binary_cross_entropy_with_logits(out[:, :1, :, :], target, reduction='none')
+
+    za = output.abs()
+    eza = (-za).exp()
+
+    logpart = - (za + EPS).log() + (-eza + EPS).log1p() - (eza + EPS).log1p()
+    rec = rloss + WEIGHT * logpart
+
+
 def sample(zmean, zlsig, eps=None):
     b, l = zmean.size()
 
