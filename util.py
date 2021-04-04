@@ -168,6 +168,23 @@ def bce_corr(output, target): # xent + correction
     rec = rloss + WEIGHT * logpart
     return rec
 
+def signorm(output, target):
+
+    EPS = 1e-5
+    VARMULT = 1e-5
+    mus = output[:, :1, :, :]
+    sgs, lsgs  = T.exp(output[:, 1:, :, :] * VARMULT), output[:, 1:, :, :] * VARMULT
+
+    y = target
+
+    lny = torch.log(y + EPS)
+    ln1y = torch.log(1 - y + EPS)
+
+    x = lny - ln1y
+
+    rec = lny + ln1y + lsgs +  \
+          0.5 * (1.0 / (sgs * sgs + EPS)) * (x - mus) ** 2
+    return rec 
 
 def sample(zmean, zlsig, eps=None):
     b, l = zmean.size()
