@@ -161,7 +161,7 @@ def bce_corr(output, target): # xent + correction
     out = output[:, :1, :, :]
     rloss = F.binary_cross_entropy_with_logits(out[:, :1, :, :], target, reduction='none')
 
-    za = output.abs()
+    za = out.abs()
     eza = (-za).exp()
 
     logpart = - (za + EPS).log() + (-eza + EPS).log1p() - (eza + EPS).log1p()
