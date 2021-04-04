@@ -165,7 +165,8 @@ def bce_corr(output, target): # xent + correction
     eza = (-za).exp()
 
     logpart = - (za + EPS).log() + (-eza + EPS).log1p() - (eza + EPS).log1p()
-    rec = rloss + WEIGHT * logpart
+    rec = rloss + WEIGHT * logparts
+    return rec
 
 
 def sample(zmean, zlsig, eps=None):
