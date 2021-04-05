@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --time=2:00:00
+#SBATCH --time=13:20:00
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=1
 #SBATCH -C TitanX
