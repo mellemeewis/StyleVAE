@@ -624,9 +624,17 @@ def go(arg):
                     xout = util.batchedn((zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
                     # -- mix the latent vector with random noise
 
+                    _, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
+                            zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
+                            dev='cuda', depth=depth)
+
                     mixout = util.batchedn((zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
 
                     # -- mix a random vector with the sample noise
+
+                    _, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
+                            zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
+                            dev='cuda', depth=depth)
 
                     # mixout2 = util.batchedn((zrand, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
                     mixout2 = util.batchedn((zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
