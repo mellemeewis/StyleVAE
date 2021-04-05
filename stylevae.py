@@ -425,7 +425,7 @@ def go(arg):
                 # assert torch.isinf(kl_loss).sum() == 0
 
                 # loss = rec_loss
-                loss = rec_loss + kl_loss
+                loss = br*rec_loss + bz*kl_loss
 
                 # assert torch.isnan(loss).sum() == 0
                 # assert torch.isinf(loss).sum() == 0
