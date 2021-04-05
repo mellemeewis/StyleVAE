@@ -98,13 +98,13 @@ def return_data(task, data_dir, batch_size):
 		C, H, W = 3, 64, 64
 
 	elif task == 'ffhq':
-		tftrain = Compose([RandomHorizontalFlip(0.5), ToTensor()])
+		tftrain = Compose([Grayscale(), RandomHorizontalFlip(0.5), ToTensor()])
 		trainset = torchvision.datasets.ImageFolder(root=data_dir,
 		                                            transform=tftrain)
 		trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
 		                                          shuffle=True, num_workers=2)
 
-		tftest = Compose([ToTensor()])
+		tftest = Compose([Grayscale(), ToTensor()])
 		testset = torchvision.datasets.ImageFolder(root=data_dir+os.sep,
 		                                           transform=tftest)
 		testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
