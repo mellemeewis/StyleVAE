@@ -359,8 +359,8 @@ def go(arg):
 
                 # -- compute KL losses
 
-                # zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
-                # kl_loss = zkl
+                zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
+                kl_loss = zkl
                 # loss = kl_loss.mean()
                 # loss.backward()
                 # opte.step()
@@ -425,7 +425,7 @@ def go(arg):
                 # assert torch.isinf(kl_loss).sum() == 0
 
                 # loss = rec_loss
-                loss = rec_loss
+                loss = rec_loss + kl_loss
 
                 # assert torch.isnan(loss).sum() == 0
                 # assert torch.isinf(loss).sum() == 0
@@ -441,23 +441,23 @@ def go(arg):
                 opte.step()
                 opte.zero_grad()
 
-                for i in range(arg.encoder_update_per_iteration):
+                # for i in range(arg.encoder_update_per_iteration):
 
-                    zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
-                            zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
-                            dev='cuda', depth=depth)
+                    # zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
+                    #         zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
+                    #         dev='cuda', depth=depth)
 
-                    with torch.no_grad():
-                        i = decoder(zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand)
+                    # with torch.no_grad():
+                    #     i = decoder(zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand)
 
                     # assert torch.isinf(i).sum() == 0
                     # assert torch.isnan(i).sum() == 0
-                    isample = util.sample_image(i)
+                    # isample = util.sample_image(i)
 
-                    iz, in0, in1, in2, in3, in4, in5 = encoder(isample, depth)
+                    # iz, in0, in1, in2, in3, in4, in5 = encoder(isample, depth)
 
-                    iz_loss = util.normal_lt_loss(iz, zrand).mean()
-                    i_loss = iz_loss
+                    # iz_loss = util.normal_lt_loss(iz, zrand).mean()
+                    # i_loss = iz_loss
                     # in0_loss = util.normal_lt_loss(torch.flatten(in0, start_dim=1), torch.flatten(n0rand, start_dim=1)).mean()
                     # i_loss = iz_loss + in0_loss 
                     # if depth >0:
@@ -483,8 +483,8 @@ def go(arg):
                     # loss = br * rec_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
                     # loss = loss.mean(dim=0)
                     # loss = br * i_loss + bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
-                    epoch_loss[2] += i_loss.mean(dim=0).item()
-                    loss = i_loss.mean(dim=0)
+                    # epoch_loss[2] += i_loss.mean(dim=0).item()
+                    # loss = i_loss.mean(dim=0)
 
                     # i_loss = iz_loss.mean(dim=0)
                     # print(i_loss)
@@ -497,7 +497,7 @@ def go(arg):
                     #     print('NO-N5 KL: ', n0kl, n1kl, n2kl, n3kl, n4kl, n5kl)
                     #     print('MEAN: ', loss)
 
-                    instances_seen += input.size(0)
+                instances_seen += input.size(0)
 
                     # tbw.add_scalar('style-vae/zkl-loss', float(zkl.data.mean(dim=0).item()), instances_seen)
                     # tbw.add_scalar('style-vae/n0kl-loss', float(n0kl.data.mean(dim=0).item()), instances_seen)
@@ -511,9 +511,9 @@ def go(arg):
 
                     # Backward pas
 
-                    loss.backward()
-                    opte.step()
-                    opte.zero_grad()
+                    # loss.backward()
+                    # opte.step()
+                    # opte.zero_grad()
 
                     
                 # optimizer.zero_grad()
@@ -545,25 +545,30 @@ def go(arg):
 
                             # -- compute KL losses
 
-                            # zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
+                            zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
                             # n0kl = util.kl_loss_image(n0)
                             # n1kl = util.kl_loss_image(n1)
                             # n2kl = util.kl_loss_image(n2)
                             # n3kl = util.kl_loss_image(n3)
                             # n4kl = util.kl_loss_image(n4)
                             # n5kl = util.kl_loss_image(n5)
+                            kl_loss= zkl
 
                             # -- take samples
                             zsample  = util.sample(z[:, :zs], z[:, zs:])
-                            n0sample = util.sample_image(n0)
-                            n1sample = util.sample_image(n1)
-                            n2sample = util.sample_image(n2)
-                            n3sample = util.sample_image(n3)
-                            n4sample = util.sample_image(n4)
-                            n5sample = util.sample_image(n5)
+                            # n0sample = util.sample_image(n0)
+                            # n1sample = util.sample_image(n1)
+                            # n2sample = util.sample_image(n2)
+                            # n3sample = util.sample_image(n3)
+                            # n4sample = util.sample_image(n4)
+                            # n5sample = util.sample_image(n5)
+                            _, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
+                            zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
+                            dev='cuda', depth=depth)
 
                             # -- decoding
-                            xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
+                            # xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
+                            xout = decoder(zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand)
 
                             perceptual_loss = 0
                             if arg.perceptual_loss:
@@ -577,7 +582,8 @@ def go(arg):
 
                             # rec_loss = util.normal_im(xout, input).view(b, c*h*w).sum(dim=1)
                             rec_loss = util.normal_im(xout, input).view(b, c*h*w).sum(dim=1)
-                            loss = rec_loss.mean(dim=0)
+                            loss = rec_loss + kl_loss
+                            loss = loss.mean(dim=0)
 
                             err_te.append(loss.data.item())
 
@@ -606,22 +612,24 @@ def go(arg):
 
                     # -- take samples
                     zsample = util.sample(z[:, :zs], z[:, zs:])
-                    n0sample = util.sample_image(n0)
-                    n1sample = util.sample_image(n1)
-                    n2sample = util.sample_image(n2)
-                    n3sample = util.sample_image(n3)
-                    n4sample = util.sample_image(n4)
-                    n5sample = util.sample_image(n5)
+                    # n0sample = util.sample_image(n0)
+                    # n1sample = util.sample_image(n1)
+                    # n2sample = util.sample_image(n2)
+                    # n3sample = util.sample_image(n3)
+                    # n4sample = util.sample_image(n4)
+                    # n5sample = util.sample_image(n5)
 
                     # -- decoding
-                    xout = util.batchedn((zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
+                    # xout = util.batchedn((zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
+                    xout = util.batchedn((zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
                     # -- mix the latent vector with random noise
 
                     mixout = util.batchedn((zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
 
                     # -- mix a random vector with the sample noise
 
-                    mixout2 = util.batchedn((zrand, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
+                    # mixout2 = util.batchedn((zrand, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
+                    mixout2 = util.batchedn((zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
 
                     xout_sigmoid = torch.sigmoid(xout)
                     mixout_sigmoid = torch.sigmoid(mixout)
@@ -641,7 +649,7 @@ def go(arg):
                     utils.save_image(images, f'images.{depth}.{epoch}.png', nrow=24, padding=2)
                     utils.save_image(images_sigmoid, f'images_sigmoid.{depth}.{epoch}.png', nrow=24, padding=2)
 
-                    slack_util.send_message(f'Epoch {epoch} Depth {depth} Finished NORMAL IM ENCODE RECON UPDATE\n Options: {arg}')
+                    slack_util.send_message(f' Depth {depth}, Epoch {epoch}. \nOptions: {arg}')
                     slack_util.send_image(f'images.{depth}.{epoch}.png', f'Depth {depth}, Epoch: {epoch}')
                     slack_util.send_image(f'images_sigmoid.{depth}.{epoch}.png', f'Sigmoid_Depth {depth}, Epoch: {epoch}')
 
