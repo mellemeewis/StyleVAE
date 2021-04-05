@@ -26,7 +26,7 @@ def return_data(task, data_dir, batch_size):
 		testset = torchvision.datasets.QMNIST(root=data_dir, train=False,
 		                                       download=True, transform=transform)
 		print(testset.data.size())
-		testset = testset[-1000:,:,:]
+		testset.data = testset.data[-1000:,:,:]
 		testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
 		                                         shuffle=False, num_workers=2)
 
