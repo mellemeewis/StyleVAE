@@ -1,4 +1,4 @@
-fimport os, tqdm, random, pickle, sys
+import os, tqdm, random, pickle, sys
 
 import torch
 import torchvision
