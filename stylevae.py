@@ -545,7 +545,6 @@ def go(arg):
                 # loss.backward()
 
                 # optimizer.step()
-            print(epoch_loss)
             print([int(e) for e in epoch_loss])
 
             if arg.epochs[depth] <= arg.np or epoch % (arg.epochs[depth]//arg.np) == 0 or epoch == arg.epochs[depth] - 1:
