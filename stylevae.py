@@ -353,7 +353,7 @@ def go(arg):
         print(f'starting depth {depth}, for {arg.epochs[depth]} epochs')
         for epoch in range(arg.epochs[depth]):
 
-            epoch_loss = [0,0,0,[0,0,0,0,0,0]]
+            epoch_loss = [0,0,0,[0,0,0,0,0,0,0]]
 
             # Train
             err_tr = []
