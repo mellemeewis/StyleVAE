@@ -1,4 +1,4 @@
-import os, tqdm, random, pickle, sys
+fimport os, tqdm, random, pickle, sys
 
 import torch
 import torchvision
@@ -64,13 +64,13 @@ class StyleEncoder(nn.Module):
         self.block4 = util.Block(c3, c4, kernel_size=k, batch_norm=batch_norm)
         self.block5 = util.Block(c4, c5, kernel_size=k, batch_norm=batch_norm)
 
-        # affine mappings to distribution on latent space
-        self.affine0 = nn.Linear(util.prod(in_size), 2 * zs)
-        self.affine1 = nn.Linear(util.prod((c1, h//2, w//2)), 2 * zs)
-        self.affine2 = nn.Linear(util.prod((c2, h//4, w//4)), 2 * zs)
-        self.affine3 = nn.Linear(util.prod((c3, h//8, w//8)), 2 * zs)
-        self.affine4 = nn.Linear(util.prod((c4, h//16, w//16)), 2 * zs)
-        self.affine5 = nn.Linear(util.prod((c5, h//32, w//32)), 2 * zs)
+        # affine mappings to distribution on latent space !!!4*zs for reverse ADAIN, otherwise 2*zs!!
+        self.affine0 = nn.Linear(util.prod(in_size), 4 * zs)
+        self.affine1 = nn.Linear(util.prod((c1, h//2, w//2)), 4 * zs)
+        self.affine2 = nn.Linear(util.prod((c2, h//4, w//4)), 4 * zs)
+        self.affine3 = nn.Linear(util.prod((c3, h//8, w//8)), 4 * zs)
+        self.affine4 = nn.Linear(util.prod((c4, h//16, w//16)), 4 * zs)
+        self.affine5 = nn.Linear(util.prod((c5, h//32, w//32)), 4 * zs)
 
         self.affinez = nn.Linear(12 * zs, 2 * zs)
 
@@ -82,6 +82,10 @@ class StyleEncoder(nn.Module):
         self.tonoise3 = nn.Conv2d(c3, z3*2, kernel_size=1, padding=0)
         self.tonoise4 = nn.Conv2d(c4, z4*2, kernel_size=1, padding=0)
         self.tonoise5 = nn.Conv2d(c5, z5*2, kernel_size=1, padding=0)
+
+        # learnable constant start vector z
+        self.z = nn.Parameter(torch.randn(1, zs*2))
+
 
         um = []
         for _ in range(unmapping):
@@ -95,50 +99,63 @@ class StyleEncoder(nn.Module):
         n0 = n1 = n2 = n3 = n4 = n5 = None
 
         z0 = self.affine0(x0.view(b, -1))
+        z = util.adain_reverse(z0, self.z)
         n0 = self.tonoise0(x0)
 
         if depth <= 0:
-            z = self.unmapping(z0)
+            # z = self.unmapping(z0) #commented out for reverse adain
+            z = self.unmapping(z)
             return z, n0, n1, n2, n3, n4, n5
 
         x1 = F.avg_pool2d(self.block1(x0), 2)
         z1 = self.affine1(x1.view(b, -1))
+        z = util.adain_reverse(z1, z)
+
         n1 = self.tonoise1(x1)
 
         if depth <= 1:
-            z = self.unmapping(z0 + z1)
-
+            # z = self.unmapping(z0 + z1) #commented out for reverse adain
+            z = self.unmapping(z)
             return z, n0, n1, n2, n3, n4, n5
 
         x2 = F.avg_pool2d(self.block2(x1), 2)
         z2 = self.affine2(x2.view(b, -1))
+        z = util.adain_reverse(z2, z)
+
         n2 = self.tonoise2(x2)
 
         if depth <= 2:
-            z = self.unmapping(z0 + z1 + z2)
+            # z = self.unmapping(z0 + z1 + z2) #commented out for reverse adain
+            z = self.unmapping(z)
             return z, n0, n1, n2, n3, n4, n5
 
         x3 = F.avg_pool2d(self.block3(x2), 2)
         z3 = self.affine3(x3.view(b, -1))
+        z = util.adain_reverse(z3, z)
         n3 = self.tonoise3(x3)
 
         if depth <= 3:
-            z = self.unmapping(z0 + z1 + z2 + z3)
+            # z = self.unmapping(z0 + z1 + z2 + z3) #commented out for reverse adain
+            z = self.unmapping(z)
             return z, n0, n1, n2, n3, n4, n5
 
         x4 = F.avg_pool2d(self.block4(x3), 2)
         z4 = self.affine4(x4.view(b, -1))
+        z = util.adain_reverse(z4, z)
         n4 = self.tonoise4(x4)
 
         if depth <= 4:
-            z = self.unmapping(z0 + z1 + z2 + z3 + z4)
+            # z = self.unmapping(z0 + z1 + z2 + z3 + z4) #commented out for reverse adain
+            z = self.unmapping(z)
             return z, n0, n1, n2, n3, n4, n5
 
         x5 = F.avg_pool2d(self.block5(x4), 2)
         z5 = self.affine5(x5.view(b, -1))
+        z = util.adain_reverse(z5, z)
         n5 = self.tonoise5(x5)
 
-        z = self.unmapping(z0 + z1 + z2 + z3 + z4 + z5)
+        # z = self.unmapping(z0 + z1 + z2 + z3 + z4 + z5) #commented out for reverse adain
+        z = self.unmapping(z)
         return z, n0, n1, n2, n3, n4, n5
 
         # combine the z vectors
