@@ -384,7 +384,6 @@ def go(arg):
 
 
                 n0kl = util.kl_loss_image(n0)
-                print(n0kl)
                 n1kl = util.kl_loss_image(n1)
                 n2kl = util.kl_loss_image(n2)
                 n3kl = util.kl_loss_image(n3)
