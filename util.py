@@ -75,6 +75,7 @@ def adain(y, x):
     return (ys + 1.) * x + yb
 
 def adain_inverse(x, z):
+    print("HELLO")
     print(x.size())
     b, c, h, w = x.size()
 
