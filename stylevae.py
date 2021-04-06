@@ -353,7 +353,7 @@ def go(arg):
         print(f'starting depth {depth}, for {arg.epochs[depth]} epochs')
         for epoch in range(arg.epochs[depth]):
 
-            epoch_loss = [0,0,0,[0,0,0,0,0,0,0]]
+            epoch_loss = [0,0,0,0,0,0,0,0,0,0]
 
             # Train
             err_tr = []
@@ -436,7 +436,6 @@ def go(arg):
 
                 # dense_loss = 0
                 kl_loss = bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
-                kl_loss_list = [bz * zkl, b0 * n0kl, b1 * n1kl, b2 * n2kl, b3 * n3kl, b4 * n4kl, b5 * n5kl]
 
                 # kl_loss = zkl
                 # assert torch.isnan(kl_loss).sum() == 0
@@ -452,7 +451,13 @@ def go(arg):
                 with torch.no_grad():
                     epoch_loss[0] += rec_loss.mean(dim=0).item()
                     epoch_loss[1] += kl_loss.mean(dim=0).item()
-                    epoch_loss[3] = [epoch_loss[3][i] + k for i, k in enumerate(kl_loss_list)]
+                    epoch_loss[3] += n0kl.mean(dim=0).item()
+                    epoch_loss[4] += n1kl.mean(dim=0).item()
+                    epoch_loss[5] += n2kl.mean(dim=0).item()
+                    epoch_loss[6] += n3kl.mean(dim=0).item()
+                    epoch_loss[7] += n4kl.mean(dim=0).item()
+                    epoch_loss[8] += n5kl.mean(dim=0).item()
+
                 loss.backward()
                 optd.step()
                 optd.zero_grad()
@@ -540,7 +545,7 @@ def go(arg):
 
                 # optimizer.step()
             print(epoch_loss)
-            print([int(e) for e in epoch_loss[:3]] + [int(e) for e in epoch_loss[3]])
+            print([int(e) for e in epoch_loss])
 
             if arg.epochs[depth] <= arg.np or epoch % (arg.epochs[depth]//arg.np) == 0 or epoch == arg.epochs[depth] - 1:
                 with torch.no_grad():
