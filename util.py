@@ -77,7 +77,7 @@ def adain(y, x):
 def adain_inverse(x, z):
     b, l = x.size()
 
-    z = F.instance_norm(z)
+    # z = F.instance_norm(z)
     xs = x[:, :l//2]
     xb = x[:, l//2:]
 
