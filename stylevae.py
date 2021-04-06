@@ -452,7 +452,7 @@ def go(arg):
                     epoch_loss[0] += rec_loss.mean(dim=0).item()
                     epoch_loss[1] += kl_loss.mean(dim=0).item()
                     epoch_loss[3] += n0kl.mean(dim=0).item() 
-                    epoch_loss[4] += n1kl.mean(dim=0).item() if depth > 0 else a=1
+                    if depth > 0: epoch_loss[4] += n1kl.mean(dim=0).item()
                     epoch_loss[5] += n2kl.mean(dim=0).item()
                     epoch_loss[6] += n3kl.mean(dim=0).item()
                     epoch_loss[7] += n4kl.mean(dim=0).item()
