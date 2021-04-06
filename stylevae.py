@@ -359,9 +359,9 @@ def go(arg):
             err_tr = []
             encoder.train(True)
             decoder.train(True)
-            # for i, (input, _) in enumerate(trainloader):
+            for i, (input, _) in enumerate(trainloader):
 
-            for i, (input, _) in enumerate(tqdm.tqdm(trainloader)):
+            # for i, (input, _) in enumerate(tqdm.tqdm(trainloader)):
                 if arg.limit is not None and i * arg.batch_size > arg.limit:
                     break
 
