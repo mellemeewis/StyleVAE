@@ -351,7 +351,7 @@ def go(arg):
     for depth in range(6):
 
         print(f'starting depth {depth}, for {arg.epochs[depth]} epochs')
-        print('\t\tRec\t\tKL\t\tZ\t\tN0\t\tN1\t\tN2\t\tN3\t\tN4\t\tN5\t\t')
+        print('\tRec\tKL\tZ\tN0\tN1\tN2\tN3\tN4\tN5\t')
         for epoch in range(arg.epochs[depth]):
 
             epoch_loss = [0,0,0,0,0,0,0,0,0,0]
@@ -545,7 +545,7 @@ def go(arg):
                 # loss.backward()
 
                 # optimizer.step()
-            print(f'Epoch {epoch}:\t','\t\t'.join([str(int(e)) for e in epoch_loss]))
+            print(f'Epoch {epoch}:\t','\t'.join([str(int(e)) for e in epoch_loss]))
 
             if arg.epochs[depth] <= arg.np or epoch % (arg.epochs[depth]//arg.np) == 0 or epoch == arg.epochs[depth] - 1:
                 with torch.no_grad():
