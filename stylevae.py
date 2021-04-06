@@ -435,10 +435,7 @@ def go(arg):
                 br, bz, b0, b1, b2, b3, b4, b5 = arg.betas
 
                 # dense_loss = 0
-                print(n0kl, b0)
                 kl_loss = bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
-                print(n0kl* b0)
-
                 # kl_loss = zkl
                 # assert torch.isnan(kl_loss).sum() == 0
                 # assert torch.isinf(kl_loss).sum() == 0
