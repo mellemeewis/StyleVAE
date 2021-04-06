@@ -75,11 +75,12 @@ def adain(y, x):
     return (ys + 1.) * x + yb
 
 def adain_inverse(x, z):
-    b, c, h, w = y.size()
+    print(x.size())
+    b, c, h, w = x.size()
 
     z = F.instance_norm(z)
-    xs = y[:, :c//2, :, :]
-    xb = y[:, c//2:, :, :]
+    xs = x[:, :c//2, :, :]
+    xb = x[:, c//2:, :, :]
 
 
     return (xs + 1.) * z + xb
