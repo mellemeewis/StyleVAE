@@ -99,7 +99,7 @@ class StyleEncoder(nn.Module):
         n0 = n1 = n2 = n3 = n4 = n5 = None
 
         z0 = self.affine0(x0.view(b, -1))
-        z = util.adain_reverse(z0, self.z)
+        z = util.adain_inverse(z0, self.z)
         n0 = self.tonoise0(x0)
 
         if depth <= 0:
@@ -109,7 +109,7 @@ class StyleEncoder(nn.Module):
 
         x1 = F.avg_pool2d(self.block1(x0), 2)
         z1 = self.affine1(x1.view(b, -1))
-        z = util.adain_reverse(z1, z)
+        z = util.adain_inverse(z1, z)
 
         n1 = self.tonoise1(x1)
 
@@ -120,7 +120,7 @@ class StyleEncoder(nn.Module):
 
         x2 = F.avg_pool2d(self.block2(x1), 2)
         z2 = self.affine2(x2.view(b, -1))
-        z = util.adain_reverse(z2, z)
+        z = util.adain_inverse(z2, z)
 
         n2 = self.tonoise2(x2)
 
@@ -131,7 +131,7 @@ class StyleEncoder(nn.Module):
 
         x3 = F.avg_pool2d(self.block3(x2), 2)
         z3 = self.affine3(x3.view(b, -1))
-        z = util.adain_reverse(z3, z)
+        z = util.adain_inverse(z3, z)
         n3 = self.tonoise3(x3)
 
         if depth <= 3:
@@ -141,7 +141,7 @@ class StyleEncoder(nn.Module):
 
         x4 = F.avg_pool2d(self.block4(x3), 2)
         z4 = self.affine4(x4.view(b, -1))
-        z = util.adain_reverse(z4, z)
+        z = util.adain_inverse(z4, z)
         n4 = self.tonoise4(x4)
 
         if depth <= 4:
@@ -151,7 +151,7 @@ class StyleEncoder(nn.Module):
 
         x5 = F.avg_pool2d(self.block5(x4), 2)
         z5 = self.affine5(x5.view(b, -1))
-        z = util.adain_reverse(z5, z)
+        z = util.adain_inverse(z5, z)
         n5 = self.tonoise5(x5)
 
         # z = self.unmapping(z0 + z1 + z2 + z3 + z4 + z5) #commented out for reverse adain
