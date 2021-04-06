@@ -452,7 +452,7 @@ def go(arg):
                 with torch.no_grad():
                     epoch_loss[0] += rec_loss.mean(dim=0).item()
                     epoch_loss[1] += kl_loss.mean(dim=0).item()
-                    epoch_loss[3] = [epoch_loss[3][i] + k for k, i in enumerate(kl_loss_list)]
+                    epoch_loss[3] = [epoch_loss[3][i] + k for i, k in enumerate(kl_loss_list)]
                 loss.backward()
                 optd.step()
                 optd.zero_grad()
