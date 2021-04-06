@@ -351,7 +351,7 @@ def go(arg):
     for depth in range(6):
 
         print(f'starting depth {depth}, for {arg.epochs[depth]} epochs')
-        print('\t\tRec\tKL\tZ\tN0\tN1\tN2\tN3\tN4\tN5\t')
+        print('\t\tRec\t\tKL\tZ\tN0\tN1\tN2\tN3\tN4\tN5\t')
         for epoch in range(arg.epochs[depth]):
 
             epoch_loss = [0,0,0,0,0,0,0,0,0,0]
