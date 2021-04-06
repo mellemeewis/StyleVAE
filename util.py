@@ -74,7 +74,7 @@ def adain(y, x):
 
     return (ys + 1.) * x + yb
 
-def adain_inverse(x, z, depth):
+def adain_inverse(x, z):
     b, c, h, w = y.size()
 
     z = F.instance_norm(z)
