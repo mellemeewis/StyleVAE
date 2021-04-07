@@ -297,7 +297,7 @@ def go(arg):
                 # loss.backward()
 
                 # optimizer.step()
-            print(f'Epoch {epoch}:\t','\t'.join([str(int(e)) for e in epoch_loss]))
+            print(f'Epoch {epoch}:','\t'.join([str(int(e)) for e in epoch_loss]))
 
             if arg.epochs[depth] <= arg.np or epoch % (arg.epochs[depth]//arg.np) == 0 or epoch == arg.epochs[depth] - 1:
                 with torch.no_grad():
