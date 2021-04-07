@@ -22,10 +22,13 @@ from argparse import ArgumentParser
 
 from collections import defaultdict, Counter, OrderedDict
 
+
 import util#, models
 from models.alexnet import AlexNet
 from models.densenet import DenseNet
 from data import return_data
+from encoder import StyleEncoder, StyleEncoder2
+from decoder import StyleDecoder
 import slack_util
 
 from tensorboardX import SummaryWriter
@@ -48,265 +51,9 @@ DV = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
 
-class StyleEncoder(nn.Module):
-
-    def __init__(self, in_size, channels, zchannels, zs=256, k=3, unmapping=3, batch_norm=False):
-        super().__init__()
-
-        c, h, w = in_size
-        c1, c2, c3, c4, c5 = channels
-        z0, z1, z2, z3, z4, z5 = zchannels
-
-        # resnet blocks
-        self.block1 = util.Block(c,  c1, kernel_size=k, batch_norm=batch_norm)
-        self.block2 = util.Block(c1, c2, kernel_size=k, batch_norm=batch_norm)
-        self.block3 = util.Block(c2, c3, kernel_size=k, batch_norm=batch_norm)
-        self.block4 = util.Block(c3, c4, kernel_size=k, batch_norm=batch_norm)
-        self.block5 = util.Block(c4, c5, kernel_size=k, batch_norm=batch_norm)
-
-        # affine mappings to distribution on latent space !!!4*zs for reverse ADAIN, otherwise 2*zs!!
-        self.affine0 = nn.Linear(util.prod(in_size), 4 * zs)
-        self.affine1 = nn.Linear(util.prod((c1, h//2, w//2)), 4 * zs)
-        self.affine2 = nn.Linear(util.prod((c2, h//4, w//4)), 4 * zs)
-        self.affine3 = nn.Linear(util.prod((c3, h//8, w//8)), 4 * zs)
-        self.affine4 = nn.Linear(util.prod((c4, h//16, w//16)), 4 * zs)
-        self.affine5 = nn.Linear(util.prod((c5, h//32, w//32)), 4 * zs)
-
-        self.affinez = nn.Linear(12 * zs, 2 * zs)
-
-        # 1x1 convolution to distribution on "noise space"
-        # (mean and sigma)
-        self.tonoise0 = nn.Conv2d(c,  z0*2, kernel_size=1, padding=0)
-        self.tonoise1 = nn.Conv2d(c1, z1*2, kernel_size=1, padding=0)
-        self.tonoise2 = nn.Conv2d(c2, z2*2, kernel_size=1, padding=0)
-        self.tonoise3 = nn.Conv2d(c3, z3*2, kernel_size=1, padding=0)
-        self.tonoise4 = nn.Conv2d(c4, z4*2, kernel_size=1, padding=0)
-        self.tonoise5 = nn.Conv2d(c5, z5*2, kernel_size=1, padding=0)
-
-        # learnable constant start vector z
-        self.z = nn.Parameter(torch.randn(1, zs*2))
 
 
-        um = []
-        for _ in range(unmapping):
-            um.append(nn.ReLU())
-            um.append(nn.Linear(zs*2, zs*2))
-        self.unmapping = nn.Sequential(*um)
 
-    def forward(self, x0, depth):
-        b = x0.size(0)
-
-        n0 = n1 = n2 = n3 = n4 = n5 = None
-
-        z0 = self.affine0(x0.view(b, -1))
-        z = util.adain_inverse(z0, self.z)
-        n0 = self.tonoise0(x0)
-
-        if depth <= 0:
-            # z = self.unmapping(z0) #commented out for reverse adain
-            z = self.unmapping(z)
-            return z, n0, n1, n2, n3, n4, n5
-
-        x1 = F.avg_pool2d(self.block1(x0), 2)
-        z1 = self.affine1(x1.view(b, -1))
-        z = util.adain_inverse(z1, z)
-
-        n1 = self.tonoise1(x1)
-
-        if depth <= 1:
-            # z = self.unmapping(z0 + z1) #commented out for reverse adain
-            z = self.unmapping(z)
-            return z, n0, n1, n2, n3, n4, n5
-
-        x2 = F.avg_pool2d(self.block2(x1), 2)
-        z2 = self.affine2(x2.view(b, -1))
-        z = util.adain_inverse(z2, z)
-
-        n2 = self.tonoise2(x2)
-
-        if depth <= 2:
-            # z = self.unmapping(z0 + z1 + z2) #commented out for reverse adain
-            z = self.unmapping(z)
-            return z, n0, n1, n2, n3, n4, n5
-
-        x3 = F.avg_pool2d(self.block3(x2), 2)
-        z3 = self.affine3(x3.view(b, -1))
-        z = util.adain_inverse(z3, z)
-        n3 = self.tonoise3(x3)
-
-        if depth <= 3:
-            # z = self.unmapping(z0 + z1 + z2 + z3) #commented out for reverse adain
-            z = self.unmapping(z)
-            return z, n0, n1, n2, n3, n4, n5
-
-        x4 = F.avg_pool2d(self.block4(x3), 2)
-        z4 = self.affine4(x4.view(b, -1))
-        z = util.adain_inverse(z4, z)
-        n4 = self.tonoise4(x4)
-
-        if depth <= 4:
-            # z = self.unmapping(z0 + z1 + z2 + z3 + z4) #commented out for reverse adain
-            z = self.unmapping(z)
-            return z, n0, n1, n2, n3, n4, n5
-
-        x5 = F.avg_pool2d(self.block5(x4), 2)
-        z5 = self.affine5(x5.view(b, -1))
-        z = util.adain_inverse(z5, z)
-        n5 = self.tonoise5(x5)
-
-        # z = self.unmapping(z0 + z1 + z2 + z3 + z4 + z5) #commented out for reverse adain
-        z = self.unmapping(z)
-        return z, n0, n1, n2, n3, n4, n5
-
-        # combine the z vectors
-        # zbatch = torch.cat([
-        #     z0[:, :, None],
-        #     z1[:, :, None],
-        #     z2[:, :, None],
-        #     z3[:, :, None],
-        #     z4[:, :, None],
-        #     z5[:, :, None]], dim=2)
-        #
-        # z = self.affinez(zbatch.view(b, -1))
-        # z = z)
-
-        return z, n0, n1, n2, n3, n4, n5
-
-class StyleDecoder(nn.Module):
-
-    def __init__(self, out_size, channels, zchannels, zs=256, k=3, mapping=3, batch_norm=False, dropouts=None):
-        super().__init__()
-
-        self.out_size = out_size
-
-        c, h, w = self.out_size
-        self.channels = channels
-        c1, c2, c3, c4, c5 = self.channels
-        z0, z1, z2, z3, z4, z5 = zchannels
-
-        # resnet blocks
-        self.block5 = util.Block(c5, c4, kernel_size=k, batch_norm=batch_norm)
-        self.block4 = util.Block(c4, c3, kernel_size=k, batch_norm=batch_norm)
-        self.block3 = util.Block(c3, c2, kernel_size=k, batch_norm=batch_norm)
-        self.block2 = util.Block(c2, c1, kernel_size=k, batch_norm=batch_norm)
-        self.block1 = util.Block(c1, c,  kernel_size=k, batch_norm=batch_norm)
-
-        # affine mappings from latent space sample
-            
-        self.affine5 = nn.Linear(zs, 2 * util.prod((c5, h//32, w//32)))
-        self.affine4 = nn.Linear(zs, 2 * util.prod((c4, h//16, w//16)))
-        self.affine3 = nn.Linear(zs, 2 * util.prod((c3, h//8, w//8)))
-        self.affine2 = nn.Linear(zs, 2 * util.prod((c2, h//4, w//4)))
-        self.affine1 = nn.Linear(zs, 2 * util.prod((c1, h//2, w//2)))
-        self.affine0 = nn.Linear(zs, 2 * util.prod(out_size))
-
-        # 1x1 convolution from "noise space" sample
-        self.tonoise5 = nn.Conv2d(z5, c5, kernel_size=1, padding=0)
-        self.tonoise4 = nn.Conv2d(z4, c4, kernel_size=1, padding=0)
-        self.tonoise3 = nn.Conv2d(z3, c3, kernel_size=1, padding=0)
-        self.tonoise2 = nn.Conv2d(z2, c2, kernel_size=1, padding=0)
-        self.tonoise1 = nn.Conv2d(z1, c1, kernel_size=1, padding=0)
-        self.tonoise0 = nn.Conv2d(z0, c,  kernel_size=1, padding=0)
-
-        self.conv0 = nn.Conv2d(c, 2*c, kernel_size=1)
-
-        m = []
-        for _ in range(mapping):
-            m.append(nn.Linear(zs, zs))
-            m.append(nn.ReLU())
-        self.mapping = nn.Sequential(*m)
-
-        self.dropouts = dropouts
-
-        # constant, learnable input
-        self.x5 = nn.Parameter(torch.randn(1, c5, h//32, w//32))
-        self.x4 = nn.Parameter(torch.randn(1, c4, h//16, w//16))
-        self.x3 = nn.Parameter(torch.randn(1, c3, h//8, w//8))
-        self.x2 = nn.Parameter(torch.randn(1, c2, h//4, w//4))
-        self.x1 = nn.Parameter(torch.randn(1, c1, h//2, w//2))
-
-    def forward(self, z, n0, n1, n2, n3, n4, n5):
-        """
-        z, n0 are never none all others can be, depending on the depth
-        :param z:
-        :param n0:
-        :param n1:
-        :param n2:
-        :param n3:
-        :param n4:
-        :param n5:
-        :return:
-        """
-
-        x0 = x1 = x2 = x3 = x4 = x5 = None
-
-        c, h, w = self.out_size
-        c1, c2, c3, c4, c5 = self.channels
-
-        if self.dropouts is not None:
-            dz, d0, d1, d2, d3, d4, d5 = self.dropouts
-            z = F.dropout(z, p=dz, training=True)
-            if n0 is not None: n0 = F.dropout(n0, p=d0, training=True)
-            if n1 is not None: n1 = F.dropout(n1, p=d1, training=True)
-            if n2 is not None: n2 = F.dropout(n2, p=d2, training=True)
-            if n3 is not None: n3 = F.dropout(n3, p=d3, training=True)
-            if n4 is not None: n4 = F.dropout(n4, p=d4, training=True)
-            if n5 is not None: n5 = F.dropout(n5, p=d5, training=True)
-
-        z = self.mapping(z)
-
-        if n5 is not None:
-            x5 = self.x5 + self.tonoise5(n5)
-            z5 = self.affine5(z).view(-1, 2 * c5, h//32, w//32)
-
-            x5 = util.adain(z5, x5)
-
-        if n4 is not None:
-            if x5 is None:
-                x5 = self.x5
-
-            x4 = F.upsample(self.block5(x5), scale_factor=2)
-            x4 = x4 + self.tonoise4(n4)
-            z4 = self.affine4(z).view(-1, 2 * c4, h//16, w//16)
-            x4 = util.adain(z4, x4)
-
-        if n3 is not None:
-            if x4 is None:
-                x4 = self.x4
-
-            x3 = F.upsample(self.block4(x4), scale_factor=2)
-            x3 = x3 + self.tonoise3(n3)
-            z3 = self.affine3(z).view(-1, 2 * c3, h//8, w//8)
-            x3 = util.adain(z3, x3)
-
-        if n2 is not None:
-            if x3 is None:
-                x3 = self.x3
-
-            x2 = F.upsample(self.block3(x3), scale_factor=2)
-            x2 = x2 + self.tonoise2(n2)
-            z2 = self.affine2(z).view(-1, 2 * c2, h//4, w//4)
-            x2 = util.adain(z2, x2)
-
-        if n1 is not None:
-            if x2 is None:
-                x2 = self.x2
-
-            x1 = F.upsample(self.block2(x2), scale_factor=2)
-            x1 = x1 + self.tonoise1(n1)
-            z1 = self.affine1(z).view(-1, 2 * c1, h//2, w//2)
-            x1 = util.adain(z1, x1)
-
-        if n0 is not None:
-            if x1 is None:
-                x1 = self.x1
-
-            x0 = F.upsample(self.block1(x1), scale_factor=2)
-            x0 = x0 + self.tonoise0(n0)
-            z0 = self.affine0(z).view(-1, 2 * c, h, w)
-            x0 = util.adain(z0, x0)
-
-        return self.conv0(x0)
 
 def go(arg):
 
@@ -316,7 +63,11 @@ def go(arg):
 
     zs = arg.latent_size
 
-    encoder = StyleEncoder((C, H, W), arg.channels, arg.zchannels, zs=zs, k=arg.kernel_size, unmapping=arg.mapping_layers, batch_norm=arg.batch_norm)
+    if arg.encoder_type == 1:
+        encoder = StyleEncoder((C, H, W), arg.channels, arg.zchannels, zs=zs, k=arg.kernel_size, unmapping=arg.mapping_layers, batch_norm=arg.batch_norm)
+    elif arg.encoder_type == 2:
+        encoder = StyleEncoder2((C, H, W), arg.channels, arg.zchannels, zs=zs, k=arg.kernel_size, unmapping=arg.mapping_layers, batch_norm=arg.batch_norm)
+
     decoder = StyleDecoder((C, H, W), arg.channels, arg.zchannels, zs=zs, k=arg.kernel_size, mapping=arg.mapping_layers, batch_norm=arg.batch_norm, dropouts=arg.dropouts)
     
 
@@ -808,6 +559,10 @@ if __name__ == "__main__":
                         help="Amount of times the encoder is updated each iteration. (sleep phase).",
                         default=1, type=int)
 
+    parser.add_argument("-E", "--encoder",
+                        dest="encoder_type",
+                        help="Endoder 1 or 2",
+                        default=1, type=int)
 
     options = parser.parse_args()
 
