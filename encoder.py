@@ -190,45 +190,58 @@ class StyleEncoder2(nn.Module):
 
         n0 = self.tonoise0(x0)
 
+        print('X0: ', x0.size())
         if depth <= 0:
             z = self.affine0(x0.view(b, -1))
             z = self.unmapping(z) 
+            print('Z: ', z.size())
             return z, n0, n1, n2, n3, n4, n5
 
         x1 = F.avg_pool2d(self.block1(F.instance_norm(x0)), 2)
         n1 = self.tonoise1(x1)
 
+        print('X1: ', x1.size())
         if depth <= 1:
             z = self.affine1(x1.view(b, -1))
             z = self.unmapping(z)
+            print('Z: ', z.size())
             return z, n0, n1, n2, n3, n4, n5
 
         x2 = F.avg_pool2d(self.block2(F.instance_norm(x1)), 2)
         n2 = self.tonoise2(x2)
 
+        print('X2: ', x2.size())
         if depth <= 2:
             z = self.affine2(x2.view(b, -1))
             z = self.unmapping(z)
+            print('Z: ', z.size())
             return z, n0, n1, n2, n3, n4, n5
 
         x3 = F.avg_pool2d(self.block3(F.instance_norm(x2)), 2)
         n3 = self.tonoise3(x3)
 
+        print('X3: ', x3.size())
         if depth <= 3:
             z = self.affine3(x3.view(b, -1))
             z = self.unmapping(z)
+            print('Z: ', z.size())
             return z, n0, n1, n2, n3, n4, n5
 
         x4 = F.avg_pool2d(self.block4(F.instance_norm(x3)), 2)
         n4 = self.tonoise4(x4)
 
+        print('X4: ', x4.size())
         if depth <= 4:
             z = self.affine4(x4.view(b, -1))
             z = self.unmapping(z)
+            print('Z: ', z.size())
             return z, n0, n1, n2, n3, n4, n5
 
         x5 = F.avg_pool2d(self.block5(F.instance_norm(x4)), 2)
+
+        print('X5: ', x5.size())        
         z = self.affine5(x5.view(b, -1))
+        print('Z: ', z.size())
         n5 = self.tonoise5(x5)
 
         z = self.unmapping(z) 
