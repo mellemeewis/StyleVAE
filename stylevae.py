@@ -179,7 +179,7 @@ def go(arg):
                 # rec_loss = util.normal_im(xout, input).view(b, c*h*w).sum(dim=1)
                 rec_loss = util.bce_corr(xout, input).view(b, c*h*w).sum(dim=1)
                 rec_loss_rn = util.bce_corr(xout, input).view(b, c*h*w).sum(dim=1)
-                rec_loss += 0.5 * rec_loss_rn
+                rec_loss += 0.9 * rec_loss_rn
 
                 # rec_loss = F.binary_cross_entropy(xout, input, reduction='none').view(b, -1).sum(dim=1)
 
