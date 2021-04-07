@@ -6,8 +6,6 @@ from torch.autograd import Variable
 from torch import nn
 import torch.nn.functional as F
 
-import util
-
 class Block(nn.Module):
 
     def __init__(self, in_channels, channels, num_convs = 3, kernel_size = 3, batch_norm=False, use_weight=True, use_res=True, deconv=False):

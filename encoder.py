@@ -11,6 +11,8 @@ from torch.nn.functional import binary_cross_entropy, relu, nll_loss, cross_entr
 from torch.nn import Embedding, Conv2d, Sequential, BatchNorm2d, ReLU, MSELoss
 from torch.optim import Adam
 
+import util
+
 class StyleEncoder(nn.Module):
 
     def __init__(self, in_size, channels, zchannels, zs=256, k=3, unmapping=3, batch_norm=False):
