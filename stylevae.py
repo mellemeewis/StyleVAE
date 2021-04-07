@@ -152,14 +152,14 @@ def go(arg):
                 n4sample = util.sample_image(n4)
                 n5sample = util.sample_image(n5)
 
-
-                # _, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
-                #             zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
-                #             dev='cuda', depth=depth)
+                with torch.no_grad():
+                    _, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
+                                zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
+                                dev='cuda', depth=depth)
 
                 # -- decoding
                 xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
-                # xout = decoder(zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand)
+                xout_rn = decoder(zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand)
 
 
 
@@ -178,7 +178,8 @@ def go(arg):
 
                 # rec_loss = util.normal_im(xout, input).view(b, c*h*w).sum(dim=1)
                 rec_loss = util.bce_corr(xout, input).view(b, c*h*w).sum(dim=1)
-
+                rec_loss_rn = util.bce_corr(xout, input).view(b, c*h*w).sum(dim=1)
+                rec_loss += 0.5 * rec_loss_rn
 
                 # rec_loss = F.binary_cross_entropy(xout, input, reduction='none').view(b, -1).sum(dim=1)
 
