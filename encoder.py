@@ -2,6 +2,7 @@ from torch import nn
 import torch.nn.functional as F
 import torch.distributions as ds
 
+import torch
 from torch.autograd import Variable
 from torchvision.transforms import CenterCrop, ToTensor, Compose, Lambda, Resize, Grayscale, Pad, RandomHorizontalFlip
 from torchvision.datasets import coco
