@@ -394,12 +394,10 @@ def go(arg):
 
                     # -- encoding
                     # z, n0, n1, n2, n3, n4, n5 = util.nbatched(input, encoder, batch_size=32, depth=depth)
-                    z = util.nbatched(input, encoder, batch_size=32, depth=depth)
-                    print(z)
-
+                    # z = util.nbatched(input, encoder, batch_size=32, depth=depth)
+                    z = encoder(input, depth)
                     # -- take samples
                     zsample = util.sample(z[:, :zs], z[:, zs:])
-                    print(zsample)
                     # n0sample = util.sample_image(n0)
                     # n1sample = util.sample_image(n1)
                     # n2sample = util.sample_image(n2)
@@ -409,7 +407,8 @@ def go(arg):
 
                     # -- decoding
                     # xout = util.batchedn((zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
-                    xout = util.batchedn((zsample), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
+                    # xout = util.batchedn((zsample), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
+                    xout = decoder(zsample, depth).clamp(0, 1)[:, :C, :, :]
                     # xout = util.batchedn((zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
                     # -- mix the latent vector with random noise
 
