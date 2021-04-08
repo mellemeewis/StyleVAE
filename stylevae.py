@@ -161,7 +161,7 @@ def go(arg):
                 #                 dev='cuda', depth=depth)
 
                 # -- decoding
-                xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
+                # xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
                 xout = decoder(zsample, depth)
 
                 # xout_rn = decoder(zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand)
