@@ -127,7 +127,8 @@ def go(arg):
 
                 # -- encoding
                 # with torch.no_grad():
-                z, n0, n1, n2, n3, n4, n5 = encoder(input, depth)
+                # z, n0, n1, n2, n3, n4, n5 = encoder(input, depth)
+                z = encoder(input, depth)
 
                 # -- compute KL losses
 
@@ -138,30 +139,32 @@ def go(arg):
                 # opte.zero_grad()
 
 
-                n0kl = util.kl_loss_image(n0)
-                n1kl = util.kl_loss_image(n1)
-                n2kl = util.kl_loss_image(n2)
-                n3kl = util.kl_loss_image(n3)
-                n4kl = util.kl_loss_image(n4)
-                n5kl = util.kl_loss_image(n5)
+                # n0kl = util.kl_loss_image(n0)
+                # n1kl = util.kl_loss_image(n1)
+                # n2kl = util.kl_loss_image(n2)
+                # n3kl = util.kl_loss_image(n3)
+                # n4kl = util.kl_loss_image(n4)
+                # n5kl = util.kl_loss_image(n5)
 
                 # -- take samples
                 zsample  = util.sample(z[:, :zs], z[:, zs:])
-                n0sample = util.sample_image(n0)
-                n1sample = util.sample_image(n1)
-                n2sample = util.sample_image(n2)
-                n3sample = util.sample_image(n3)
-                n4sample = util.sample_image(n4)
-                n5sample = util.sample_image(n5)
+                # n0sample = util.sample_image(n0)
+                # n1sample = util.sample_image(n1)
+                # n2sample = util.sample_image(n2)
+                # n3sample = util.sample_image(n3)
+                # n4sample = util.sample_image(n4)
+                # n5sample = util.sample_image(n5)
 
-                with torch.no_grad():
-                    _, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
-                                zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
-                                dev='cuda', depth=depth)
+                # with torch.no_grad():
+                #     _, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
+                #                 zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
+                #                 dev='cuda', depth=depth)
 
                 # -- decoding
                 xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
-                xout_rn = decoder(zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand)
+                xout = decoder(zsample, depth)
+
+                # xout_rn = decoder(zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand)
 
 
 
@@ -180,8 +183,8 @@ def go(arg):
 
                 # rec_loss = util.normal_im(xout, input).view(b, c*h*w).sum(dim=1)
                 rec_loss = util.bce_corr(xout, input).view(b, c*h*w).sum(dim=1)
-                rec_loss_rn = util.bce_corr(xout_rn, input).view(b, c*h*w).sum(dim=1)
-                rec_loss += 10 * rec_loss_rn
+                # rec_loss_rn = util.bce_corr(xout_rn, input).view(b, c*h*w).sum(dim=1)
+                # rec_loss += 10 * rec_loss_rn
 
                 # rec_loss = F.binary_cross_entropy(xout, input, reduction='none').view(b, -1).sum(dim=1)
 
@@ -191,7 +194,8 @@ def go(arg):
                 br, bz, b0, b1, b2, b3, b4, b5 = arg.betas
 
                 # dense_loss = 0
-                kl_loss = bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
+                kl_loss = bz*zkl
+                # kl_loss = bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
                 # kl_loss = zkl
                 # assert torch.isnan(kl_loss).sum() == 0
                 # assert torch.isinf(kl_loss).sum() == 0
@@ -380,7 +384,8 @@ def go(arg):
                         zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
                         dev='cuda', depth=depth)
 
-                    sample = util.batchedn((zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=8).clamp(0, 1)[:, :C, :, :]
+                    # sample = util.batchedn((zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=8).clamp(0, 1)[:, :C, :, :]
+                    sample = util.batchedn((zrand), decoder, batch_size=8).clamp(0, 1)[:, :C, :, :]
 
                     # reconstruct 6x12 images from the testset
                     input = util.readn(testloader, n=6*12)
@@ -388,36 +393,38 @@ def go(arg):
                         input = input.cuda()
 
                     # -- encoding
-                    z, n0, n1, n2, n3, n4, n5 = util.nbatched(input, encoder, batch_size=32, depth=depth)
+                    # z, n0, n1, n2, n3, n4, n5 = util.nbatched(input, encoder, batch_size=32, depth=depth)
+                    z = util.nbatched(input, encoder, batch_size=32, depth=depth)
 
                     # -- take samples
                     zsample = util.sample(z[:, :zs], z[:, zs:])
-                    n0sample = util.sample_image(n0)
-                    n1sample = util.sample_image(n1)
-                    n2sample = util.sample_image(n2)
-                    n3sample = util.sample_image(n3)
-                    n4sample = util.sample_image(n4)
-                    n5sample = util.sample_image(n5)
+                    # n0sample = util.sample_image(n0)
+                    # n1sample = util.sample_image(n1)
+                    # n2sample = util.sample_image(n2)
+                    # n3sample = util.sample_image(n3)
+                    # n4sample = util.sample_image(n4)
+                    # n5sample = util.sample_image(n5)
 
                     # -- decoding
-                    xout = util.batchedn((zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
+                    # xout = util.batchedn((zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
+                    xout = util.batchedn((zsample), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
                     # xout = util.batchedn((zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
                     # -- mix the latent vector with random noise
 
-                    _, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
-                            zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
-                            dev='cuda', depth=depth)
+                    # _, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
+                    #         zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
+                    #         dev='cuda', depth=depth)
 
-                    mixout = util.batchedn((zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
+                    # mixout = util.batchedn((zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
 
                     # -- mix a random vector with the sample noise
 
-                    _, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
-                            zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
-                            dev='cuda', depth=depth)
+                    # _, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
+                    #         zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
+                    #         dev='cuda', depth=depth)
 
                     # mixout2 = util.batchedn((zrand, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
-                    mixout2 = util.batchedn((zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
+                    # mixout2 = util.batchedn((zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=4).clamp(0, 1)[:, :C, :, :]
 
                     # xout_sigmoid = torch.sigmoid(xout)
                     # mixout_sigmoid = torch.sigmoid(mixout)
@@ -425,14 +432,14 @@ def go(arg):
                     # sample_sigmoid = torch.sigmoid(sample)
 
 
-                    images = torch.cat([input.cpu()[:24,:,:], xout[:24,:,:], mixout[:24,:,:], mixout2[:24,:,:], sample[:24,:,:],
-                                        input.cpu()[24:48,:,:], xout[24:48,:,:], mixout[24:48,:,:], mixout2[24:48,:,:], sample[24:48,:,:],
-                                        input.cpu()[48:,:,:], xout[48:,:,:], mixout[48:,:,:], mixout2[48:,:,:], sample[48:,:,:]], dim=0)
+                    # images = torch.cat([input.cpu()[:24,:,:], xout[:24,:,:], mixout[:24,:,:], mixout2[:24,:,:], sample[:24,:,:],
+                    #                     input.cpu()[24:48,:,:], xout[24:48,:,:], mixout[24:48,:,:], mixout2[24:48,:,:], sample[24:48,:,:],
+                    #                     input.cpu()[48:,:,:], xout[48:,:,:], mixout[48:,:,:], mixout2[48:,:,:], sample[48:,:,:]], dim=0)
 
-                    # images_sigmoid = torch.cat([input.cpu()[:24,:,:], xout_sigmoid[:24,:,:], mixout_sigmoid[:24,:,:], mixout2_sigmoid[:24,:,:], sample_sigmoid[:24,:,:],
-                    #                     input.cpu()[24:48,:,:], xout_sigmoid[24:48,:,:], mixout_sigmoid[24:48,:,:], mixout2_sigmoid[24:48,:,:], sample_sigmoid[24:48,:,:],
-                    #                     input.cpu()[48:,:,:], xout_sigmoid[48:,:,:], mixout_sigmoid[48:,:,:], mixout2_sigmoid[48:,:,:], sample_sigmoid[48:,:,:]], dim=0)
 
+                    images = torch.cat([input.cpu()[:24,:,:], xout[:24,:,:], sample[:24,:,:],
+                                        input.cpu()[24:48,:,:], xout[24:48,:,:], sample[24:48,:,:],
+                                        input.cpu()[48:,:,:], xout[48:,:,:], sample[48:,:,:]], dim=0)
 
                     utils.save_image(images, f'images.{depth}.{epoch}.png', nrow=24, padding=2)
                     # utils.save_image(images_sigmoid, f'images_sigmoid.{depth}.{epoch}.png', nrow=24, padding=2)
