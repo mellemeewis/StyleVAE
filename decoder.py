@@ -238,7 +238,6 @@ class StyleDecoder2(nn.Module):
 
             x5 = util.adain(z5, x5)
 
-        print(1)
         if depth >= 4:
             if x5 is None:
                 x5 = self.x5.repeat(b, 1,1,1)
@@ -248,7 +247,6 @@ class StyleDecoder2(nn.Module):
             z4 = self.affine4(z).view(-1, 2 * c4, h//16, w//16)
             x4 = util.adain(z4, x4)
 
-        print(2)
         if depth >= 3:
             if x4 is None:
                 x4 = self.x4.repeat(b, 1,1,1)
@@ -256,7 +254,6 @@ class StyleDecoder2(nn.Module):
             x3 = F.upsample(self.block4(x4), scale_factor=2)
             z3 = self.affine3(z).view(-1, 2 * c3, h//8, w//8)
             x3 = util.adain(z3, x3)
-        print(3)
         if depth >= 2:
             if x3 is None:
                 x3 = self.x3.repeat(b, 1,1,1)
@@ -265,7 +262,6 @@ class StyleDecoder2(nn.Module):
             z2 = self.affine2(z).view(-1, 2 * c2, h//4, w//4)
             x2 = util.adain(z2, x2)
 
-        print(4)
         if depth >= 1:
             if x2 is None:
                 x2 = self.x2.repeat(b, 1,1,1)
@@ -274,7 +270,6 @@ class StyleDecoder2(nn.Module):
             z1 = self.affine1(z).view(-1, 2 * c1, h//2, w//2)
             x1 = util.adain(z1, x1)
 
-        print(5)
         if depth >= 0:
             if x1 is None:
                 x1 = self.x1.repeat(b, 1,1,1)
@@ -282,5 +277,4 @@ class StyleDecoder2(nn.Module):
             x0 = F.upsample(self.block1(x1), scale_factor=2)
             z0 = self.affine0(z).view(-1, 2 * c, h, w)
             x0 = util.adain(z0, x0)
-        print(self.conv0(x0))
         return self.conv0(x0)
