@@ -202,7 +202,7 @@ class StyleDecoder2(nn.Module):
         self.x2 = nn.Parameter(torch.randn(1, c2, h//4, w//4))
         self.x1 = nn.Parameter(torch.randn(1, c1, h//2, w//2))
 
-    def forward(self, z): #, n0, n1, n2, n3, n4, n5
+    def forward(self, z, depth): #, n0, n1, n2, n3, n4, n5
         """
         z, n0 are never none all others can be, depending on the depth
         :param z:
