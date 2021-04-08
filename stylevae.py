@@ -438,9 +438,9 @@ def go(arg):
                     #                     input.cpu()[48:,:,:], xout[48:,:,:], mixout[48:,:,:], mixout2[48:,:,:], sample[48:,:,:]], dim=0)
 
 
-                    images = torch.cat([input.cpu()[:24,:,:], xout[:24,:,:], sample[:24,:,:],
-                                        input.cpu()[24:48,:,:], xout[24:48,:,:], sample[24:48,:,:],
-                                        input.cpu()[48:,:,:], xout[48:,:,:], sample[48:,:,:]], dim=0)
+                    images = torch.cat([input.cpu()[:24,:,:], xout.cpu()[:24,:,:], sample.cpu()[:24,:,:],
+                                        input.cpu()[24:48,:,:], xout.cpu()[24:48,:,:], sample.cpu()[24:48,:,:],
+                                        input.cpu()[48:,:,:], xout.cpu()[48:,:,:], sample.cpu()[48:,:,:]], dim=0)
 
                     utils.save_image(images, f'images.{depth}.{epoch}.png', nrow=24, padding=2)
                     # utils.save_image(images_sigmoid, f'images_sigmoid.{depth}.{epoch}.png', nrow=24, padding=2)
