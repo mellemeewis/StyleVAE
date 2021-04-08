@@ -14,7 +14,7 @@ def send_message(message):
         )
 
     except SlackApiError as e:
-        assert e.response["error"]    #
+        print("Error sending message.", e)
 
 
 
@@ -28,4 +28,4 @@ def send_image(file, title):
         )
 
     except SlackApiError as e:
-        assert e.response["error"]    #
+        print("Error sending image.", e)
