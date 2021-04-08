@@ -97,9 +97,11 @@ class StyleDecoder(nn.Module):
         z = self.mapping(z)
 
         if n5 is not None:
+            print(self.x5.size())
             x5 = self.x5 + self.tonoise5(n5)
+            print(x5.size())
             z5 = self.affine5(z).view(-1, 2 * c5, h//32, w//32)
-
+            print(z5.size())
             x5 = util.adain(z5, x5)
 
         if n4 is not None:
@@ -169,11 +171,8 @@ class StyleDecoder2(nn.Module):
         self.block1 = util.Block(c1, c,  kernel_size=k, batch_norm=batch_norm)
 
         # affine mappings from latent space sample
-        if h //32 ==1: 
-            print("HI")
-            self.affine5 = nn.Linear(zs, 2 * util.prod((c5, 2, 2)))
-        else:
-            self.affine5 = nn.Linear(zs, 2 * util.prod((c5, h//32, w//32)))
+
+        self.affine5 = nn.Linear(zs, 2 * util.prod((c5, h//32, w//32)))
         self.affine4 = nn.Linear(zs, 2 * util.prod((c4, h//16, w//16)))
         self.affine3 = nn.Linear(zs, 2 * util.prod((c3, h//8, w//8)))
         self.affine2 = nn.Linear(zs, 2 * util.prod((c2, h//4, w//4)))

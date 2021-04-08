@@ -127,8 +127,8 @@ def go(arg):
 
                 # -- encoding
                 # with torch.no_grad():
-                # z, n0, n1, n2, n3, n4, n5 = encoder(input, depth)
-                z = encoder(input, depth)
+                z, n0, n1, n2, n3, n4, n5 = encoder(input, depth)
+                # z = encoder(input, depth)
                 # -- compute KL losses
 
                 zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
@@ -147,12 +147,12 @@ def go(arg):
 
                 # -- take samples
                 zsample  = util.sample(z[:, :zs], z[:, zs:])
-                # n0sample = util.sample_image(n0)
-                # n1sample = util.sample_image(n1)
-                # n2sample = util.sample_image(n2)
-                # n3sample = util.sample_image(n3)
-                # n4sample = util.sample_image(n4)
-                # n5sample = util.sample_image(n5)
+                n0sample = util.sample_image(n0)
+                n1sample = util.sample_image(n1)
+                n2sample = util.sample_image(n2)
+                n3sample = util.sample_image(n3)
+                n4sample = util.sample_image(n4)
+                n5sample = util.sample_image(n5)
 
                 # with torch.no_grad():
                 #     _, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
@@ -160,8 +160,8 @@ def go(arg):
                 #                 dev='cuda', depth=depth)
 
                 # -- decoding
-                # xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
-                xout = decoder(zsample, depth)
+                xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
+                # xout = decoder(zsample, depth)
 
                 # xout_rn = decoder(zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand)
 
