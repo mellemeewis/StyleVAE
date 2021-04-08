@@ -266,7 +266,7 @@ def latent_sample(b, zsize, outsize, depth, zchannels, dev):
     return z, n
 
 
-def batchedn(input, model, batch_size, depth, cuda=torch.cuda.is_available()):
+def batchedn(input, model, depth, batch_size, cuda=torch.cuda.is_available()):
     """
     Performs inference in batches. Input and output are non-variable, non-gpu tensors.
     :param input: A tuple
