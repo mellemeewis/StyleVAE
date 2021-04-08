@@ -181,7 +181,7 @@ def go(arg):
                 # assert torch.isnan(xout).sum() == 0
 
                 # rec_loss = util.normal_im(xout, input).view(b, c*h*w).sum(dim=1)
-                rec_loss = util.siglaplace(xout, input).view(b, c*h*w).sum(dim=1)
+                rec_loss = util.signorm(xout, input).view(b, c*h*w).sum(dim=1)
                 # rec_loss_rn = util.bce_corr(xout_rn, input).view(b, c*h*w).sum(dim=1)
                 # rec_loss += 10 * rec_loss_rn
 
@@ -364,7 +364,7 @@ def go(arg):
                             # rec_loss = -m.log_prob(target).sum(dim=1).sum(dim=1).sum(dim=1)
 
                             # rec_loss = util.normal_im(xout, input).view(b, c*h*w).sum(dim=1)
-                            rec_loss = util.siglaplace(xout, input).view(b, c*h*w).sum(dim=1)
+                            rec_loss = util.signorm(xout, input).view(b, c*h*w).sum(dim=1)
                             loss = rec_loss + kl_loss
                             loss = loss.mean(dim=0)
 
