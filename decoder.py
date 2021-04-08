@@ -233,7 +233,7 @@ class StyleDecoder2(nn.Module):
         z = self.mapping(z)
 
         if depth == 5:
-            x5 = self.x5.repeat(b, 1)
+            x5 = self.x5.repeat(b, 1,1,1)
             z5 = self.affine5(z).view(-1, 2 * c5, h//32, w//32)
 
             x5 = util.adain(z5, x5)
