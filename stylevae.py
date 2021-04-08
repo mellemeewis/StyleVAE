@@ -28,7 +28,7 @@ from models.alexnet import AlexNet
 from models.densenet import DenseNet
 from data import return_data
 from encoder import StyleEncoder, StyleEncoder2
-from decoder import StyleDecoder
+from decoder import StyleDecoder, StyleDecoder2
 import slack_util
 
 from tensorboardX import SummaryWriter
@@ -66,11 +66,13 @@ def go(arg):
     if arg.encoder_type == 1:
         encoder = StyleEncoder((C, H, W), arg.channels, arg.zchannels, zs=zs, k=arg.kernel_size, unmapping=arg.mapping_layers, batch_norm=arg.batch_norm)
     elif arg.encoder_type == 2:
-        print('USING 2')
         encoder = StyleEncoder2((C, H, W), arg.channels, arg.zchannels, zs=zs, k=arg.kernel_size, unmapping=arg.mapping_layers, batch_norm=arg.batch_norm)
 
-    decoder = StyleDecoder((C, H, W), arg.channels, arg.zchannels, zs=zs, k=arg.kernel_size, mapping=arg.mapping_layers, batch_norm=arg.batch_norm, dropouts=arg.dropouts)
-    
+    if arg.decoder_type == 1:
+        decoder = StyleDecoder((C, H, W), arg.channels, arg.zchannels, zs=zs, k=arg.kernel_size, mapping=arg.mapping_layers, batch_norm=arg.batch_norm, dropouts=arg.dropouts)
+    elif arg.encoder_type == 2:
+        decoder = StyleDecoder2((C, H, W), arg.channels, arg.zchannels, zs=zs, k=arg.kernel_size, mapping=arg.mapping_layers, batch_norm=arg.batch_norm, dropouts=arg.dropouts)
+
 
     if arg.perceptual_loss:
         if arg.perceptual_loss == 'AlexNet':
@@ -561,10 +563,14 @@ if __name__ == "__main__":
                         help="Amount of times the encoder is updated each iteration. (sleep phase).",
                         default=1, type=int)
 
-    parser.add_argument("-E", "--encoder",
+    parser.add_argument("-EN", "--encoder",
                         dest="encoder_type",
                         help="Endoder 1 or 2",
                         default=1, type=int)
+    parser.add_argument("-DE", "--decoder",
+                    dest="decoder_type",
+                    help="Decoder 1 or 2",
+                    default=1, type=int)
 
     options = parser.parse_args()
 
