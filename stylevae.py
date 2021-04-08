@@ -181,7 +181,11 @@ def go(arg):
                 # assert torch.isnan(xout).sum() == 0
 
                 # rec_loss = util.normal_im(xout, input).view(b, c*h*w).sum(dim=1)
-                rec_loss = util.signorm(xout, input).view(b, c*h*w).sum(dim=1)
+                if arg.loss_type == 'siglaplace':
+                    rec_loss = util.siglaplace(xout, input).view(b, c*h*w).sum(dim=1)
+
+                elif arg.loss_type == 'signorm':
+                    rec_loss = util.signorm(xout, input).view(b, c*h*w).sum(dim=1)
                 # rec_loss_rn = util.bce_corr(xout_rn, input).view(b, c*h*w).sum(dim=1)
                 # rec_loss += 10 * rec_loss_rn
 
@@ -575,10 +579,16 @@ if __name__ == "__main__":
                         dest="encoder_type",
                         help="Endoder 1 or 2",
                         default=1, type=int)
+
     parser.add_argument("-DE", "--decoder",
-                    dest="decoder_type",
-                    help="Decoder 1 or 2",
-                    default=1, type=int)
+                        dest="decoder_type",
+                        help="Decoder 1 or 2",
+                        default=1, type=int)
+
+    parser.add_argument("-L", "--loss",
+                    dest="loss_type",
+                    help="Losstype ",
+                    default='siglaplace', type=int)
 
     options = parser.parse_args()
 
