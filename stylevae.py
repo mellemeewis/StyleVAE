@@ -129,7 +129,6 @@ def go(arg):
                 # with torch.no_grad():
                 # z, n0, n1, n2, n3, n4, n5 = encoder(input, depth)
                 z = encoder(input, depth)
-                print(z)
                 # -- compute KL losses
 
                 zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
@@ -148,7 +147,6 @@ def go(arg):
 
                 # -- take samples
                 zsample  = util.sample(z[:, :zs], z[:, zs:])
-                print(zsample)
                 # n0sample = util.sample_image(n0)
                 # n1sample = util.sample_image(n1)
                 # n2sample = util.sample_image(n2)
