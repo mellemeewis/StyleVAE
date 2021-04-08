@@ -278,5 +278,5 @@ class StyleDecoder2(nn.Module):
             x0 = F.upsample(self.block1(x1), scale_factor=2)
             z0 = self.affine0(z).view(-1, 2 * c, h, w)
             x0 = util.adain(z0, x0)
-
+        print(self.conv0(x0))
         return self.conv0(x0)
