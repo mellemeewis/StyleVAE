@@ -588,7 +588,7 @@ if __name__ == "__main__":
     parser.add_argument("-L", "--loss",
                     dest="loss_type",
                     help="Losstype ",
-                    default='siglaplace', type=int)
+                    default='siglaplace', type=str)
 
     options = parser.parse_args()
 
