@@ -293,7 +293,7 @@ def batchedn(input, model, batch_size, cuda=torch.cuda.is_available(), **kwargs)
                 batches.append(batch)
             else:
                 batches.append(None)
-
+        print(**kwargs)
         out_batches.append(model(*batches, **kwargs).cpu().data)
 
         del batches
