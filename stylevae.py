@@ -395,6 +395,7 @@ def go(arg):
                     # -- encoding
                     # z, n0, n1, n2, n3, n4, n5 = util.nbatched(input, encoder, batch_size=32, depth=depth)
                     z = util.nbatched(input, encoder, batch_size=32, depth=depth)
+                    print(z)
 
                     # -- take samples
                     zsample = util.sample(z[:, :zs], z[:, zs:])
