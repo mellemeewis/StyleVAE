@@ -170,7 +170,8 @@ class StyleDecoder2(nn.Module):
 
         # affine mappings from latent space sample
         if h //32 ==1: 
-            self .affine5 = nn.Linear(zs, 2 * util.prod((c5, 2, 2)))
+            print("HI")
+            self.affine5 = nn.Linear(zs, 2 * util.prod((c5, 2, 2)))
         else:
             self.affine5 = nn.Linear(zs, 2 * util.prod((c5, h//32, w//32)))
         self.affine4 = nn.Linear(zs, 2 * util.prod((c4, h//16, w//16)))
