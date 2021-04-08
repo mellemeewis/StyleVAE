@@ -130,7 +130,7 @@ def go(arg):
                 # z, n0, n1, n2, n3, n4, n5 = encoder(input, depth)
                 z = encoder(input, depth)
                 # -- compute KL losses
-
+                print(zs)
                 zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
                 # loss = kl_loss.mean()
                 # loss.backward()
