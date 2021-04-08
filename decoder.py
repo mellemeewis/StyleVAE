@@ -97,11 +97,8 @@ class StyleDecoder(nn.Module):
         z = self.mapping(z)
 
         if n5 is not None:
-            print(self.x5.size())
             x5 = self.x5 + self.tonoise5(n5)
-            print(x5.size())
             z5 = self.affine5(z).view(-1, 2 * c5, h//32, w//32)
-            print(z5.size())
             x5 = util.adain(z5, x5)
 
         if n4 is not None:
@@ -219,6 +216,7 @@ class StyleDecoder2(nn.Module):
 
         x0 = x1 = x2 = x3 = x4 = x5 = None
 
+        b, l = z.size()
         c, h, w = self.out_size
         c1, c2, c3, c4, c5 = self.channels
 
@@ -235,9 +233,8 @@ class StyleDecoder2(nn.Module):
         z = self.mapping(z)
 
         if depth == 5:
-            x5 = self.x5
+            x5 = self.x5.repeat(b, 1)
             z5 = self.affine5(z).view(-1, 2 * c5, h//32, w//32)
-            print(z5.size(), x5.size())
 
             x5 = util.adain(z5, x5)
 
