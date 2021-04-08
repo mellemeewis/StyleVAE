@@ -384,7 +384,7 @@ def go(arg):
                         dev='cuda', depth=depth)
 
                     # sample = util.batchedn((zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand), decoder, batch_size=8).clamp(0, 1)[:, :C, :, :]
-                    sample = util.batchedn((zrand), decoder, batch_size=8).clamp(0, 1)[:, :C, :, :]
+                    sample = util.batchedn((zrand, depth), decoder, batch_size=8).clamp(0, 1)[:, :C, :, :]
 
                     # reconstruct 6x12 images from the testset
                     input = util.readn(testloader, n=6*12)
