@@ -133,7 +133,7 @@ def go(arg):
                 # -- compute KL losses
 
                 zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
-                # br, bz, b0, b1, b2, b3, b4, b5, bi = arg.betas
+                br, bz, b0, b1, b2, b3, b4, b5, bi = arg.betas
 
                 kl_loss = bz * zkl
                 loss = kl_loss.mean()
