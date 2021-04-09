@@ -155,25 +155,18 @@ def siglaplace_lt(output, target):
     b, l = output.size()
 
     mus = output[:, :l//2]
-    print(mus)
-    print(output)
-    VARMULT = 1e-5
-    EPS = 1e-5
+
+    VARMULT = 1e-4
+    EPS = 1e-4
 
     sgs, lsgs  = torch.exp(output[:, l//2:] * VARMULT), output[:, l//2:] * VARMULT
 
-    print(sgs)
-    print(lsgs)
 
     y = target
 
-    print(y)
 
     lny = torch.log(y + EPS)
     ln1y = torch.log(1 - y + EPS)
-
-    print(lny)
-    print(ln1y)
 
     x = lny - ln1y
 
@@ -192,14 +185,11 @@ def siglaplace(output, target):
     assert torch.isinf(target).sum() == 0
 
     mus = output[:, :1, :, :]
-    print("HEIDF")
-    print(output)
     VARMULT = 1e-5
     EPS = 1e-5
 
     sgs, lsgs  = torch.exp(output[:, 1:, :, :] * VARMULT), output[:, 1:, :, :] * VARMULT
-    print(sgs)
-    print(lsgs)
+
 
     y = target
 
