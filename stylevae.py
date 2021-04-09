@@ -229,6 +229,10 @@ def go(arg):
                 loss.backward()
                 optd.step()
                 optd.zero_grad()
+                for n, p in decoder.named_parameters():
+                    assert torch.isnan(p).sum() == 0
+                    assert torch.isinf(p).sum() == 0
+
                 # opte.step()
                 # opte.zero_grad()
 
