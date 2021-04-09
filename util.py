@@ -156,8 +156,8 @@ def siglaplace_lt(output, target):
 
     mus = output[:, :l//2]
 
-    VARMULT = 1e-3
-    EPS = 1e-3
+    VARMULT = 1e-2
+    EPS = 1e-2
 
     sgs, lsgs  = torch.exp(output[:, l//2:] * VARMULT), output[:, l//2:] * VARMULT
 
