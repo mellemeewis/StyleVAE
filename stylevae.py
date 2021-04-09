@@ -251,7 +251,7 @@ def go(arg):
 
                     iz = encoder(isample, depth)
 
-                    iz_loss = util.normal_lt_loss(iz, zrand).mean()
+                    iz_loss = util.siglaplace_lt(iz, zrand).mean()
                     # i_loss = iz_loss
                     # in0_loss = util.normal_lt_loss(torch.flatten(in0, start_dim=1), torch.flatten(n0rand, start_dim=1)).mean()
                     # i_loss = iz_loss + in0_loss 
@@ -284,8 +284,9 @@ def go(arg):
                     i_loss = bi * iz_loss.mean(dim=0)
                     loss = i_loss
                     with torch.no_grad():
-                        epoch_loss[4] += i_loss.mean(dim=0).item()
                         epoch_loss[3] += iz_loss.mean(dim=0).item()
+                        epoch_loss[4] += i_loss.mean(dim=0).item()
+
                     # print(i_loss)
 
                     # if i%720 == 0:

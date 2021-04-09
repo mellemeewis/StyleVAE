@@ -145,6 +145,34 @@ def normal_im(output, target):
 
     return vars.log() + (1.0/(2.0 * vars.pow(2.0))) * (target - means).pow(2.0)
 
+def siglaplace_lt(output, target):
+
+    assert torch.isnan(output).sum() == 0
+    assert torch.isnan(target).sum() == 0
+    assert torch.isinf(output).sum() == 0
+    assert torch.isinf(target).sum() == 0
+
+    b, l = output.size()
+
+    mus = output[:, :l]
+    VARMULT = 1e-5
+    EPS = 1e-5
+
+    sgs, lsgs  = torch.exp(output[:, l] * VARMULT), output[:, l:] * VARMULT
+
+    y = target
+
+    lny = torch.log(y + EPS)
+    ln1y = torch.log(1 - y + EPS)
+
+    x = lny - ln1y
+
+    rec = lny + ln1y + lsgs + math.log(2.0) + (x - mus).abs() / sgs
+
+    assert torch.isnan(rec).sum() == 0
+    assert torch.isinf(rec).sum() == 0
+    return rec
+
 
 def siglaplace(output, target):
 
