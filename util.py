@@ -150,6 +150,12 @@ def normal_im(output, target):
 
 
 def siglaplace(output, target):
+
+    assert torch.isnan(output).sum() == 0
+    assert torch.isnan(target).sum() == 0
+    assert torch.isinf(output).sum() == 0
+    assert torch.isinf(target).sum() == 0
+
     mus = output[:, :1, :, :]
     VARMULT = 1e-5
     EPS = 1e-5
@@ -164,6 +170,9 @@ def siglaplace(output, target):
     x = lny - ln1y
 
     rec = lny + ln1y + lsgs + math.log(2.0) + (x - mus).abs() / sgs
+
+    assert torch.isnan(rec).sum() == 0
+    assert torch.isinf(rec).sum() == 0
     return rec
 
 
