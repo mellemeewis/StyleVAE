@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --time=14:00:00
+#SBATCH --time=48:00:00
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=1
 #SBATCH -C TitanX
@@ -28,4 +28,4 @@ cd o`echo $$`
 
 # Run the actual experiment
 
-python -u /home/mms496/StyleVAE_Experiments/code/StyleVAE/stylevae.py  --task mnist --numplots 200 -z 128 -e 0 0 0 0 0 1000 -l 0.00001 -b 512  --betas 1 5 0 0 0 0 0 0 --dropouts 0 0 0 0 0 0 0 --mapping-layers 3 -EU 1  --skip-test -E 2 -D /var/scratch/mms496/data/mnist/
+python -u /home/mms496/StyleVAE_Experiments/code/StyleVAE/stylevae.py  --task mnist --numplots 4000 -z 512 -e 100 100 100 100 100 100000 -l 0.00005 -b 512  --betas 1 1 0 0 0 0 0 0 1 --dropouts 0 0 0 0 0 0 0 --mapping-layers 3 -EU 1  --skip-test -EN 2 -DE 2 -D /var/scratch/mms496/data/mnist/

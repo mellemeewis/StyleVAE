@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --time=42:00:00
+#SBATCH --time=48:00:00
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=1
 #SBATCH -C TitanX
@@ -28,4 +28,4 @@ cd o`echo $$`
 
 # Run the actual experiment
 
-python -u /home/mms496/StyleVAE_Experiments/code/StyleVAE/stylevae.py --task ffhq --numplots 11000 -z 256 -e 0 0 0 0 0 10000 -l 0.00005 -b 32 --betas 0.4 1 1 1 1 1 1 1 --dropouts 0 0.9 0.9 0.9 0.9 0.9 0.9 --mapping-layers 6 -D /var/scratch/mms496/data/ffhq/full/thumbnails128x128 #--channels 64 128 256 512 1024 --zchannels 4 8 16 32 64 128
+python -u /home/mms496/StyleVAE_Experiments/code/StyleVAE/stylevae.py --task ffhq-gs --numplots 4000 -z 512  -e 100 100 100 100 100 100000 -l 0.00005 -b 128 --betas 1 1 0 0 0 0 0 1 --dropouts 0 0 0 0 0 0 0 --mapping-layers 3 --skip-test -EN 2 -DE 2 -D /var/scratch/mms496/data/ffhq/full/thumbnails128x128 #--channels 64 128 256 512 1024 --zchannels 4 8 16 32 64 128
