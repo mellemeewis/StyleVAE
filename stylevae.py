@@ -211,8 +211,8 @@ def go(arg):
                 loss = br*rec_loss
                 # loss = br*rec_loss + kl_loss
 
-                # assert torch.isnan(loss).sum() == 0
-                # assert torch.isinf(loss).sum() == 0
+                assert torch.isnan(loss).sum() == 0
+                assert torch.isinf(loss).sum() == 0
 
                 loss = loss.mean(dim=0)
                 with torch.no_grad():
@@ -241,8 +241,8 @@ def go(arg):
                     with torch.no_grad():
                         i = decoder(zrand, depth)
 
-                    assert torch.isinf(i).sum() == 0
-                    assert torch.isnan(i).sum() == 0
+                    # assert torch.isinf(i).sum() == 0
+                    # assert torch.isnan(i).sum() == 0
                     isample = util.sample_image(i)
 
                     iz = encoder(isample, depth)
