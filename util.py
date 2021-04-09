@@ -154,11 +154,11 @@ def siglaplace_lt(output, target):
 
     b, l = output.size()
 
-    mus = output[:, :l]
+    mus = output[:, :l//2]
     VARMULT = 1e-5
     EPS = 1e-5
 
-    sgs, lsgs  = torch.exp(output[:, l] * VARMULT), output[:, l:] * VARMULT
+    sgs, lsgs  = torch.exp(output[:, l//2:] * VARMULT), output[:, l//2:] * VARMULT
 
     y = target
 
