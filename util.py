@@ -106,6 +106,8 @@ def kl_loss_image(z):
 def sleep_loss(output, target):
     b,l = output.size()
 
+    print(output.size(), target.size())
+
     mu, logvar = output[:,:l], output[:, l:]
     var = torch.exp(0.5 * logvar)
     loss = 0.5 * (target - mu).pow(2) / var.pow(2) + logvar
