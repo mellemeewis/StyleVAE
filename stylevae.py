@@ -251,7 +251,7 @@ def go(arg):
 
                     iz = encoder(isample, depth)
 
-                    iz_loss = util.siglaplace_lt(iz, zrand).mean()
+                    iz_loss = util.sleep_loss(iz, zrand).mean()
                     # i_loss = iz_loss
                     # in0_loss = util.normal_lt_loss(torch.flatten(in0, start_dim=1), torch.flatten(n0rand, start_dim=1)).mean()
                     # i_loss = iz_loss + in0_loss 

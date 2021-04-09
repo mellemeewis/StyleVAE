@@ -103,6 +103,16 @@ def kl_loss_image(z):
     return kl
 
 
+def sleep_loss(output, target):
+    b,l = output.size()
+
+    mu, logvar = output[:,:l], output[:, l:]
+    var = torch.exp(0.5 * logvar)
+    loss = 0.5 * (target - mu).pow(2) / var.pow(2) + logvar
+    return loss
+
+
+
 def kl_loss(zmean, zlsig):
 
     b, l = zmean.size()
@@ -144,38 +154,6 @@ def normal_im(output, target):
     vars=torch.clamp(vars, min=0.001)
 
     return vars.log() + (1.0/(2.0 * vars.pow(2.0))) * (target - means).pow(2.0)
-
-def siglaplace_lt(output, target):
-
-    assert torch.isnan(output).sum() == 0
-    assert torch.isnan(target).sum() == 0
-    assert torch.isinf(output).sum() == 0
-    assert torch.isinf(target).sum() == 0
-
-    b, l = output.size()
-
-    mus = output[:, :l//2]
-
-    VARMULT = 1e-2
-    EPS = 1e-2
-
-    sgs, lsgs  = torch.exp(output[:, l//2:] * VARMULT), output[:, l//2:] * VARMULT
-
-
-    y = target
-
-
-    lny = torch.log(y + EPS)
-    ln1y = torch.log(1 - y + EPS)
-
-    x = lny - ln1y
-
-    rec = lny + ln1y + lsgs + math.log(2.0) + (x - mus).abs() / sgs
-
-    assert torch.isnan(rec).sum() == 0
-    assert torch.isinf(rec).sum() == 0
-    return rec
-
 
 def siglaplace(output, target):
 
