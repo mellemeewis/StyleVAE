@@ -156,6 +156,7 @@ def siglaplace_lt(output, target):
 
     mus = output[:, :l//2]
     print(mus)
+    print(output)
     VARMULT = 1e-5
     EPS = 1e-5
 
