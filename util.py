@@ -192,6 +192,8 @@ def siglaplace(output, target):
     assert torch.isinf(target).sum() == 0
 
     mus = output[:, :1, :, :]
+    print("HEIDF")
+    print(output)
     VARMULT = 1e-5
     EPS = 1e-5
 
