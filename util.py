@@ -127,10 +127,12 @@ def normal_lt_loss(output, target):
     means = torch.sigmoid(output[:,  :l//2])
     vars  = torch.sigmoid(output[:,  l//2:])
 
-    means=torch.clamp(means, min=0.001) 
-    vars=torch.clamp(vars, min=0.001)
+    means=torch.clamp(means, min=0.001, max=100000) 
+    vars=torch.clamp(vars, min=0.001, max=100000)
 
-    return vars.log() + (1.0/(2.0 * vars.pow(2.0))) * (target - means).pow(2.0)
+    l = ars.log() + (1.0/(2.0 * vars.pow(2.0))) * (target - means).pow(2.0)
+    assert torch.isnan(l).sum() == 0
+    return l
 
 def normal_im(output, target):
     # assert torch.isnan(output).sum() == 0
