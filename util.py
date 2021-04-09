@@ -169,6 +169,9 @@ def siglaplace_lt(output, target):
     lny = torch.log(y + EPS)
     ln1y = torch.log(1 - y + EPS)
 
+    print(lny)
+    print(ln1y)
+
     x = lny - ln1y
 
     rec = lny + ln1y + lsgs + math.log(2.0) + (x - mus).abs() / sgs
