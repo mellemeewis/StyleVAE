@@ -133,7 +133,9 @@ def go(arg):
                 # -- compute KL losses
 
                 zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
-                kl_loss = zkl
+                br, bz, b0, b1, b2, b3, b4, b5, bi = arg.betas
+
+                kl_loss = bz * zkl
                 loss = kl_loss.mean()
                 loss.backward()
                 opte.step()
@@ -197,7 +199,7 @@ def go(arg):
                 # assert torch.isnan(rec_loss).sum() == 0
                 # assert torch.isinf(rec_loss).sum() == 0
 
-                # br, bz, b0, b1, b2, b3, b4, b5 = arg.betas
+                br, bz, b0, b1, b2, b3, b4, b5, bi = arg.betas
 
                 # dense_loss = 0
                 # kl_loss = bz*zkl
@@ -206,7 +208,7 @@ def go(arg):
                 # assert torch.isnan(kl_loss).sum() == 0
                 # assert torch.isinf(kl_loss).sum() == 0
 
-                loss = rec_loss
+                loss = br*rec_loss
                 # loss = br*rec_loss + kl_loss
 
                 # assert torch.isnan(loss).sum() == 0
@@ -275,7 +277,7 @@ def go(arg):
                     # epoch_loss[2] += i_loss.mean(dim=0).item()
                     # loss = i_loss.mean(dim=0)
 
-                    i_loss = iz_loss.mean(dim=0)
+                    i_loss = bi * iz_loss.mean(dim=0)
                     loss = i_loss
                     with torch.no_grad():
                         epoch_loss[3] += i_loss.mean(dim=0).item()
@@ -530,9 +532,9 @@ if __name__ == "__main__":
     parser.add_argument('--betas',
                         dest='betas',
                         help="Scaling parameters of the kl losses. The first two are for reconstruction loss and the z parameter, the rest are for the noise parameters in order. Provide exactly 7 floats.",
-                        nargs=8,
+                        nargs=9,
                         type=float,
-                        default=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
+                        default=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
 
     parser.add_argument('--dropouts',
                         dest='dropouts',
