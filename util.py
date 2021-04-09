@@ -130,7 +130,7 @@ def normal_lt_loss(output, target):
     means=torch.clamp(means, min=0.001, max=100000) 
     vars=torch.clamp(vars, min=0.001, max=100000)
 
-    l = ars.log() + (1.0/(2.0 * vars.pow(2.0))) * (target - means).pow(2.0)
+    l = vars.log() + (1.0/(2.0 * vars.pow(2.0))) * (target - means).pow(2.0)
     assert torch.isnan(l).sum() == 0
     return l
 
