@@ -198,6 +198,8 @@ def siglaplace(output, target):
     EPS = 1e-5
 
     sgs, lsgs  = torch.exp(output[:, 1:, :, :] * VARMULT), output[:, 1:, :, :] * VARMULT
+    print(sgs)
+    print(lsgs)
 
     y = target
 
