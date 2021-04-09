@@ -109,6 +109,7 @@ def sleep_loss(output, target):
     print(output.size(), target.size())
 
     mu, logvar = output[:,:l], output[:, l:]
+    print(mu.size(), logvar.size())
     var = torch.exp(0.5 * logvar)
     loss = 0.5 * (target - mu).pow(2) / var.pow(2) + logvar
     return loss
