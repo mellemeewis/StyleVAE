@@ -74,22 +74,22 @@ def go(arg):
         decoder = StyleDecoder2((C, H, W), arg.channels, arg.zchannels, zs=zs, k=arg.kernel_size, mapping=arg.mapping_layers, batch_norm=arg.batch_norm, dropouts=arg.dropouts)
 
 
-    if arg.perceptual_loss:
-        if arg.perceptual_loss == 'AlexNet':
-            perceptual_loss_model = AlexNet()
-            checkpoint = torch.load('saved_models/alexnet.pth.tar')
-        elif arg.perceptual_loss == 'DenseNet':
-            perceptual_loss_model = DenseNet()
-            checkpoint = torch.load('saved_models/densenet.pth.tar')
+    # if arg.perceptual_loss:
+    #     if arg.perceptual_loss == 'AlexNet':
+    #         perceptual_loss_model = AlexNet()
+    #         checkpoint = torch.load('saved_models/alexnet.pth.tar')
+    #     elif arg.perceptual_loss == 'DenseNet':
+    #         perceptual_loss_model = DenseNet()
+    #         checkpoint = torch.load('saved_models/densenet.pth.tar')
 
-        else:
-            raise Exception('Model for perceptual_loss {} not recognized.'.format(arg.perceptual_loss))
+    #     else:
+    #         raise Exception('Model for perceptual_loss {} not recognized.'.format(arg.perceptual_loss))
 
 
-        new_state_dict = {key.replace('module.', ''): checkpoint['state_dict'][key] for key in checkpoint['state_dict'].keys()}
-        perceptual_loss_model.load_state_dict(new_state_dict)
-        perceptual_loss_model.eval()
-        print(f"{arg.perceptual_loss} loaded")
+    #     new_state_dict = {key.replace('module.', ''): checkpoint['state_dict'][key] for key in checkpoint['state_dict'].keys()}
+    #     perceptual_loss_model.load_state_dict(new_state_dict)
+    #     perceptual_loss_model.eval()
+    #     print(f"{arg.perceptual_loss} loaded")
 
     # optimizer = Adam(list(encoder.parameters()) + list(decoder.parameters()), lr=arg.lr)
     opte = Adam(list(encoder.parameters()), lr=arg.lr)
@@ -98,8 +98,8 @@ def go(arg):
         encoder.cuda()
         decoder.cuda()
 
-        if arg.perceptual_loss:
-            perceptual_loss_model.cuda()
+        # if arg.perceptual_loss:
+        #     perceptual_loss_model.cuda()
 
     instances_seen = 0
     for depth in range(6):
@@ -128,14 +128,16 @@ def go(arg):
                 # -- encoding
                 # with torch.no_grad():
                 # z, n0, n1, n2, n3, n4, n5 = encoder(input, depth)
+                # with torch.no_grad():
                 z = encoder(input, depth)
                 # -- compute KL losses
 
                 zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
-                # loss = kl_loss.mean()
-                # loss.backward()
-                # opte.step()
-                # opte.zero_grad()
+                kl_loss = zkl
+                loss = kl_loss.mean()
+                loss.backward()
+                opte.step()
+                opte.zero_grad()
 
 
                 # n0kl = util.kl_loss_image(n0)
@@ -146,7 +148,8 @@ def go(arg):
                 # n5kl = util.kl_loss_image(n5)
 
                 # -- take samples
-                zsample  = util.sample(z[:, :zs], z[:, zs:])
+                with torch.no_grad():
+                    zsample  = util.sample(z[:, :zs], z[:, zs:])
                 # n0sample = util.sample_image(n0)
                 # n1sample = util.sample_image(n1)
                 # n2sample = util.sample_image(n2)
@@ -168,12 +171,12 @@ def go(arg):
 
 
 
-                perceptual_loss = 0
-                if arg.perceptual_loss:
-                    with torch.no_grad():
-                        perceptual_input = perceptual_loss_model(input)
-                        perceptual_output = perceptual_loss_model(xout)
-                        perceptual_loss = F.mse_loss(perceptual_input, perceptual_output, reduction='none').view(b, -1).sum(dim=1)
+                # perceptual_loss = 0
+                # if arg.perceptual_loss:
+                #     with torch.no_grad():
+                #         perceptual_input = perceptual_loss_model(input)
+                #         perceptual_output = perceptual_loss_model(xout)
+                #         perceptual_loss = F.mse_loss(perceptual_input, perceptual_output, reduction='none').view(b, -1).sum(dim=1)
 
 
 
@@ -194,17 +197,17 @@ def go(arg):
                 # assert torch.isnan(rec_loss).sum() == 0
                 # assert torch.isinf(rec_loss).sum() == 0
 
-                br, bz, b0, b1, b2, b3, b4, b5 = arg.betas
+                # br, bz, b0, b1, b2, b3, b4, b5 = arg.betas
 
                 # dense_loss = 0
-                kl_loss = bz*zkl
+                # kl_loss = bz*zkl
                 # kl_loss = bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
                 # kl_loss = zkl
                 # assert torch.isnan(kl_loss).sum() == 0
                 # assert torch.isinf(kl_loss).sum() == 0
 
-                # loss = rec_loss
-                loss = br*rec_loss + kl_loss
+                loss = rec_loss
+                # loss = br*rec_loss + kl_loss
 
                 # assert torch.isnan(loss).sum() == 0
                 # assert torch.isinf(loss).sum() == 0
@@ -224,25 +227,25 @@ def go(arg):
                 loss.backward()
                 optd.step()
                 optd.zero_grad()
-                opte.step()
-                opte.zero_grad()
+                # opte.step()
+                # opte.zero_grad()
 
-                # for i in range(arg.encoder_update_per_iteration):
+                for it in range(arg.encoder_update_per_iteration):
 
-                    # zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
-                    #         zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
-                    #         dev='cuda', depth=depth)
+                    zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
+                            zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
+                            dev='cuda', depth=depth)
 
-                    # with torch.no_grad():
-                    #     i = decoder(zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand)
+                    with torch.no_grad():
+                        i = decoder(zrand, depth)
 
                     # assert torch.isinf(i).sum() == 0
                     # assert torch.isnan(i).sum() == 0
-                    # isample = util.sample_image(i)
+                    isample = util.sample_image(i)
 
-                    # iz, in0, in1, in2, in3, in4, in5 = encoder(isample, depth)
+                    iz = encoder(isample, depth)
 
-                    # iz_loss = util.normal_lt_loss(iz, zrand).mean()
+                    iz_loss = util.normal_lt_loss(iz, zrand).mean()
                     # i_loss = iz_loss
                     # in0_loss = util.normal_lt_loss(torch.flatten(in0, start_dim=1), torch.flatten(n0rand, start_dim=1)).mean()
                     # i_loss = iz_loss + in0_loss 
@@ -272,7 +275,10 @@ def go(arg):
                     # epoch_loss[2] += i_loss.mean(dim=0).item()
                     # loss = i_loss.mean(dim=0)
 
-                    # i_loss = iz_loss.mean(dim=0)
+                    i_loss = iz_loss.mean(dim=0)
+                    loss = i_loss
+                    with torch.no_grad():
+                        epoch_loss[3] += i_loss.mean(dim=0).item()
                     # print(i_loss)
 
                     # if i%720 == 0:
@@ -283,7 +289,7 @@ def go(arg):
                     #     print('NO-N5 KL: ', n0kl, n1kl, n2kl, n3kl, n4kl, n5kl)
                     #     print('MEAN: ', loss)
 
-                instances_seen += input.size(0)
+                    # instances_seen += input.size(0)
 
                     # tbw.add_scalar('style-vae/zkl-loss', float(zkl.data.mean(dim=0).item()), instances_seen)
                     # tbw.add_scalar('style-vae/n0kl-loss', float(n0kl.data.mean(dim=0).item()), instances_seen)
@@ -297,9 +303,9 @@ def go(arg):
 
                     # Backward pas
 
-                    # loss.backward()
-                    # opte.step()
-                    # opte.zero_grad()
+                    loss.backward()
+                    opte.step()
+                    opte.zero_grad()
 
                     
                 # optimizer.zero_grad()
