@@ -166,7 +166,9 @@ def go(arg):
 
                 # -- decoding
                 # xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
-                xout = decoder(zsample, depth)
+                for it in range(arg.decoder_update_per_iteration):
+
+                    xout = decoder(zsample, depth)
 
                 # xout_rn = decoder(zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand)
 
@@ -185,12 +187,12 @@ def go(arg):
                 # assert torch.isinf(xout).sum() == 0
                 # assert torch.isnan(xout).sum() == 0
 
-                # rec_loss = util.normal_im(xout, input).view(b, c*h*w).sum(dim=1)
-                if arg.loss_type == 'siglaplace':
-                    rec_loss = util.siglaplace(xout, input).view(b, c*h*w).sum(dim=1)
+                    # rec_loss = util.normal_im(xout, input).view(b, c*h*w).sum(dim=1)
+                    if arg.loss_type == 'siglaplace':
+                        rec_loss = util.siglaplace(xout, input).view(b, c*h*w).sum(dim=1)
 
-                elif arg.loss_type == 'signorm':
-                    rec_loss = util.signorm(xout, input).view(b, c*h*w).sum(dim=1)
+                    elif arg.loss_type == 'signorm':
+                        rec_loss = util.signorm(xout, input).view(b, c*h*w).sum(dim=1)
                 # rec_loss_rn = util.bce_corr(xout_rn, input).view(b, c*h*w).sum(dim=1)
                 # rec_loss += 10 * rec_loss_rn
 
@@ -199,7 +201,7 @@ def go(arg):
                 # assert torch.isnan(rec_loss).sum() == 0
                 # assert torch.isinf(rec_loss).sum() == 0
 
-                br, bz, b0, b1, b2, b3, b4, b5, bi = arg.betas
+                    br, bz, b0, b1, b2, b3, b4, b5, bi = arg.betas
 
                 # dense_loss = 0
                 # kl_loss = bz*zkl
@@ -208,30 +210,30 @@ def go(arg):
                 # assert torch.isnan(kl_loss).sum() == 0
                 # assert torch.isinf(kl_loss).sum() == 0
 
-                loss = br*rec_loss
+                    loss = br*rec_loss
                 # loss = br*rec_loss + kl_loss
 
-                assert torch.isnan(loss).sum() == 0
-                assert torch.isinf(loss).sum() == 0
+                    assert torch.isnan(loss).sum() == 0
+                    assert torch.isinf(loss).sum() == 0
 
-                loss = loss.mean(dim=0)
-                with torch.no_grad():
-                    epoch_loss[0] += rec_loss.mean(dim=0).item()
-                    # epoch_loss[1] += kl_loss.mean(dim=0).item()
-                    epoch_loss[2] += zkl.mean(dim=0).item()
-                    # epoch_loss[3] += n0kl.mean(dim=0).item() 
-                    # if depth > 0: epoch_loss[4] += n1kl.mean(dim=0).item()
-                    # if depth > 1:epoch_loss[5] += n2kl.mean(dim=0).item()
-                    # if depth > 2:epoch_loss[6] += n3kl.mean(dim=0).item()
-                    # if depth > 3:epoch_loss[7] += n4kl.mean(dim=0).item()
-                    # if depth > 4:epoch_loss[8] += n5kl.mean(dim=0).item()
+                    loss = loss.mean(dim=0)
+                    with torch.no_grad():
+                        epoch_loss[0] += rec_loss.mean(dim=0).item()
+                        # epoch_loss[1] += kl_loss.mean(dim=0).item()
+                        epoch_loss[2] += zkl.mean(dim=0).item()
+                        # epoch_loss[3] += n0kl.mean(dim=0).item() 
+                        # if depth > 0: epoch_loss[4] += n1kl.mean(dim=0).item()
+                        # if depth > 1:epoch_loss[5] += n2kl.mean(dim=0).item()
+                        # if depth > 2:epoch_loss[6] += n3kl.mean(dim=0).item()
+                        # if depth > 3:epoch_loss[7] += n4kl.mean(dim=0).item()
+                        # if depth > 4:epoch_loss[8] += n5kl.mean(dim=0).item()
 
-                loss.backward()
-                optd.step()
-                optd.zero_grad()
-                for n, p in decoder.named_parameters():
-                    assert torch.isnan(p).sum() == 0
-                    assert torch.isinf(p).sum() == 0
+                    loss.backward()
+                    optd.step()
+                    optd.zero_grad()
+                    for n, p in decoder.named_parameters():
+                        assert torch.isnan(p).sum() == 0
+                        assert torch.isinf(p).sum() == 0
 
                 # opte.step()
                 # opte.zero_grad()
@@ -587,6 +589,11 @@ if __name__ == "__main__":
     parser.add_argument("-EU", "--encoder-update-per-iteration",
                         dest="encoder_update_per_iteration",
                         help="Amount of times the encoder is updated each iteration. (sleep phase).",
+                        default=1, type=int)
+
+    parser.add_argument("-DU", "--decoder-update-per-iteration",
+                        dest="decoder_update_per_iteration",
+                        help="Amount of times the decoder is updated each iteration. (wake phase).",
                         default=1, type=int)
 
     parser.add_argument("-EN", "--encoder",
