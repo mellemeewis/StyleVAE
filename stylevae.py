@@ -132,7 +132,7 @@ def go(arg):
                     z = encoder(input, depth)
                 # -- compute KL losses
 
-                    # zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
+                    zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
                 # br, bz, b0, b1, b2, b3, b4, b5, bi = arg.betas
 
                 # kl_loss = bz * zkl
@@ -218,7 +218,7 @@ def go(arg):
                 with torch.no_grad():
                     epoch_loss[0] += rec_loss.mean(dim=0).item()
                     # epoch_loss[1] += kl_loss.mean(dim=0).item()
-                    # epoch_loss[2] += zkl.mean(dim=0).item()
+                    epoch_loss[2] += zkl.mean(dim=0).item()
                     # epoch_loss[3] += n0kl.mean(dim=0).item() 
                     # if depth > 0: epoch_loss[4] += n1kl.mean(dim=0).item()
                     # if depth > 1:epoch_loss[5] += n2kl.mean(dim=0).item()
