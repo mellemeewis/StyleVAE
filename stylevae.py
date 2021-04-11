@@ -104,8 +104,11 @@ def go(arg):
     instances_seen = 0
     for depth in range(6):
 
-        print(f'starting depth {depth}, for {arg.epochs[depth]} epochs')
+        ## CLASSIV VAE
+
+        print(f'starting CLASSIV VAE depth {depth}, for {arg.epochs[depth]} epochs')
         print('\t\tRec\t\tKL\tZ\tN0\tN1\tN2\tN3\tN4\tN5\t')
+        
         for epoch in range(arg.epochs[depth]):
 
             epoch_loss = [0,0,0,0,0,0,0,0,0,0]
@@ -128,11 +131,11 @@ def go(arg):
                 # -- encoding
                 # with torch.no_grad():
                 # z, n0, n1, n2, n3, n4, n5 = encoder(input, depth)
-                with torch.no_grad():
-                    z = encoder(input, depth)
+                # with torch.no_grad():
+                z = encoder(input, depth)
                 # -- compute KL losses
 
-                    zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
+                zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
                 # br, bz, b0, b1, b2, b3, b4, b5, bi = arg.betas
 
                 # kl_loss = bz * zkl
@@ -151,7 +154,7 @@ def go(arg):
 
                 # -- take samples
                 # with torch.no_grad():
-                    zsample  = util.sample(z[:, :zs], z[:, zs:])
+                zsample  = util.sample(z[:, :zs], z[:, zs:])
                 # n0sample = util.sample_image(n0)
                 # n1sample = util.sample_image(n1)
                 # n2sample = util.sample_image(n2)
@@ -166,9 +169,8 @@ def go(arg):
 
                 # -- decoding
                 # xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
-                for it in range(arg.decoder_update_per_iteration):
 
-                    xout = decoder(zsample, depth)
+                xout = decoder(zsample, depth)
 
                 # xout_rn = decoder(zsample, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand)
 
@@ -188,11 +190,11 @@ def go(arg):
                 # assert torch.isnan(xout).sum() == 0
 
                     # rec_loss = util.normal_im(xout, input).view(b, c*h*w).sum(dim=1)
-                    if arg.loss_type == 'siglaplace':
-                        rec_loss = util.siglaplace(xout, input).view(b, c*h*w).sum(dim=1)
+                if arg.loss_type == 'siglaplace':
+                    rec_loss = util.siglaplace(xout, input).view(b, c*h*w).sum(dim=1)
 
-                    elif arg.loss_type == 'signorm':
-                        rec_loss = util.signorm(xout, input).view(b, c*h*w).sum(dim=1)
+                elif arg.loss_type == 'signorm':
+                    rec_loss = util.signorm(xout, input).view(b, c*h*w).sum(dim=1)
                 # rec_loss_rn = util.bce_corr(xout_rn, input).view(b, c*h*w).sum(dim=1)
                 # rec_loss += 10 * rec_loss_rn
 
@@ -201,59 +203,62 @@ def go(arg):
                 # assert torch.isnan(rec_loss).sum() == 0
                 # assert torch.isinf(rec_loss).sum() == 0
 
-                    br, bz, b0, b1, b2, b3, b4, b5, bi = arg.betas
+                br, bz, b0, b1, b2, b3, b4, b5, bi = arg.betas
 
                 # dense_loss = 0
-                # kl_loss = bz*zkl
+                kl_loss = bz*zkl
                 # kl_loss = bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl
                 # kl_loss = zkl
                 # assert torch.isnan(kl_loss).sum() == 0
                 # assert torch.isinf(kl_loss).sum() == 0
 
-                    loss = br*rec_loss
-                # loss = br*rec_loss + kl_loss
+                # loss = br*rec_loss
+                loss = br*rec_loss + kl_loss
 
-                    assert torch.isnan(loss).sum() == 0
-                    assert torch.isinf(loss).sum() == 0
+                assert torch.isnan(loss).sum() == 0
+                assert torch.isinf(loss).sum() == 0
 
-                    loss = loss.mean(dim=0)
-                    with torch.no_grad():
-                        epoch_loss[0] += rec_loss.mean(dim=0).item()
-                        # epoch_loss[1] += kl_loss.mean(dim=0).item()
-                        epoch_loss[2] += zkl.mean(dim=0).item()
-                        # epoch_loss[3] += n0kl.mean(dim=0).item() 
-                        # if depth > 0: epoch_loss[4] += n1kl.mean(dim=0).item()
-                        # if depth > 1:epoch_loss[5] += n2kl.mean(dim=0).item()
-                        # if depth > 2:epoch_loss[6] += n3kl.mean(dim=0).item()
-                        # if depth > 3:epoch_loss[7] += n4kl.mean(dim=0).item()
-                        # if depth > 4:epoch_loss[8] += n5kl.mean(dim=0).item()
+                loss = loss.mean(dim=0)
+                with torch.no_grad():
+                    epoch_loss[0] += rec_loss.mean(dim=0).item()
+                    epoch_loss[1] += kl_loss.mean(dim=0).item()
+                    epoch_loss[2] += zkl.mean(dim=0).item()
+                    # epoch_loss[3] += n0kl.mean(dim=0).item() 
+                    # if depth > 0: epoch_loss[4] += n1kl.mean(dim=0).item()
+                    # if depth > 1:epoch_loss[5] += n2kl.mean(dim=0).item()
+                    # if depth > 2:epoch_loss[6] += n3kl.mean(dim=0).item()
+                    # if depth > 3:epoch_loss[7] += n4kl.mean(dim=0).item()
+                    # if depth > 4:epoch_loss[8] += n5kl.mean(dim=0).item()
 
-                    loss.backward()
-                    optd.step()
-                    optd.zero_grad()
-                    for n, p in decoder.named_parameters():
-                        assert torch.isnan(p).sum() == 0
-                        assert torch.isinf(p).sum() == 0
+                loss.backward()
+                optd.step()
+                optd.zero_grad()
+                opte.step()
+                opte.zero_grad()
+
+                # for n, p in decoder.named_parameters():
+                #     assert torch.isnan(p).sum() == 0
+                #     assert torch.isinf(p).sum() == 0
 
                 # opte.step()
                 # opte.zero_grad()
 
-                for it in range(arg.encoder_update_per_iteration):
+                # for it in range(arg.encoder_update_per_iteration):
 
-                    zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
-                            zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
-                            dev='cuda', depth=depth)
+                #     zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
+                #             zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
+                #             dev='cuda', depth=depth)
 
-                    with torch.no_grad():
-                        i = decoder(zrand, depth)
+                #     with torch.no_grad():
+                #         i = decoder(zrand, depth)
 
-                    # assert torch.isinf(i).sum() == 0
-                    # assert torch.isnan(i).sum() == 0
-                    isample = util.sample_image(i)
+                #     # assert torch.isinf(i).sum() == 0
+                #     # assert torch.isnan(i).sum() == 0
+                #     isample = util.sample_image(i)
 
-                    iz = encoder(isample, depth)
+                #     iz = encoder(isample, depth)
 
-                    iz_loss = util.sleep_loss(iz, zrand).mean()
+                    # iz_loss = util.sleep_loss(iz, zrand).mean()
                     # i_loss = iz_loss
                     # in0_loss = util.normal_lt_loss(torch.flatten(in0, start_dim=1), torch.flatten(n0rand, start_dim=1)).mean()
                     # i_loss = iz_loss + in0_loss 
@@ -283,11 +288,11 @@ def go(arg):
                     # epoch_loss[2] += i_loss.mean(dim=0).item()
                     # loss = i_loss.mean(dim=0)
 
-                    i_loss = bi * iz_loss.mean(dim=0)
-                    loss = i_loss
-                    with torch.no_grad():
-                        epoch_loss[3] += iz_loss.mean(dim=0).item()
-                        epoch_loss[4] += i_loss.mean(dim=0).item()
+                    # i_loss = bi * iz_loss.mean(dim=0)
+                    # loss = i_loss
+                    # with torch.no_grad():
+                    #     epoch_loss[3] += iz_loss.mean(dim=0).item()
+                    #     epoch_loss[4] += i_loss.mean(dim=0).item()
 
                     # print(i_loss)
 
@@ -313,9 +318,9 @@ def go(arg):
 
                     # Backward pas
 
-                    loss.backward()
-                    opte.step()
-                    opte.zero_grad()
+                    # loss.backward()
+                    # opte.step()
+                    # opte.zero_grad()
 
                     
                 # optimizer.zero_grad()
@@ -474,6 +479,139 @@ def go(arg):
                     # utils.save_image(mixout, f'images_mixout_lv_rn.{depth}.{epoch}.png', nrow=3, padding=2)
                     # utils.save_image(mixout2, f'images_mixout2_rv_sn.{depth}.{epoch}.png', nrow=3, padding=2)
                     # utils.save_image(sample, f'images_sample_total_random.{depth}.{epoch}.png', nrow=3, padding=2)
+
+
+
+        ## WAKE SLEEP
+
+        print(f'starting WAKE SLEEP depth {depth}, for {arg.epochs[depth]} epochs')
+        print('\t\tRec\t\tKL\tZ\tN0\tN1\tN2\tN3\tN4\tN5\t')
+        
+        for epoch in range(arg.epochs[depth]):
+
+            epoch_loss = [0,0,0,0,0,0,0,0,0,0]
+
+            # Train
+            err_tr = []
+            encoder.train(True)
+            decoder.train(True)
+            for i, (input, _) in enumerate(trainloader):
+
+            # for i, (input, _) in enumerate(tqdm.tqdm(trainloader)):
+                if arg.limit is not None and i * arg.batch_size > arg.limit:
+                    break
+
+                # Prepare the input
+                b, c, w, h = input.size()
+                if torch.cuda.is_available():
+                    input = input.cuda()
+
+                # -- encoding
+                with torch.no_grad():
+                    z = encoder(input, depth)
+                # -- compute KL losses
+
+
+                # -- take samples
+                    zsample  = util.sample(z[:, :zs], z[:, zs:])
+
+                xout = decoder(zsample, depth)
+
+                if arg.loss_type == 'siglaplace':
+                    rec_loss = util.siglaplace(xout, input).view(b, c*h*w).sum(dim=1)
+
+                elif arg.loss_type == 'signorm':
+                    rec_loss = util.signorm(xout, input).view(b, c*h*w).sum(dim=1)
+
+
+                br, bz, b0, b1, b2, b3, b4, b5, bi = arg.betas
+
+                loss = br*rec_loss
+                assert torch.isnan(loss).sum() == 0
+                assert torch.isinf(loss).sum() == 0
+
+                loss = loss.mean(dim=0)
+                with torch.no_grad():
+                    epoch_loss[4] += rec_loss.mean(dim=0).item()
+
+                loss.backward()
+                optd.step()
+                optd.zero_grad()
+
+
+                for it in range(arg.encoder_update_per_iteration):
+
+                    zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
+                            zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
+                            dev='cuda', depth=depth)
+
+                    with torch.no_grad():
+                        i = decoder(zrand, depth)
+
+
+                    isample = util.sample_image(i)
+
+                    iz = encoder(isample, depth)
+
+                    iz_loss = util.sleep_loss(iz, zrand).mean()
+                    i_loss = iz_loss
+
+
+
+
+
+
+                    loss = bi * i_loss.mean(dim=0)
+                    with torch.no_grad():
+                        epoch_loss[5] += loss.mean(dim=0).item()
+                        epoch_loss[5] += i_loss.mean(dim=0).item()
+
+                    # Backward pas
+                    loss.backward()
+                    opte.step()
+                    opte.zero_grad()
+
+            print(f'Epoch {epoch}:\t','\t'.join([str(int(e)) for e in epoch_loss]))
+
+            if arg.epochs[depth] <= arg.np or epoch % (arg.epochs[depth]//arg.np) == 0 or epoch == arg.epochs[depth] - 1:
+                with torch.no_grad():
+                    err_te = []
+                    encoder.train(False)
+                    decoder.train(False)
+
+                    # sample 6x12 images
+                    b = 6*12
+
+                    zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b,\
+                        zsize=arg.latent_size, outsize=(C, H, W), zchannels=arg.zchannels, \
+                        dev='cuda', depth=depth)
+
+
+                    sample = decoder(zrand, depth).clamp(0, 1)[:, :C, :, :]
+                    # reconstruct 6x12 images from the testset
+                    input = util.readn(testloader, n=6*12)
+                    if torch.cuda.is_available():
+                        input = input.cuda()
+
+                    # -- encoding
+                    z = encoder(input, depth)
+
+                    # -- take samples
+                    zsample = util.sample(z[:, :zs], z[:, zs:])
+     
+                    xout = decoder(zsample, depth).clamp(0, 1)[:, :C, :, :]
+     
+
+                    images = torch.cat([input.cpu()[:24,:,:], xout.cpu()[:24,:,:], sample.cpu()[:24,:,:],
+                                        input.cpu()[24:48,:,:], xout.cpu()[24:48,:,:], sample.cpu()[24:48,:,:],
+                                        input.cpu()[48:,:,:], xout.cpu()[48:,:,:], sample.cpu()[48:,:,:]], dim=0)
+
+                    utils.save_image(images, f'images.{depth}.{epoch}.png', nrow=24, padding=2)
+
+                    slack_util.send_message(f' Depth {depth}, Epoch {epoch}. \nOptions: {arg}')
+                    slack_util.send_image(f'images.{depth}.{epoch}.png', f'Depth {depth}, Epoch: {epoch}')
+
+
 
 
 
