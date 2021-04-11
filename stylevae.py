@@ -606,10 +606,10 @@ def go(arg):
                                         input.cpu()[24:48,:,:], xout.cpu()[24:48,:,:], sample.cpu()[24:48,:,:],
                                         input.cpu()[48:,:,:], xout.cpu()[48:,:,:], sample.cpu()[48:,:,:]], dim=0)
 
-                    utils.save_image(images, f'images.{depth}.{epoch}.png', nrow=24, padding=2)
+                    utils.save_image(images, f'WS_images.{depth}.{epoch}.png', nrow=24, padding=2)
 
-                    slack_util.send_message(f' Depth {depth}, Epoch {epoch}. \nOptions: {arg}')
-                    slack_util.send_image(f'images.{depth}.{epoch}.png', f'Depth {depth}, Epoch: {epoch}')
+                    slack_util.send_message(f' WS Depth {depth}, Epoch {epoch}. \nOptions: {arg}')
+                    slack_util.send_image(f'WS_images.{depth}.{epoch}.png', f'Depth {depth}, Epoch: {epoch}')
 
 
 
