@@ -256,6 +256,7 @@ def sample_images(z, distribution, n=1, eps=None):
 
         print(torch.isnan(loc).sum())
         print(torch.isnan(scale).sum())
+        print(scale[scale < 0].sum())
 
         distribution = torch.distributions.laplace.Laplace(loc, scale, validate_args=None)
         sample = distribution.sample(sample_shape=(n,))
