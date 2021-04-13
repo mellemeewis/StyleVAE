@@ -141,6 +141,7 @@ class StyleEncoder(nn.Module):
         print(z)
         z = self.unmapping(z)
         print(z)
+        sys.exit()
 
         return z
         # return z, n0, n1, n2, n3, n4, n5
