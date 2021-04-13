@@ -116,7 +116,7 @@ def go(arg):
                 ## SLEEP UPDATE
 
                 # -- sample random latent
-                zrand = torch.randn(b, zsize, device=dev)
+                zrand = torch.randn(b, zs, device=dev)
 
                 # -- generate x from latent
                 with torch.no_grad():
