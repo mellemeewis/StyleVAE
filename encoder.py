@@ -117,6 +117,7 @@ class StyleEncoder(nn.Module):
         # n5 = self.tonoise5(x5)
 
         # combine the z vectors
+        print(z0)
         print(z1)
         print(z2)
         print(z3)
