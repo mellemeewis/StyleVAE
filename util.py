@@ -110,7 +110,7 @@ def sleep_loss(output, target):
     mu, logvar = output[:,:l//2], output[:, l//2:]
     var = torch.exp(0.5 * logvar)
     loss = 0.5 * (target - mu).pow(2) / var.pow(2) + logvar
-    loss = torch.clamp(loss, min = 0.001, max = 100000)
+    # loss = torch.clamp(loss, min = 0.001, max = 100000)
     return loss
 
 
