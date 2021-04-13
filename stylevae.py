@@ -143,7 +143,7 @@ def go(arg):
 
    
             print(f'Epoch {epoch}:\t','\t'.join([str(int(e)) for e in epoch_loss]))
-            string = f'Epoch {epoch}:\t','\t'.join([str(int(e)) for e in epoch_loss])
+            string = f'Epoch {epoch}:\t\n' +'\t'.join([str(int(e)) for e in epoch_loss])
 
             ## MAKE PLOTS
 
