@@ -229,22 +229,34 @@ def sample(zmean, zlsig, eps=None):
     return zmean + eps * (zlsig * 0.5).exp()
 
 
-def sample_image(z, eps=None):
+def sample_images(z, distribution, , n=1, eps=None):
+
     if z  is None:
         return None
 
+    if distribution == 'normal':
 
-    b, c, h, w = z.size()
-    mean = z[:, :c//2, :, :].view(b, -1)
-    sig = z[:, c//2:, :, :].view(b, -1)
+        b, c, h, w = z.size()
+        mean = z[:, :c//2, :, :].view(b, -1)
+        sig = z[:, c//2:, :, :].view(b, -1)
 
-    if eps is None:
-        eps = torch.randn(b, c//2, h, w).view(b, -1)
-        if z.is_cuda:
-            eps = eps.cuda()
-        eps = Variable(eps)
+        if eps is None:
+            eps = torch.randn(b, c//2, h, w).view(b, -1)
+            if z.is_cuda:
+                eps = eps.cuda()
+            eps = Variable(eps)
 
-    sample = mean + eps * (sig * 0.5).exp()
+        sample = mean + eps * (sig * 0.5).exp()
+
+    elif distribution == 'siglaplace':
+
+        loc = z[:, :c//2, :, :].view(b, -1)
+        scale = z[:, c//2:, :, :].view(b, -1)
+
+        distribution = torch.distributions.laplace.Laplace(loc, scale)
+        sample = distribution.sample(sample_shape=(n,))
+        sample = torch.sigmoid(sample)
+
 
     return sample.view(b, c//2, h, w)
 
