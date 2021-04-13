@@ -254,6 +254,11 @@ def sample_images(z, distribution, n=1, eps=None):
         loc = z[:, :c//2, :, :].view(b, -1)
         scale = torch.abs(z[:, c//2:, :, :]).view(b, -1)
 
+        assert torch.isnan(loc).sum() == 0
+        assert torch.isinf(loc).sum() == 0
+        assert torch.isnan(scale).sum() == 0
+        assert torch.isinf(scale).sum() == 0
+
         distribution = torch.distributions.laplace.Laplace(loc, scale, validate_args=None)
         sample = distribution.sample(sample_shape=(n,))
         sample = torch.sigmoid(sample)
