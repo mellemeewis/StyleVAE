@@ -252,9 +252,9 @@ def sample_images(z, distribution, n=1, eps=None):
     elif distribution == 'siglaplace':
 
         loc = z[:, :c//2, :, :].view(b, -1)
-        scale = z[:, c//2:, :, :].view(b, -1)
+        # scale = z[:, c//2:, :, :].view(b, -1)
 
-        # scale = torch.abs(z[:, c//2:, :, :]).view(b, -1)
+        scale = torch.abs(z[:, c//2:, :, :]).view(b, -1)
 
         assert torch.isnan(loc).sum() == 0
         assert torch.isinf(loc).sum() == 0
@@ -262,7 +262,7 @@ def sample_images(z, distribution, n=1, eps=None):
         assert torch.isinf(scale).sum() == 0
         # assert scale[scale < 0].sum() == 0
 
-        scale = scale.clamp(min=0.0001)
+        # scale = scale.clamp(min=0.0001)
         print(scale)
 
         distribution = torch.distributions.laplace.Laplace(loc, scale, validate_args=None)
