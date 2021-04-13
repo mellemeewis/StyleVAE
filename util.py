@@ -229,7 +229,7 @@ def sample(zmean, zlsig, eps=None):
     return zmean + eps * (zlsig * 0.5).exp()
 
 
-def sample_images(z, distribution, , n=1, eps=None):
+def sample_images(z, distribution, n=1, eps=None):
 
     if z  is None:
         return None
