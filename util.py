@@ -252,6 +252,8 @@ def sample_images(z, distribution, n=1, eps=None):
     elif distribution == 'siglaplace':
 
         loc = z[:, :c//2, :, :].view(b, -1)
+        scale = z[:, c//2:, :, :].view(b, -1)
+
         # scale = torch.abs(z[:, c//2:, :, :]).view(b, -1)
 
         assert torch.isnan(loc).sum() == 0
