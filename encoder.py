@@ -69,7 +69,8 @@ class StyleEncoder(nn.Module):
 
         if depth <= 0:
             z = self.unmapping(z)
-            return z, n0, n1, n2, n3, n4, n5
+            return z
+            # return z, n0, n1, n2, n3, n4, n5
 
         x1 = F.avg_pool2d(self.block1(x0), 2)
         z1 = self.affine1(x1.view(b, -1))
@@ -77,9 +78,12 @@ class StyleEncoder(nn.Module):
         # n1 = self.tonoise1(x1)
 
         if depth <= 1:
-            # z = self.unmapping(z0 + z1) #commented out for reverse adain
+            zbatch = torch.cat([z0[:, None, :],z1[:, None, :]], dim=1)
+            z = self.z_dropout(zbatch)        
+            z = z.sum(dim=1)
             z = self.unmapping(z)
-            return z, n0, n1, n2, n3, n4, n5
+            return z
+            # return z, n0, n1, n2, n3, n4, n5
 
         x2 = F.avg_pool2d(self.block2(x1), 2)
         z2 = self.affine2(x2.view(b, -1))
@@ -87,9 +91,12 @@ class StyleEncoder(nn.Module):
         # n2 = self.tonoise2(x2)
 
         if depth <= 2:
-            # z = self.unmapping(z0 + z1 + z2) #commented out for reverse adain
+            zbatch = torch.cat([z0[:, None, :],z1[:, None, :],z2[:, None, :]], dim=1)
+            z = self.z_dropout(zbatch)        
+            z = z.sum(dim=1)
             z = self.unmapping(z)
-            return z, n0, n1, n2, n3, n4, n5
+            return z
+            # return z, n0, n1, n2, n3, n4, n5
 
         x3 = F.avg_pool2d(self.block3(x2), 2)
         z3 = self.affine3(x3.view(b, -1))
@@ -97,9 +104,12 @@ class StyleEncoder(nn.Module):
         # n3 = self.tonoise3(x3)
 
         if depth <= 3:
-            # z = self.unmapping(z0 + z1 + z2 + z3) #commented out for reverse adain
+            zbatch = torch.cat([z0[:, None, :],z1[:, None, :],z2[:, None, :], z3[:, None, :]], dim=1)
+            z = self.z_dropout(zbatch)        
+            z = z.sum(dim=1)
             z = self.unmapping(z)
-            return z, n0, n1, n2, n3, n4, n5
+            return z
+            # return z, n0, n1, n2, n3, n4, n5
 
         x4 = F.avg_pool2d(self.block4(x3), 2)
         z4 = self.affine4(x4.view(b, -1))
@@ -107,9 +117,12 @@ class StyleEncoder(nn.Module):
         # n4 = self.tonoise4(x4)
 
         if depth <= 4:
-            # z = self.unmapping(z0 + z1 + z2 + z3 + z4) #commented out for reverse adain
+            zbatch = torch.cat([z0[:, None, :],z1[:, None, :],z2[:, None, :], z3[:, None, :], z4[:, None, :]], dim=1)
+            z = self.z_dropout(zbatch)        
+            z = z.sum(dim=1)
             z = self.unmapping(z)
-            return z, n0, n1, n2, n3, n4, n5
+            return z
+            # return z, n0, n1, n2, n3, n4, n5
 
         x5 = F.avg_pool2d(self.block5(x4), 2)
         z5 = self.affine5(x5.view(b, -1))
@@ -117,12 +130,6 @@ class StyleEncoder(nn.Module):
         # n5 = self.tonoise5(x5)
 
         # combine the z vectors
-        print(z0)
-        print(z1)
-        print(z2)
-        print(z3)
-        print(z4)
-        print(z5)
 
         zbatch = torch.cat([
             z0[:, None, :],
@@ -132,16 +139,9 @@ class StyleEncoder(nn.Module):
             z4[:, None, :],
             z5[:, None, :]], dim=1)
 
-        print("BATCH")
-        print(zbatch)
-
         z = self.z_dropout(zbatch)        
-        print(z)
         z = z.sum(dim=1)
-        print(z)
         z = self.unmapping(z)
-        print(z)
-        sys.exit()
 
         return z
         # return z, n0, n1, n2, n3, n4, n5
