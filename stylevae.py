@@ -36,7 +36,7 @@ from tensorboardX import SummaryWriter
 # from layers import PlainMaskedConv2d, MaskedConv2d
 
 SEEDFRAC = 2
-DV = 'cuda' if torch.cuda.is_available() else 'cpu'
+dev = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
 def go(arg):
