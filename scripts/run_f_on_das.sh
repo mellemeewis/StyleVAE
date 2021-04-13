@@ -28,4 +28,4 @@ cd o`echo $$`
 
 # Run the actual experiment
 
-python -u /home/mms496/StyleVAE_Experiments/code/StyleVAE/stylevae.py --task ffhq-gs --numplots 4000 -z 512  -e 100 100 100 100 100 100000 -l 0.0001 -b 64 --betas 0.2 1 0 0 0 0 0 0 0.05 --dropouts 0 0 0 0 0 0 0 --mapping-layers 3 --skip-test -EN 2 -DE 2 -D /var/scratch/mms496/data/ffhq/full/thumbnails128x128 #--channels 64 128 256 512 1024 --zchannels 4 8 16 32 64 128
+python -u /home/mms496/StyleVAE_Experiments/code/StyleVAE/stylevae.py --task ffhq-gs --numplots 400 -z 512  -e 100 100 100 100 100 1000 -l 0.0001 -b 32 --betas 0.2 1 0 0 0 0 0 0 0.05 --dropouts 0 0 0 0 0 0 0 --mapping-layers 3 --skip-test -EN 1 -DE 2 -D /var/scratch/mms496/data/ffhq/full/thumbnails128x128 #--channels 64 128 256 512 1024 --zchannels 4 8 16 32 64 128
