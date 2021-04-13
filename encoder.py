@@ -135,7 +135,7 @@ class StyleEncoder(nn.Module):
         print("BATCH")
         print(zbatch)
 
-        z = self.z_dropout()        
+        z = self.z_dropout(zbatch)        
         print(z)
         z = z.sum(dim=1)
         print(z)
