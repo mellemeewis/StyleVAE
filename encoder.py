@@ -143,7 +143,8 @@ class StyleEncoder(nn.Module):
         z = self.z_dropout(zbatch)        
         z = z.sum(dim=1)
         z = self.unmapping(z)
-        print(z)
+        print(z.device)
+        print(z.grad_fn)
         return z
         # return z, n0, n1, n2, n3, n4, n5
 
