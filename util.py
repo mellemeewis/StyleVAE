@@ -234,9 +234,10 @@ def sample_images(z, distribution, n=1, eps=None):
     if z  is None:
         return None
 
+    b, c, h, w = z.size()
+
     if distribution == 'normal':
 
-        b, c, h, w = z.size()
         mean = z[:, :c//2, :, :].view(b, -1)
         sig = z[:, c//2:, :, :].view(b, -1)
 
