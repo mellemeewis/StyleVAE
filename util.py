@@ -260,10 +260,11 @@ def sample_images(z, distribution, n=1, eps=None):
         assert torch.isinf(loc).sum() == 0
         assert torch.isnan(scale).sum() == 0
         assert torch.isinf(scale).sum() == 0
-        assert scale[scale < 0].sum() == 0
+        # assert scale[scale < 0].sum() == 0
 
         scale = torch.clamp(scale, min=0.0001)
         print(scale)
+        
         distribution = torch.distributions.laplace.Laplace(loc, scale, validate_args=None)
         sample = distribution.sample(sample_shape=(n,))
         sample = torch.sigmoid(sample)
