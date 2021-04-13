@@ -132,6 +132,7 @@ class StyleEncoder(nn.Module):
             z4[:, None, :],
             z5[:, None, :]], dim=1)
 
+        print("BATCH")
         print(zbatch)
 
         z = self.z_dropout()        
