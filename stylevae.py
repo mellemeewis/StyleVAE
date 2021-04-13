@@ -121,7 +121,7 @@ def go(arg):
                 # -- generate x from latent
                 with torch.no_grad():
                     x = decoder(zrand, depth)
-                    xsample = util.sample_image(x, arg.output_distribution)
+                    xsample = util.sample_images(x, arg.output_distribution)
 
                 # -- reconstruct latent
                 z_prime = encoder(xsample, depth)
