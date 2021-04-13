@@ -106,6 +106,8 @@ def kl_loss_image(z):
 def sleep_loss(output, target):
     b,l = output.size()
 
+    assert torch.isnan(output).sum() == 0
+    assert torch.isinf(output).sum() == 0
 
     loc = output[:,:l//2]
     scale = output[:, l//2:].clamp(min=0.0001)
