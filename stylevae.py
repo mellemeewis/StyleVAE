@@ -183,7 +183,7 @@ def go(arg):
                         # -- save and slack images
                         utils.save_image(images, f'images.{depth}.{epoch}.png', nrow=24, padding=2)
                         slack_util.send_message(f' Depth {depth}, Epoch {epoch}. \nOptions: {arg}')
-                        slack_util.send_message(f'Epoch {epoch}:\t','\t'.join([str(int(e)) for e in epoch_loss]))
+                        slack_util.send_message(f'Epoch {epoch}:\t\n\t'.join([str(int(e)) for e in epoch_loss]))
                         slack_util.send_image(f'images.{depth}.{epoch}.png', f'Depth {depth}, Epoch: {epoch}')
 
 
