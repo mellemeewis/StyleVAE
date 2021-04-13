@@ -254,6 +254,9 @@ def sample_images(z, distribution, n=1, eps=None):
         loc = z[:, :c//2, :, :].view(b, -1)
         scale = z[:, c//2:, :, :].view(b, -1)
 
+        print(loc)
+        print(scale)
+
         distribution = torch.distributions.laplace.Laplace(loc, scale)
         sample = distribution.sample(sample_shape=(n,))
         sample = torch.sigmoid(sample)
