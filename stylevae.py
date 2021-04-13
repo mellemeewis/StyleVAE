@@ -148,44 +148,44 @@ def go(arg):
             ## MAKE PLOTS
 
             if arg.epochs[depth] <= arg.np or epoch % (arg.epochs[depth]//arg.np) == 0 or epoch == arg.epochs[depth] - 1:
-                if depth ==5:
-                    with torch.no_grad():
-                        err_te = []
-                        encoder.train(False)
-                        decoder.train(False)
+                # if depth ==5:
+                with torch.no_grad():
+                    err_te = []
+                    encoder.train(False)
+                    decoder.train(False)
 
-                        ## sample 6x12 images
-                        b = 6*12
+                    ## sample 6x12 images
+                    b = 6*12
 
-                        # -- sample latents
-                        zrand = torch.randn(b, zs, device=dev)
+                    # -- sample latents
+                    zrand = torch.randn(b, zs, device=dev)
 
-                        # -- construct output
-                        sample = decoder(zrand, depth).clamp(0, 1)[:, :C, :, :]
+                    # -- construct output
+                    sample = decoder(zrand, depth).clamp(0, 1)[:, :C, :, :]
 
-                        ## reconstruct 6x12 images from the testset
-                        input = util.readn(testloader, n=6*12)
-                        if torch.cuda.is_available():
-                            input = input.cuda()
+                    ## reconstruct 6x12 images from the testset
+                    input = util.readn(testloader, n=6*12)
+                    if torch.cuda.is_available():
+                        input = input.cuda()
 
-                        # -- encoding
-                        z = encoder(input, depth)
+                    # -- encoding
+                    z = encoder(input, depth)
 
-                        # -- take samples
-                        zsample = util.sample(z[:, :zs], z[:, zs:])
+                    # -- take samples
+                    zsample = util.sample(z[:, :zs], z[:, zs:])
 
-                        # -- decoding
-                        xout = decoder(zsample, depth).clamp(0, 1)[:, :C, :, :]
+                    # -- decoding
+                    xout = decoder(zsample, depth).clamp(0, 1)[:, :C, :, :]
 
-                        images = torch.cat([input.cpu()[:24,:,:], xout.cpu()[:24,:,:], sample.cpu()[:24,:,:],
-                                            input.cpu()[24:48,:,:], xout.cpu()[24:48,:,:], sample.cpu()[24:48,:,:],
-                                            input.cpu()[48:,:,:], xout.cpu()[48:,:,:], sample.cpu()[48:,:,:]], dim=0)
+                    images = torch.cat([input.cpu()[:24,:,:], xout.cpu()[:24,:,:], sample.cpu()[:24,:,:],
+                                        input.cpu()[24:48,:,:], xout.cpu()[24:48,:,:], sample.cpu()[24:48,:,:],
+                                        input.cpu()[48:,:,:], xout.cpu()[48:,:,:], sample.cpu()[48:,:,:]], dim=0)
 
-                        # -- save and slack images
-                        utils.save_image(images, f'images.{depth}.{epoch}.png', nrow=24, padding=2)
-                        slack_util.send_message(f' Depth {depth}, Epoch {epoch}. \nOptions: {arg}')
-                        slack_util.send_message(string)
-                        slack_util.send_image(f'images.{depth}.{epoch}.png', f'Depth {depth}, Epoch: {epoch}')
+                    # -- save and slack images
+                    utils.save_image(images, f'images.{depth}.{epoch}.png', nrow=24, padding=2)
+                    slack_util.send_message(f' Depth {depth}, Epoch {epoch}. \nOptions: {arg}')
+                    slack_util.send_message(string)
+                    slack_util.send_image(f'images.{depth}.{epoch}.png', f'Depth {depth}, Epoch: {epoch}')
 
 
 
