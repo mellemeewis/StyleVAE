@@ -30,13 +30,12 @@ class StyleEncoder(nn.Module):
         self.block4 = util.Block(c3, c4, kernel_size=k, batch_norm=batch_norm)
         self.block5 = util.Block(c4, c5, kernel_size=k, batch_norm=batch_norm)
 
-        # affine mappings to distribution on latent space !!!4*zs for reverse ADAIN, otherwise 2*zs!!
-        self.affine0 = nn.Linear(util.prod(in_size), 4 * zs)
-        self.affine1 = nn.Linear(util.prod((c1, h//2, w//2)), 4 * zs)
-        self.affine2 = nn.Linear(util.prod((c2, h//4, w//4)), 4 * zs)
-        self.affine3 = nn.Linear(util.prod((c3, h//8, w//8)), 4 * zs)
-        self.affine4 = nn.Linear(util.prod((c4, h//16, w//16)), 4 * zs)
-        self.affine5 = nn.Linear(util.prod((c5, h//32, w//32)), 4 * zs)
+        self.affine0 = nn.Linear(util.prod(in_size), 2 * zs)
+        self.affine1 = nn.Linear(util.prod((c1, h//2, w//2)), 2 * zs)
+        self.affine2 = nn.Linear(util.prod((c2, h//4, w//4)), 2 * zs)
+        self.affine3 = nn.Linear(util.prod((c3, h//8, w//8)), 2 * zs)
+        self.affine4 = nn.Linear(util.prod((c4, h//16, w//16)), 2 * zs)
+        self.affine5 = nn.Linear(util.prod((c5, h//32, w//32)), 2 * zs)
 
         self.affinez = nn.Linear(12 * zs, 2 * zs)
 
