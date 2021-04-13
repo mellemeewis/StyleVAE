@@ -128,6 +128,8 @@ def go(arg):
 
                 # -- compute loss
                 sleep_loss = bs * util.sleep_loss(z_prime, zrand).mean()
+                print(sleep_loss)
+                sys.exit()
 
                 # -- Backward pas
                 sleep_loss.backward()
