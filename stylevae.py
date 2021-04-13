@@ -156,7 +156,7 @@ def go(arg):
                     b = 6*12
 
                     # -- sample latents
-                    zrand = torch.randn(b, zsize, device=dev)
+                    zrand = torch.randn(b, zs, device=dev)
 
                     # -- construct output
                     sample = decoder(zrand, depth).clamp(0, 1)[:, :C, :, :]
