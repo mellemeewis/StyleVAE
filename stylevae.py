@@ -54,7 +54,7 @@ def go(arg):
 
     if arg.decoder_type == 1:
         decoder = StyleDecoder((C, H, W), arg.channels, arg.zchannels, zs=zs, k=arg.kernel_size, mapping=arg.mapping_layers, batch_norm=arg.batch_norm, dropouts=arg.dropouts)
-    elif arg.encoder_type == 2:
+    elif arg.decoder_type == 2:
         decoder = StyleDecoder2((C, H, W), arg.channels, arg.zchannels, zs=zs, k=arg.kernel_size, mapping=arg.mapping_layers, batch_norm=arg.batch_norm, dropouts=arg.dropouts)
 
 
