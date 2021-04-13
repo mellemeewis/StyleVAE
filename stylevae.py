@@ -59,7 +59,7 @@ def go(arg):
 
 
     if arg.output_distribution == 'siglaplace':
-        rec_criterion = uitl.siglaplace
+        rec_criterion = util.siglaplace
     elif arg.output_distribution == 'signorm':
         rec_criterion = util.signorm
 
