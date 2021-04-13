@@ -68,6 +68,7 @@ class StyleEncoder(nn.Module):
         # n0 = self.tonoise0(x0)
 
         if depth <= 0:
+            z=z0
             z = self.unmapping(z)
             return z
             # return z, n0, n1, n2, n3, n4, n5
