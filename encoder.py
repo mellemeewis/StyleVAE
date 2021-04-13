@@ -16,7 +16,7 @@ import util
 
 class StyleEncoder(nn.Module):
 
-    def __init__(self, in_size, channels, zchannels, zs=256, k=3, unmapping=3, batch_norm=False):
+    def __init__(self, in_size, channels, zchannels, zs=256, k=3, unmapping=3, batch_norm=False, z_dropout=0.25):
         super().__init__()
 
         c, h, w = in_size
@@ -49,8 +49,8 @@ class StyleEncoder(nn.Module):
         self.tonoise4 = nn.Conv2d(c4, z4*2, kernel_size=1, padding=0)
         self.tonoise5 = nn.Conv2d(c5, z5*2, kernel_size=1, padding=0)
 
-        # learnable constant start vector z
-        self.z = nn.Parameter(torch.randn(1, zs*2))
+        self.z_dropout = nn.Dropout2d(p=z_dropout, inplace=False)
+
 
 
         um = []
@@ -65,19 +65,17 @@ class StyleEncoder(nn.Module):
         n0 = n1 = n2 = n3 = n4 = n5 = None
 
         z0 = self.affine0(x0.view(b, -1))
-        z = util.adain_inverse(z0, self.z)
-        n0 = self.tonoise0(x0)
+        x0 = util.F.instance_norm(x0)
+        # n0 = self.tonoise0(x0)
 
         if depth <= 0:
-            # z = self.unmapping(z0) #commented out for reverse adain
             z = self.unmapping(z)
             return z, n0, n1, n2, n3, n4, n5
 
         x1 = F.avg_pool2d(self.block1(x0), 2)
         z1 = self.affine1(x1.view(b, -1))
-        z = util.adain_inverse(z1, z)
-
-        n1 = self.tonoise1(x1)
+        x1 = util.F.instance_norm(x1)
+        # n1 = self.tonoise1(x1)
 
         if depth <= 1:
             # z = self.unmapping(z0 + z1) #commented out for reverse adain
@@ -86,9 +84,8 @@ class StyleEncoder(nn.Module):
 
         x2 = F.avg_pool2d(self.block2(x1), 2)
         z2 = self.affine2(x2.view(b, -1))
-        z = util.adain_inverse(z2, z)
-
-        n2 = self.tonoise2(x2)
+        x2 = util.F.instance_norm(x2)
+        # n2 = self.tonoise2(x2)
 
         if depth <= 2:
             # z = self.unmapping(z0 + z1 + z2) #commented out for reverse adain
@@ -97,8 +94,8 @@ class StyleEncoder(nn.Module):
 
         x3 = F.avg_pool2d(self.block3(x2), 2)
         z3 = self.affine3(x3.view(b, -1))
-        z = util.adain_inverse(z3, z)
-        n3 = self.tonoise3(x3)
+        x3 = util.F.instance_norm(x3)
+        # n3 = self.tonoise3(x3)
 
         if depth <= 3:
             # z = self.unmapping(z0 + z1 + z2 + z3) #commented out for reverse adain
@@ -107,8 +104,8 @@ class StyleEncoder(nn.Module):
 
         x4 = F.avg_pool2d(self.block4(x3), 2)
         z4 = self.affine4(x4.view(b, -1))
-        z = util.adain_inverse(z4, z)
-        n4 = self.tonoise4(x4)
+        x4 = util.F.instance_norm(x4)
+        # n4 = self.tonoise4(x4)
 
         if depth <= 4:
             # z = self.unmapping(z0 + z1 + z2 + z3 + z4) #commented out for reverse adain
@@ -117,26 +114,35 @@ class StyleEncoder(nn.Module):
 
         x5 = F.avg_pool2d(self.block5(x4), 2)
         z5 = self.affine5(x5.view(b, -1))
-        z = util.adain_inverse(z5, z)
-        n5 = self.tonoise5(x5)
-
-        # z = self.unmapping(z0 + z1 + z2 + z3 + z4 + z5) #commented out for reverse adain
-        z = self.unmapping(z)
-        return z, n0, n1, n2, n3, n4, n5
+        x5 = util.F.instance_norm(x5)
+        # n5 = self.tonoise5(x5)
 
         # combine the z vectors
-        # zbatch = torch.cat([
-        #     z0[:, :, None],
-        #     z1[:, :, None],
-        #     z2[:, :, None],
-        #     z3[:, :, None],
-        #     z4[:, :, None],
-        #     z5[:, :, None]], dim=2)
-        #
-        # z = self.affinez(zbatch.view(b, -1))
-        # z = z)
+        print(z1)
+        print(z2)
+        print(z3)
+        print(z4)
+        print(z5)
 
-        return z, n0, n1, n2, n3, n4, n5
+        zbatch = torch.cat([
+            z0[:, None, :],
+            z1[:, None, :],
+            z2[:, None, :],
+            z3[:, None, :],
+            z4[:, None, :],
+            z5[:, None, :]], dim=1)
+
+        print(zbatch)
+
+        z = self.z_dropout()        
+        print(z)
+        z = z.sum(dim=1)
+        print(z)
+        z = self.unmapping(z)
+        print(z)
+
+        return z
+        # return z, n0, n1, n2, n3, n4, n5
 
 
 class StyleEncoder2(nn.Module):
