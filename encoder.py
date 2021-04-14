@@ -83,8 +83,6 @@ class StyleEncoder(nn.Module):
             z = self.z_dropout(zbatch)       
             if z[z != 0].sum() ==0:
                 print("PROBLEM")
-            else:
-                print('fine')
             z = z.sum(dim=1)
             z = self.unmapping(z)
             return z
