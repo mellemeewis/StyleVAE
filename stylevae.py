@@ -103,7 +103,12 @@ def go(arg):
                 xout = decoder(zsample, depth)
 
                 # -- compute losses
+                print('BATCH ', b)
+                print('XOUT ', xout.size())
+                print("INPUT ", input.size())
                 rec_loss = rec_criterion(xout, input).view(b, c*h*w).sum(dim=1)
+                print("REC_LOSS ", rec_loss.size())
+                print(rec_loss)
                 kl_loss  = util.kl_loss(z[:, :zs], z[:, zs:])
                 loss = br*rec_loss + bz * kl_loss
                 loss = loss.mean(dim=0)
