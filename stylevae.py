@@ -114,12 +114,12 @@ def go(arg):
                 optd.step(); optd.zero_grad()
                 opte.step(); opte.zero_grad()
                 for ep in encoder.parameters():
-                    assert torch.isnan(p).sum() == 0
-                    assert torch.isinf(p).sum() == 0
+                    assert torch.isnan(ep).sum() == 0
+                    assert torch.isinf(ep).sum() == 0
 
                 for dp in decoder.parameters():
-                    assert torch.isnan(p).sum() == 0
-                    assert torch.isinf(p).sum() == 0
+                    assert torch.isnan(dp).sum() == 0
+                    assert torch.isinf(dp).sum() == 0
                 ## SLEEP UPDATE
 
                 # -- sample random latent
