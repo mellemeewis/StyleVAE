@@ -103,22 +103,12 @@ def go(arg):
                 xout = decoder(zsample, depth)
 
                 # -- compute losses
-                print('LATENT', zs)
-                print('BATCH ', b)
-                print('XOUT ', xout.size())
-                print("INPUT ", input.size())
                 rec_loss = rec_criterion(xout, input).view(b, c*h*w)
-                print("REC_LOSS ", rec_loss.size())
-                print(rec_loss)
                 rec_loss = rec_loss.mean(dim=1)
-                print('SUM ', rec_loss.size(), rec_loss)            
                 kl_loss  = util.kl_loss(z[:, :zs], z[:, zs:])
-                print("KL ", kl_loss.size())
-                print(kl_loss)
                 loss = br*rec_loss + bz * kl_loss
                 loss = loss.mean(dim=0)
 
-                sys.exit()
                 # -- backward pass and update
                 loss.backward()
                 optd.step(); optd.zero_grad()
@@ -138,8 +128,10 @@ def go(arg):
                 z_prime = encoder(xsample, depth)
 
                 # -- compute loss
-                sleep_loss = bs * util.sleep_loss(z_prime, zrand).mean()
-
+                sleep_loss = bs * util.sleep_loss(z_prime, zrand)
+                print(sleep_loss.size)
+                sleep_loss = sleep_loss.mean()
+                print(sleep_loss.size())
                 # -- Backward pas
                 sleep_loss.backward()
                 opte.step()
