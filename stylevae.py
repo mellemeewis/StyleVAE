@@ -132,6 +132,7 @@ def go(arg):
                 print(sleep_loss.size)
                 sleep_loss = sleep_loss.mean()
                 print(sleep_loss.size())
+                sys.exit()
                 # -- Backward pas
                 sleep_loss.backward()
                 opte.step()
