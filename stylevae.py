@@ -103,6 +103,7 @@ def go(arg):
                 xout = decoder(zsample, depth)
 
                 # -- compute losses
+                print('LATENT', zs)
                 print('BATCH ', b)
                 print('XOUT ', xout.size())
                 print("INPUT ", input.size())
@@ -113,6 +114,7 @@ def go(arg):
                 loss = br*rec_loss + bz * kl_loss
                 loss = loss.mean(dim=0)
 
+                sys.exit()
                 # -- backward pass and update
                 loss.backward()
                 optd.step(); optd.zero_grad()
