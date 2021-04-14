@@ -102,8 +102,8 @@ def go(arg):
 
                 # -- take sample
                 zsample  = util.sample(z[:, :zs], z[:, zs:])
-                assert torch.isnan(sample).sum() == 0
-                assert torch.isinf(sample).sum() == 0
+                assert torch.isnan(zsample).sum() == 0
+                assert torch.isinf(zsample).sum() == 0
 
                 # -- reconstruct input
                 xout = decoder(zsample, depth)
