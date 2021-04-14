@@ -110,7 +110,7 @@ def go(arg):
                 rec_loss = rec_criterion(xout, input).view(b, c*h*w)
                 print("REC_LOSS ", rec_loss.size())
                 print(rec_loss)
-                rec_loss = rec_loss.sum(dim=1)
+                rec_loss = rec_loss.mean(dim=1)
                 print('SUM ', rec_loss.size(), rec_loss)            
                 kl_loss  = util.kl_loss(z[:, :zs], z[:, zs:])
                 print("KL ", kl_loss.size())
