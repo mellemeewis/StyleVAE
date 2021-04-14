@@ -139,11 +139,17 @@ def go(arg):
                 z_prime = encoder(xsample, depth)
 
                 # -- compute loss
-                sleep_loss = bs * util.sleep_loss(z_prime, zrand).mean()
+                sleep_loss = bs * util.sleep_loss(z_prime, zrand)
+                    assert torch.isnan(ep).sum() == 0
+                    assert torch.isinf(ep).sum() == 0
+                sleep_loss = sleep_loss.mean()
                 # -- Backward pas
                 sleep_loss.backward()
                 opte.step()
                 opte.zero_grad()
+                for ep in encoder.parameters():
+                    assert torch.isnan(ep).sum() == 0
+                    assert torch.isinf(ep).sum() == 0
 
                 # -- administration
                 with torch.no_grad():
