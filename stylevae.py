@@ -128,11 +128,7 @@ def go(arg):
                 z_prime = encoder(xsample, depth)
 
                 # -- compute loss
-                sleep_loss = bs * util.sleep_loss(z_prime, zrand)
-                print(sleep_loss.size())
-                sleep_loss = sleep_loss.mean(dim=1)
-                print(sleep_loss.size(), sleep_loss)
-                sys.exit()
+                sleep_loss = bs * util.sleep_loss(z_prime, zrand).mean()
                 # -- Backward pas
                 sleep_loss.backward()
                 opte.step()
