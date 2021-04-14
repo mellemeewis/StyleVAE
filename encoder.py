@@ -140,6 +140,7 @@ class StyleEncoder(nn.Module):
             z4[:, None, :],
             z5[:, None, :]], dim=1)
 
+        print("HI ZBATCH")
         print(zbatch[zbatch != 0] == 0)
 
         if zbatch[zbatch != 0] == 0:
