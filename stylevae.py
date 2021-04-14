@@ -113,11 +113,11 @@ def go(arg):
                 loss.backward()
                 optd.step(); optd.zero_grad()
                 opte.step(); opte.zero_grad()
-                for p in encoder.parameters()
+                for p in encoder.parameters():
                     assert torch.isnan(p).sum() == 0
                     assert torch.isinf(p).sum() == 0
 
-                for p in decoder.parameters()
+                for p in decoder.parameters():
                     assert torch.isnan(p).sum() == 0
                     assert torch.isinf(p).sum() == 0
                 ## SLEEP UPDATE
