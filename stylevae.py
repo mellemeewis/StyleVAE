@@ -129,7 +129,7 @@ def go(arg):
 
                 # -- compute loss
                 sleep_loss = bs * util.sleep_loss(z_prime, zrand)
-                print(sleep_loss.size)
+                print(sleep_loss.size())
                 sleep_loss = sleep_loss.mean()
                 print(sleep_loss.size())
                 sys.exit()
