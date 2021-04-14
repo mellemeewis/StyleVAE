@@ -127,6 +127,8 @@ def go(arg):
                 loss.backward()
                 optd.step(); optd.zero_grad()
                 opte.step(); opte.zero_grad()
+                if i==10:
+                    print(loss, rec_loss, kl_loss)
                 for ep in encoder.parameters():
                     if torch.isnan(ep).sum() != 0 or torch.isinf(ep).sum() != 0:
                         print(loss, rec_loss, kl_loss)
