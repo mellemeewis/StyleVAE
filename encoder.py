@@ -80,8 +80,8 @@ class StyleEncoder(nn.Module):
 
         if depth <= 1:
             zbatch = torch.cat([z0[:, None, :],z1[:, None, :]], dim=1)
-            if zbatch[zbatch != 0].sum() == 0:
-                print("PROBLEM")
+            print(zbatch[zbatch != 0].sum())
+                # print("PROBLEM")
             z = self.z_dropout(zbatch)        
             z = z.sum(dim=1)
             z = self.unmapping(z)
