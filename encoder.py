@@ -16,7 +16,7 @@ import util
 
 class StyleEncoder(nn.Module):
 
-    def __init__(self, in_size, channels, zchannels, zs=256, k=3, unmapping=3, batch_norm=False, z_dropout=0.99):
+    def __init__(self, in_size, channels, zchannels, zs=256, k=3, unmapping=3, batch_norm=False, z_dropout=1):
         super().__init__()
 
         c, h, w = in_size
