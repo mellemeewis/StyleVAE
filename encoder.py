@@ -16,7 +16,7 @@ import util
 
 class StyleEncoder(nn.Module):
 
-    def __init__(self, in_size, channels, zchannels, zs=256, k=3, unmapping=3, batch_norm=False, z_dropout=0.25):
+    def __init__(self, in_size, channels, zchannels, zs=256, k=3, unmapping=3, batch_norm=False, z_dropout=1):
         super().__init__()
 
         c, h, w = in_size
@@ -84,7 +84,7 @@ class StyleEncoder(nn.Module):
             zbatch = torch.cat([z0[:, None, :],z1[:, None, :]], dim=1)
                 # print("PROBLEM")
             z = self.z_dropout(zbatch)       
-            print(z[z != 0].sum())
+            print(z[z != 0].sum() ==0)
             print(z)
             sys.exit() 
             z = z.sum(dim=1)
