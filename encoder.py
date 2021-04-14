@@ -140,6 +140,11 @@ class StyleEncoder(nn.Module):
             z4[:, None, :],
             z5[:, None, :]], dim=1)
 
+        print(zbatch[zbatch != 0] == 0)
+
+        if zbatch[zbatch != 0] == 0:
+            print("PROBLEM")
+
         z = self.z_dropout(zbatch)        
         z = z.sum(dim=1)
         z = self.unmapping(z)
