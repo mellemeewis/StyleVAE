@@ -79,8 +79,12 @@ class StyleEncoder(nn.Module):
         # n1 = self.tonoise1(x1)
 
         if depth <= 1:
+            print(z0)
+            print(z1)
             zbatch = torch.cat([z0[:, None, :],z1[:, None, :]], dim=1)
             print(zbatch[zbatch != 0].sum())
+            print(zbatch)
+            sys.exit()
                 # print("PROBLEM")
             z = self.z_dropout(zbatch)        
             z = z.sum(dim=1)
