@@ -104,11 +104,16 @@ def go(arg):
 
                 # -- compute losses
                 rec_loss = rec_criterion(xout, input).view(b, c*h*w)
+                assert torch.isnan(rec_loss).sum() == 0
+                assert torch.isinf(rec_loss).sum() == 0
                 rec_loss = rec_loss.mean(dim=1)
                 kl_loss  = util.kl_loss(z[:, :zs], z[:, zs:])
+                assert torch.isnan(kl_loss).sum() == 0
+                assert torch.isinf(kl_loss).sum() == 0
                 loss = br*rec_loss + bz * kl_loss
                 loss = loss.mean(dim=0)
-
+                assert torch.isnan(loss).sum() == 0
+                assert torch.isinf(loss).sum() == 0
                 # -- backward pass and update
                 loss.backward()
                 optd.step(); optd.zero_grad()
