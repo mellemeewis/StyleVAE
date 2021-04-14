@@ -187,6 +187,7 @@ def siglaplace(output, target):
 
     rec = lny + ln1y + lsgs + math.log(2.0) + (x - mus).abs() / sgs
 
+    rec = rec.clamp(min=-10000, max=10000)
     assert torch.isnan(rec).sum() == 0
     assert torch.isinf(rec).sum() == 0
     return rec
