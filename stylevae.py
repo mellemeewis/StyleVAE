@@ -63,8 +63,8 @@ def go(arg):
     elif arg.output_distribution == 'signorm':
         rec_criterion = util.signorm
 
-    opte = Adam(list(encoder.parameters()), lr=arg.lr)
-    optd = Adam(list(decoder.parameters()), lr=arg.lr)
+    opte = Adam(list(encoder.parameters()), lr=arg.lr[0])
+    optd = Adam(list(decoder.parameters()), lr=arg.lr[1])
 
     if torch.cuda.is_available():
         encoder.cuda()
@@ -104,7 +104,7 @@ def go(arg):
 
                 # -- compute losses
                 rec_loss = rec_criterion(xout, input).view(b, c*h*w)
-                rec_loss = rec_loss.sum(dim=1)
+                rec_loss = rec_loss.mean(dim=1)
                 kl_loss  = util.kl_loss(z[:, :zs], z[:, zs:])
                 loss = br*rec_loss + bz * kl_loss
                 loss = loss.mean(dim=0)
@@ -113,11 +113,11 @@ def go(arg):
                 loss.backward()
                 optd.step(); optd.zero_grad()
                 opte.step(); opte.zero_grad()
-                for p in encoder.parameters():
+                for ep in encoder.parameters():
                     assert torch.isnan(p).sum() == 0
                     assert torch.isinf(p).sum() == 0
 
-                for p in decoder.parameters():
+                for dp in decoder.parameters():
                     assert torch.isnan(p).sum() == 0
                     assert torch.isinf(p).sum() == 0
                 ## SLEEP UPDATE
@@ -287,7 +287,7 @@ if __name__ == "__main__":
     parser.add_argument("-l", "--learn-rate",
                         dest="lr",
                         help="Learning rate.",
-                        default=0.001, type=float)
+                        default=[0.0001, 0.0001], type=list)
 
     parser.add_argument("-D", "--data-directory",
                         dest="data_dir",
