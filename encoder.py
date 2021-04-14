@@ -82,7 +82,7 @@ class StyleEncoder(nn.Module):
             zbatch = torch.cat([z0[:, None, :],z1[:, None, :]], dim=1)
             z = self.z_dropout(zbatch)       
             if z[z != 0].sum() ==0:
-                print("PROBLEM")
+                z = zbatch
             z = z.sum(dim=1)
             z = self.unmapping(z)
             return z
@@ -97,7 +97,7 @@ class StyleEncoder(nn.Module):
             zbatch = torch.cat([z0[:, None, :],z1[:, None, :],z2[:, None, :]], dim=1)
             z = self.z_dropout(zbatch)
             if z[z != 0].sum() == 0:
-                print("PROBLEM")        
+                z = zbatch       
             z = z.sum(dim=1)
             z = self.unmapping(z)
             return z
@@ -112,7 +112,7 @@ class StyleEncoder(nn.Module):
             zbatch = torch.cat([z0[:, None, :],z1[:, None, :],z2[:, None, :], z3[:, None, :]], dim=1)
             z = self.z_dropout(zbatch)   
             if z[z != 0].sum() == 0:
-                print("PROBLEM")     
+                z = zbatch   
             z = z.sum(dim=1)
             z = self.unmapping(z)
             return z
@@ -127,7 +127,7 @@ class StyleEncoder(nn.Module):
             zbatch = torch.cat([z0[:, None, :],z1[:, None, :],z2[:, None, :], z3[:, None, :], z4[:, None, :]], dim=1)
             z = self.z_dropout(zbatch)     
             if z[z != 0].sum() == 0:
-                print("PROBLEM")   
+                z = zbatch
             z = z.sum(dim=1)
             z = self.unmapping(z)
             return z
@@ -150,7 +150,7 @@ class StyleEncoder(nn.Module):
 
         z = self.z_dropout(zbatch)    
         if z[z != 0].sum() == 0:
-            print("PROBLEM")    
+            z = zbatch   
         z = z.sum(dim=1)
         z = self.unmapping(z)
         return z
