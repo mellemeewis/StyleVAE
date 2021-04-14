@@ -287,7 +287,8 @@ if __name__ == "__main__":
     parser.add_argument("-l", "--learn-rate",
                         dest="lr",
                         help="Learning rate.",
-                        default=[0.0001, 0.0001], type=list)
+                        nargs=2
+                        default=[0.0001, 0.0001], type=float)
 
     parser.add_argument("-D", "--data-directory",
                         dest="data_dir",
