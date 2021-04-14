@@ -86,6 +86,8 @@ def go(arg):
             decoder.train(True)
 
             for i, (input, _) in enumerate(trainloader):
+                assert torch.isnan(input).sum() == 0
+                assert torch.isinf(input).sum() == 0
 
                 # Prepare the input
                 b, c, w, h = input.size()
@@ -95,12 +97,18 @@ def go(arg):
                 ## NORMAL VAE
                 # -- encoding
                 z = encoder(input, depth)
+                assert torch.isnan(z).sum() == 0
+                assert torch.isinf(z).sum() == 0
 
                 # -- take sample
                 zsample  = util.sample(z[:, :zs], z[:, zs:])
+                assert torch.isnan(sample).sum() == 0
+                assert torch.isinf(sample).sum() == 0
 
                 # -- reconstruct input
                 xout = decoder(zsample, depth)
+                assert torch.isnan(xout).sum() == 0
+                assert torch.isinf(xout).sum() == 0
 
                 # -- compute losses
                 rec_loss = rec_criterion(xout, input).view(b, c*h*w)
@@ -111,9 +119,10 @@ def go(arg):
                 assert torch.isnan(kl_loss).sum() == 0
                 assert torch.isinf(kl_loss).sum() == 0
                 loss = br*rec_loss + bz * kl_loss
-                loss = loss.mean(dim=0)
                 assert torch.isnan(loss).sum() == 0
                 assert torch.isinf(loss).sum() == 0
+                loss = loss.mean(dim=0)
+
                 # -- backward pass and update
                 loss.backward()
                 optd.step(); optd.zero_grad()
@@ -131,14 +140,22 @@ def go(arg):
 
                 # -- sample random latent
                 zrand = torch.randn(b, zs, device=dev)
+                assert torch.isnan(zrand).sum() == 0
+                assert torch.isinf(zrand).sum() == 0
 
                 # -- generate x from latent
                 with torch.no_grad():
                     x = decoder(zrand, depth)
+                    assert torch.isnan(x).sum() == 0
+                    assert torch.isinf(x).sum() == 0
                     xsample = util.sample_images(x, arg.output_distribution)
+                    assert torch.isnan(xsample).sum() == 0
+                    assert torch.isinf(xsample).sum() == 0
 
                 # -- reconstruct latent
                 z_prime = encoder(xsample, depth)
+                assert torch.isnan(z_prime).sum() == 0
+                assert torch.isinf(z_prime).sum() == 0
 
                 # -- compute loss
                 sleep_loss = bs * util.sleep_loss(z_prime, zrand)
