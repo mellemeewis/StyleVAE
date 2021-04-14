@@ -140,8 +140,8 @@ def go(arg):
 
                 # -- compute loss
                 sleep_loss = bs * util.sleep_loss(z_prime, zrand)
-                    assert torch.isnan(ep).sum() == 0
-                    assert torch.isinf(ep).sum() == 0
+                assert torch.isnan(ep).sum() == 0
+                assert torch.isinf(ep).sum() == 0
                 sleep_loss = sleep_loss.mean()
                 # -- Backward pas
                 sleep_loss.backward()
