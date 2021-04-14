@@ -104,7 +104,7 @@ def go(arg):
 
                 # -- compute losses
                 rec_loss = rec_criterion(xout, input).view(b, c*h*w)
-                rec_loss = rec_loss.mean(dim=1)
+                rec_loss = rec_loss.sum(dim=1)
                 kl_loss  = util.kl_loss(z[:, :zs], z[:, zs:])
                 loss = br*rec_loss + bz * kl_loss
                 loss = loss.mean(dim=0)
