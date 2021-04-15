@@ -44,7 +44,7 @@ def go(arg):
     tbw = SummaryWriter(log_dir=arg.tb_dir)
 
     br, bz, b0, b1, b2, b3, b4, b5, bs = arg.betas
-    bz_list = torch.arange(0, bz, step = bz / toch.sum(arg.epochs))
+    bz_list = torch.arange(0, bz, step = bz / torch.sum(arg.epochs))
     print(bz_list)
     C, H, W, trainset, trainloader, testset, testloader = return_data(arg.task, arg.data_dir, arg.batch_size)
     zs = arg.latent_size
