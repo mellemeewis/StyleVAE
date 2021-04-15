@@ -225,7 +225,10 @@ def go(arg):
                                         input.cpu()[48:,:,:], xout.cpu()[48:,:,:], sample.cpu()[48:,:,:]], dim=0)
 
                     # -- save and slack images
-                    utils.save_image(images, f'images.{depth}.{epoch}.png', nrow=24, padding=2)
+                    try:
+                        utils.save_image(images, f'images.{depth}.{epoch}.png', nrow=24, padding=2)
+                    except Error as e:
+                        print("Saving images.{depth}.{epoch}.png failed.")
                     slack_util.send_message(f' Depth {depth}, Epoch {epoch}. \nOptions: {arg}')
                     slack_util.send_message(string)
                     slack_util.send_image(f'images.{depth}.{epoch}.png', f'Depth {depth}, Epoch: {epoch}')
