@@ -182,7 +182,7 @@ def go(arg):
                     epoch_loss[3] += sleep_loss.mean(dim=0).item()
 
    
-            print(f'Epoch {epoch}:\t','\t'.join([str(int(e)) for e in epoch_loss]))
+            print(f'Epoch {epoch}, bz: {bz}:\t','\t'.join([str(int(e)) for e in epoch_loss]))
             string = f'Epoch {epoch}:\t\n' +'\t'.join([str(int(e)) for e in epoch_loss])
 
             ## MAKE PLOTS
