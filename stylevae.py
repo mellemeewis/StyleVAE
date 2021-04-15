@@ -118,7 +118,7 @@ def go(arg):
                 rec_loss = rec_criterion(xout, input).view(b, c*h*w)
                 assert torch.isnan(rec_loss).sum() == 0
                 assert torch.isinf(rec_loss).sum() == 0
-                rec_loss = rec_loss.mean(dim=1)
+                rec_loss = rec_loss.sum(dim=1)
                 kl_loss  = util.kl_loss(z[:, :zs], z[:, zs:])
                 assert torch.isnan(kl_loss).sum() == 0
                 assert torch.isinf(kl_loss).sum() == 0
