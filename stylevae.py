@@ -129,6 +129,9 @@ def go(arg):
 
                 # -- backward pass and update
                 loss.backward()
+                torch.nn.utils.clip_grad_norm_(encoder.parameters(), args.clip)
+                torch.nn.utils.clip_grad_norm_(decoder.parameters(), args.clip)
+
                 optd.step(); optd.zero_grad()
                 opte.step(); opte.zero_grad()
                 for ep in encoder.parameters():
@@ -171,6 +174,7 @@ def go(arg):
                 sleep_loss = sleep_loss.mean()
                 # -- Backward pas
                 sleep_loss.backward()
+                torch.nn.utils.clip_grad_norm_(encoder.parameters(), 1)
                 opte.step()
                 opte.zero_grad()
                 for ep in encoder.parameters():
