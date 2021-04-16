@@ -28,4 +28,4 @@ cd o`echo $$`
 
 # Run the actual experiment
 
-python -u /home/mms496/StyleVAE_Experiments/code/StyleVAE/stylevae.py  --task mnist --numplots 350 -z 512 -e 0 0 0 0 0 700 -l 0.000001 0.000001 -b 128  --betas 100 0.5 0 0 0 0 0 0 0.01 --dropouts 0 0 0 0 0 0 0 --mapping-layers 3 -EU 1  --skip-test -EN 1 -DE 2 -D /var/scratch/mms496/data/mnist/
+python -u /home/mms496/StyleVAE_Experiments/code/StyleVAE/stylevae.py  --task mnist --numplots 350 -z 512 -e 0 0 0 0 0 700 -l 0.0001 0.0001 -b 128  --betas 100 0.5 0 0 0 0 0 0 0.01 --dropouts 0 0 0 0 0 0 0 --mapping-layers 3 -EU 1  --skip-test -EN 1 -DE 2 -D /var/scratch/mms496/data/mnist/
