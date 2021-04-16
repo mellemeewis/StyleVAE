@@ -174,7 +174,7 @@ def go(arg):
                 assert torch.isinf(ep).sum() == 0
                 sleep_loss = sleep_loss.mean()
 
-                -- Backward pas
+                # -- Backward pas
                 sleep_loss.backward()
                 torch.nn.utils.clip_grad_norm_(encoder.parameters(), 1)
                 opte.step()
