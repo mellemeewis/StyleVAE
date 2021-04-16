@@ -129,8 +129,8 @@ def go(arg):
 
                 # -- backward pass and update
                 loss.backward()
-                torch.nn.utils.clip_grad_norm_(encoder.parameters(), args.clip)
-                torch.nn.utils.clip_grad_norm_(decoder.parameters(), args.clip)
+                torch.nn.utils.clip_grad_norm_(encoder.parameters(), 1)
+                torch.nn.utils.clip_grad_norm_(decoder.parameters(), 1)
 
                 optd.step(); optd.zero_grad()
                 opte.step(); opte.zero_grad()
