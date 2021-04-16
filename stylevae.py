@@ -145,48 +145,48 @@ def go(arg):
                     assert torch.isinf(dp).sum() == 0
 
 
-                # if epoch %10 == 0:
-                 ## SLEEP UPDATE
+                if epoch  > 10:
+                 # SLEEP UPDATE
 
-                # -- sample random latent
-                zrand = torch.randn(b, zs, device=dev)
-                assert torch.isnan(zrand).sum() == 0
-                assert torch.isinf(zrand).sum() == 0
+                    # -- sample random latent
+                    zrand = torch.randn(b, zs, device=dev)
+                    assert torch.isnan(zrand).sum() == 0
+                    assert torch.isinf(zrand).sum() == 0
 
-                # -- generate x from latent
-                with torch.no_grad():
-                    x = decoder(zrand, depth)
-                    assert torch.isnan(x).sum() == 0
-                    assert torch.isinf(x).sum() == 0
-                    xsample = util.sample_images(x, arg.output_distribution)
-                    assert torch.isnan(xsample).sum() == 0
-                    assert torch.isinf(xsample).sum() == 0
+                    # -- generate x from latent
+                    with torch.no_grad():
+                        x = decoder(zrand, depth)
+                        assert torch.isnan(x).sum() == 0
+                        assert torch.isinf(x).sum() == 0
+                        xsample = util.sample_images(x, arg.output_distribution)
+                        assert torch.isnan(xsample).sum() == 0
+                        assert torch.isinf(xsample).sum() == 0
 
-                # -- reconstruct latent
-                z_prime = encoder(xsample, depth)
-                assert torch.isnan(z_prime).sum() == 0
-                assert torch.isinf(z_prime).sum() == 0
+                    # -- reconstruct latent
+                    z_prime = encoder(xsample, depth)
+                    assert torch.isnan(z_prime).sum() == 0
+                    assert torch.isinf(z_prime).sum() == 0
 
-                # -- compute loss
-                sleep_loss = bs * util.sleep_loss(z_prime, zrand)
-                assert torch.isnan(ep).sum() == 0
-                assert torch.isinf(ep).sum() == 0
-                sleep_loss = sleep_loss.mean()
-                # -- Backward pas
-                sleep_loss.backward()
-                torch.nn.utils.clip_grad_norm_(encoder.parameters(), 1)
-                opte.step()
-                opte.zero_grad()
-                for ep in encoder.parameters():
+                    # -- compute loss
+                    sleep_loss = bs * util.sleep_loss(z_prime, zrand)
                     assert torch.isnan(ep).sum() == 0
                     assert torch.isinf(ep).sum() == 0
+                    sleep_loss = sleep_loss.mean()
+                    # -- Backward pas
+                    sleep_loss.backward()
+                    torch.nn.utils.clip_grad_norm_(encoder.parameters(), 1)
+                    opte.step()
+                    opte.zero_grad()
+                    for ep in encoder.parameters():
+                        assert torch.isnan(ep).sum() == 0
+                        assert torch.isinf(ep).sum() == 0
 
-                # -- administration
-                with torch.no_grad():
-                    epoch_loss[0] += loss.mean(dim=0).item()
-                    epoch_loss[1] += rec_loss.mean(dim=0).item()
-                    epoch_loss[2] += kl_loss.mean(dim=0).item()
-                    epoch_loss[3] += sleep_loss.mean(dim=0).item()
+                    # -- administration
+                    with torch.no_grad():
+                        epoch_loss[0] += loss.mean(dim=0).item()
+                        epoch_loss[1] += rec_loss.mean(dim=0).item()
+                        epoch_loss[2] += kl_loss.mean(dim=0).item()
+                        epoch_loss[3] += sleep_loss.mean(dim=0).item()
 
    
             print(f'Epoch {epoch}, bz: {bz}:\t','\t'.join([str(int(e)) for e in epoch_loss]))
