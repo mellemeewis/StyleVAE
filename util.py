@@ -171,11 +171,12 @@ def siglaplace(output, target):
     assert torch.isinf(output).sum() == 0
     assert torch.isinf(target).sum() == 0
 
+    b, c, w, h = output.size()
     mus = output[:, :1, :, :]
     VARMULT = 1e-5
     EPS = 1e-5
 
-    sgs, lsgs  = torch.exp(output[:, 1:, :, :] * VARMULT), output[:, 1:, :, :] * VARMULT
+    sgs, lsgs  = torch.exp(output[:, c//2:, :, :] * VARMULT), output[:, c//2:, :, :] * VARMULT
 
 
     y = target
