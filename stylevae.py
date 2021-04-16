@@ -125,7 +125,7 @@ def go(arg):
                 loss = br*rec_loss + bz * kl_loss
                 assert torch.isnan(loss).sum() == 0
                 assert torch.isinf(loss).sum() == 0
-                loss = loss.mean(dim=0)
+                loss = loss.mean(dim=0).clamp(max=0)
 
                 # -- backward pass and update
                 loss.backward()
