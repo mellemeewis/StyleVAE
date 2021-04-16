@@ -96,7 +96,7 @@ def kl_loss_image(z):
     sig = z[:, c//2:, :, :].view(b, -1)
 
     kl = 0.5 * torch.sum(sig.exp() - sig + mean.pow(2) - 1, dim=1)
-    kl = torch.clamp(kl, min=0.001, max=100)
+    # kl = torch.clamp(kl, min=0.001, max=100)
 
     assert kl.size() == (b,)
 
@@ -187,7 +187,7 @@ def siglaplace(output, target):
 
     rec = lny + ln1y + lsgs + math.log(2.0) + (x - mus).abs() / sgs
 
-    rec = rec.clamp(min=-10000, max=10000)
+    # rec = rec.clamp(min=-10000, max=10000)
     assert torch.isnan(rec).sum() == 0
     assert torch.isinf(rec).sum() == 0
     return rec
