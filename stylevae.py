@@ -128,12 +128,12 @@ def go(arg):
                 loss = loss.mean(dim=0)
 
                 # -- backward pass and update
-                # loss.backward()
-                # torch.nn.utils.clip_grad_norm_(encoder.parameters(), 1)
-                # torch.nn.utils.clip_grad_norm_(decoder.parameters(), 1)
+                loss.backward()
+                torch.nn.utils.clip_grad_norm_(encoder.parameters(), 1)
+                torch.nn.utils.clip_grad_norm_(decoder.parameters(), 1)
 
-                # optd.step(); optd.zero_grad()
-                # opte.step(); opte.zero_grad()
+                optd.step(); optd.zero_grad()
+                opte.step(); opte.zero_grad()
 
                 for ep in encoder.parameters():
                     if torch.isnan(ep).sum() != 0 or torch.isinf(ep).sum() != 0:
@@ -174,22 +174,11 @@ def go(arg):
                 assert torch.isinf(ep).sum() == 0
                 sleep_loss = sleep_loss.mean()
 
-                loss += sleep_loss
-                #### TEMP
-                loss.backward()
+                -- Backward pas
+                sleep_loss.backward()
                 torch.nn.utils.clip_grad_norm_(encoder.parameters(), 1)
-                torch.nn.utils.clip_grad_norm_(decoder.parameters(), 1)
-
-                optd.step(); optd.zero_grad()
-                #### TEMP
-                opte.step(); opte.zero_grad()
-
-                
-                # -- Backward pas
-                # sleep_loss.backward()
-                # torch.nn.utils.clip_grad_norm_(encoder.parameters(), 1)
-                # opte.step()
-                # opte.zero_grad()
+                opte.step()
+                opte.zero_grad()
 
 
                 for ep in encoder.parameters():
