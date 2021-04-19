@@ -459,7 +459,7 @@ if __name__ == "__main__":
     try:
         go(options)
     except Exception as e:
-        slack_util.send_message("Run Failed.")
+        slack_util.send_message(f"Run Failed.\n{e}")
         sys.exit(1)
 
     print('Finished succesfully')
