@@ -32,7 +32,7 @@ from decoder import StyleDecoder, StyleDecoder2
 import slack_util
 
 from tensorboardX import SummaryWriter
-
+import Error
 # from layers import PlainMaskedConv2d, MaskedConv2d
 
 SEEDFRAC = 2
