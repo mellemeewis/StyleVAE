@@ -45,7 +45,7 @@ def go(arg):
 
     br, bz, b0, b1, b2, b3, b4, b5 = arg.betas
     bsz, bs0, bs1, bs2, bs3, bs4, bs5 = arg.sleep_betas
-    bz_list = torch.arange(0, bz, step = bz / torch.sum(torch.tensor(arg.epochs)))
+    # bz_list = torch.arange(0, bz, step = bz / torch.sum(torch.tensor(arg.epochs)))
     C, H, W, trainset, trainloader, testset, testloader = return_data(arg.task, arg.data_dir, arg.batch_size)
     zs = arg.latent_size
 
@@ -81,7 +81,7 @@ def go(arg):
         
         for epoch in range(arg.epochs[depth]):
 
-            bz = bz_list[epoch]
+            # bz = bz_list[epoch]
             epoch_loss = [0,0,0,0,0,0,0,0,0,0]
 
 
