@@ -45,7 +45,6 @@ def go(arg):
 
     br, bz, b0, b1, b2, b3, b4, b5, bs = arg.betas
     bz_list = torch.arange(0, bz, step = bz / torch.sum(torch.tensor(arg.epochs)))
-    print(bz_list.size())
     C, H, W, trainset, trainloader, testset, testloader = return_data(arg.task, arg.data_dir, arg.batch_size)
     zs = arg.latent_size
 
@@ -77,7 +76,7 @@ def go(arg):
         ## CLASSIV VAE
 
         print(f'starting depth {depth}, for {arg.epochs[depth]} epochs')
-        print('\t\tLoss\t\tREC\tKL\tSleep\tN1\tN2\tN3\tN4\tN5\t')
+        print('\t\tLoss\t\tREC\tKL\tN0\tN1\tN2\tN3\tN4\tN5\tSleep')
         
         for epoch in range(arg.epochs[depth]):
 
@@ -100,17 +99,28 @@ def go(arg):
 
                 ## NORMAL VAE
                 # -- encoding
-                z = encoder(input, depth)
+                z, n0, n1, n2, n3, n4, n5 = encoder(input, depth)
                 assert torch.isnan(z).sum() == 0
                 assert torch.isinf(z).sum() == 0
 
                 # -- take sample
                 zsample  = util.sample(z[:, :zs], z[:, zs:])
-                assert torch.isnan(zsample).sum() == 0
-                assert torch.isinf(zsample).sum() == 0
+                n0sample = util.sample_images(n0, 'normal')
+                n1sample = util.sample_images(n1, 'normal')
+                n2sample = util.sample_images(n2, 'normal')
+                n3sample = util.sample_images(n3, 'normal')
+                n4sample = util.sample_images(n4, 'normal')
+                n5sample = util.sample_images(n5, 'normal')
+                assert torch.isnan(zsample).sum() == 0; assert torch.isinf(zsample).sum() == 0
+                assert torch.isnan(n0sample).sum() == 0; assert torch.isinf(n0sample).sum() == 0
+                assert torch.isnan(n1sample).sum() == 0; assert torch.isinf(n1sample).sum() == 0
+                assert torch.isnan(n2sample).sum() == 0; assert torch.isinf(n2sample).sum() == 0
+                assert torch.isnan(n3sample).sum() == 0; assert torch.isinf(n3sample).sum() == 0
+                assert torch.isnan(n4sample).sum() == 0; assert torch.isinf(n4sample).sum() == 0
+                assert torch.isnan(n5sample).sum() == 0; assert torch.isinf(n5sample).sum() == 0
 
                 # -- reconstruct input
-                xout = decoder(zsample, depth)
+                xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
                 assert torch.isnan(xout).sum() == 0
                 assert torch.isinf(xout).sum() == 0
 
@@ -119,10 +129,18 @@ def go(arg):
                 assert torch.isnan(rec_loss).sum() == 0
                 assert torch.isinf(rec_loss).sum() == 0
                 rec_loss = rec_loss.mean(dim=1)
-                kl_loss  = util.kl_loss(z[:, :zs], z[:, zs:])
+                zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
+                n0kl = util.kl_loss_image(n0)
+                n1kl = util.kl_loss_image(n1)
+                n2kl = util.kl_loss_image(n2)
+                n3kl = util.kl_loss_image(n3)
+                n4kl = util.kl_loss_image(n4)
+                n5kl = util.kl_loss_image(n5)
+                kl_loss = bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl  
+
                 assert torch.isnan(kl_loss).sum() == 0
                 assert torch.isinf(kl_loss).sum() == 0
-                loss = br*rec_loss + bz * kl_loss
+                loss = br*rec_loss + kl_loss
                 assert torch.isnan(loss).sum() == 0
                 assert torch.isinf(loss).sum() == 0
                 loss = loss.mean(dim=0)
@@ -150,13 +168,13 @@ def go(arg):
                  # SLEEP UPDATE
 
                     # -- sample random latent
-                zrand = torch.randn(b, zs, device=dev)
+                zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b, zs, (C, H, W), depth, arg.zchannels, device=dev)
                 assert torch.isnan(zrand).sum() == 0
                 assert torch.isinf(zrand).sum() == 0
 
                 # -- generate x from latent
                 with torch.no_grad():
-                    x = decoder(zrand, depth)
+                    x = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
                     assert torch.isnan(x).sum() == 0
                     assert torch.isinf(x).sum() == 0
                     xsample = util.sample_images(x, arg.output_distribution)
@@ -190,7 +208,13 @@ def go(arg):
                     epoch_loss[0] += loss.mean(dim=0).item()
                     epoch_loss[1] += rec_loss.mean(dim=0).item()
                     epoch_loss[2] += kl_loss.mean(dim=0).item()
-                    epoch_loss[3] += sleep_loss.mean(dim=0).item()
+                    epoch_loss[3] += n0kl.mean(dim=0).item()
+                    epoch_loss[4] += n1kl.mean(dim=0).item()
+                    epoch_loss[5] += n2kl.mean(dim=0).item()
+                    epoch_loss[6] += n3kl.mean(dim=0).item()
+                    epoch_loss[7] += n4kl.mean(dim=0).item()
+                    epoch_loss[8] += n5kl.mean(dim=0).item()
+                    epoch_loss[9] += sleep_loss.mean(dim=0).item()
 
    
             print(f'Epoch {epoch}, bz: {bz}:\t','\t'.join([str(int(e)) for e in epoch_loss]))
@@ -209,10 +233,11 @@ def go(arg):
                     b = 6*12
 
                     # -- sample latents
-                    zrand = torch.randn(b, zs, device=dev)
+                    zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b, zs, (C, H, W), depth, arg.zchannels, device=dev)
+                    zrand, (n0rand_, n1rand_, n2rand_, n3rand_, n4rand_, n5rand_) = util.latent_sample(b, zs, (C, H, W), depth, arg.zchannels, device=dev)
 
                     # -- construct output
-                    sample = decoder(zrand, depth).clamp(0, 1)[:, :C, :, :]
+                    sample = decoder(zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand).clamp(0, 1)[:, :C, :, :]
 
                     ## reconstruct 6x12 images from the testset
                     input = util.readn(testloader, n=6*12)
@@ -220,17 +245,24 @@ def go(arg):
                         input = input.cuda()
 
                     # -- encoding
-                    z = encoder(input, depth)
+                    z, n0, n1, n2, n3, n4, n5 = encoder(input, depth)
 
                     # -- take samples
                     zsample = util.sample(z[:, :zs], z[:, zs:])
+                    n0sample = util.sample_images(n0, 'normal')
+                    n1sample = util.sample_images(n1, 'normal')
+                    n2sample = util.sample_images(n2, 'normal')
+                    n3sample = util.sample_images(n3, 'normal')
+                    n4sample = util.sample_images(n4, 'normal')
+                    n5sample = util.sample_images(n5, 'normal')
 
                     # -- decoding
-                    xout = decoder(zsample, depth).clamp(0, 1)[:, :C, :, :]
+                    xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample).clamp(0, 1)[:, :C, :, :]
+                    xout_ = decoder(zsample, n0rand_, n1rand_, n2rand_, n3rand_, n4rand_, n5rand_).clamp(0, 1)[:, :C, :, :]
 
-                    images = torch.cat([input.cpu()[:24,:,:], xout.cpu()[:24,:,:], sample.cpu()[:24,:,:],
-                                        input.cpu()[24:48,:,:], xout.cpu()[24:48,:,:], sample.cpu()[24:48,:,:],
-                                        input.cpu()[48:,:,:], xout.cpu()[48:,:,:], sample.cpu()[48:,:,:]], dim=0)
+                    images = torch.cat([input.cpu()[:24,:,:], xout.cpu()[:24,:,:], xout_.cpu()[:24,:,:], sample.cpu()[:24,:,:],
+                                        input.cpu()[24:48,:,:], xout.cpu()[24:48,:,:], xout_.cpu()[24:48,:,:], sample.cpu()[24:48,:,:],
+                                        input.cpu()[48:,:,:], xout.cpu()[48:,:,:], xout_.cpu()[48:,:,:], sample.cpu()[48:,:,:]], dim=0)
 
                     # -- save and slack images
                     try:
@@ -270,7 +302,7 @@ if __name__ == "__main__":
                         dest="zchannels",
                         help="Number of channels per noise input.",
                         nargs=6,
-                        default=[1, 2, 4, 8, 16, 32],
+                        default=[1, 1, 1, 1, 1, 1],
                         type=int)
 
     parser.add_argument("--skip-test",
