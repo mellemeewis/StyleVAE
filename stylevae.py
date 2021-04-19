@@ -137,7 +137,6 @@ def go(arg):
                 n3kl = util.kl_loss_image(n3)
                 n4kl = util.kl_loss_image(n4)
                 n5kl = util.kl_loss_image(n5)
-                print(n0kl, n1kl, n2kl, n3kl, n4kl, n5kl)
                 kl_loss = bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl  
 
                 assert torch.isnan(kl_loss).sum() == 0
