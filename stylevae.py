@@ -128,8 +128,8 @@ def go(arg):
                         _, (n0rn, n1rn, n2rn, n3rn, n4rn, n5rn) = util.latent_sample(b, zs, (C, H, W), depth, arg.zchannels, dev)
                     xout_rn = decoder(zsample, n0rn, n1rn, n2rn, n3rn, n4rn, n5rn)
 
-                assert torch.isnan(xout).sum() == 0
-                assert torch.isinf(xout).sum() == 0
+                # assert torch.isnan(xout).sum() == 0
+                # assert torch.isinf(xout).sum() == 0
 
                 # -- compute losses
                 rec_loss_orignal = rec_criterion(xout, input).view(b, c*h*w)
