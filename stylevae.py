@@ -77,12 +77,12 @@ def go(arg):
         ## CLASSIV VAE
 
         print(f'starting depth {depth}, for {arg.epochs[depth]} epochs')
-        print('\t\tLoss\t\tREC\tKL\tN0\tN1\tN2\tN3\tN4\tN5\tSleep')
+        print('\t\tLoss\t\tREC\tKL\tZ\tN0\tN1\tN2\tN3\tN4\tN5\tSleep')
         
         for epoch in range(arg.epochs[depth]):
 
             # bz = bz_list[epoch]
-            epoch_loss = [0,0,0,0,0,0,0,0,0,0]
+            epoch_loss = [0,0,0,0,0,0,0,0,0,0,0]
 
 
             # Train
@@ -217,13 +217,14 @@ def go(arg):
                     epoch_loss[0] += loss.mean(dim=0).item()
                     epoch_loss[1] += rec_loss.mean(dim=0).item()
                     epoch_loss[2] += kl_loss.mean(dim=0).item()
-                    epoch_loss[3] += n0kl.mean(dim=0).item()
-                    if depth >= 1: epoch_loss[4] += n1kl.mean(dim=0).item()
-                    if depth >= 2: epoch_loss[5] += n2kl.mean(dim=0).item()
-                    if depth >= 3: epoch_loss[6] += n3kl.mean(dim=0).item()
-                    if depth >= 4: epoch_loss[7] += n4kl.mean(dim=0).item()
-                    if depth >= 5: epoch_loss[8] += n5kl.mean(dim=0).item()
-                    epoch_loss[9] += sleep_loss.mean(dim=0).item()
+                    epoch_loss[4] += zkl.mean(dim=0).item()
+                    epoch_loss[4] += n0kl.mean(dim=0).item()
+                    if depth >= 1: epoch_loss[5] += n1kl.mean(dim=0).item()
+                    if depth >= 2: epoch_loss[6] += n2kl.mean(dim=0).item()
+                    if depth >= 3: epoch_loss[7] += n3kl.mean(dim=0).item()
+                    if depth >= 4: epoch_loss[8] += n4kl.mean(dim=0).item()
+                    if depth >= 5: epoch_loss[9] += n5kl.mean(dim=0).item()
+                    epoch_loss[10] += sleep_loss.mean(dim=0).item()
 
    
             print(f'Epoch {epoch}, bz: {bz}:\t','\t'.join([str(int(e)) for e in epoch_loss]))
