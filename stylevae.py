@@ -43,7 +43,8 @@ def go(arg):
 
     tbw = SummaryWriter(log_dir=arg.tb_dir)
 
-    br, bz, b0, b1, b2, b3, b4, b5, bs = arg.betas
+    br, bz, b0, b1, b2, b3, b4, b5 = arg.betas
+    bsz, bs0, bs1, bs2, bs3, bs4, bs5 = arg.sleep_betas
     bz_list = torch.arange(0, bz, step = bz / torch.sum(torch.tensor(arg.epochs)))
     C, H, W, trainset, trainloader, testset, testloader = return_data(arg.task, arg.data_dir, arg.batch_size)
     zs = arg.latent_size
@@ -182,14 +183,22 @@ def go(arg):
                     assert torch.isinf(xsample).sum() == 0
 
                 # -- reconstruct latent
-                z_prime = encoder(xsample, depth)
+                z_prime, n0prime, n1prime, n2prime, n3prime, n4prime, n5prime = encoder(xsample, depth)
                 assert torch.isnan(z_prime).sum() == 0
                 assert torch.isinf(z_prime).sum() == 0
 
                 # -- compute loss
-                sleep_loss = bs * util.sleep_loss(z_prime, zrand)
-                assert torch.isnan(ep).sum() == 0
-                assert torch.isinf(ep).sum() == 0
+                sleep_z = util.sleep_loss(z_prime, zrand)
+                sleep_n0 = util.sleep_loss(z_prime, zrand)
+                sleep_n1 = util.sleep_loss(z_prime, zrand)
+                sleep_n2 = util.sleep_loss(z_prime, zrand)
+                sleep_n3 = util.sleep_loss(z_prime, zrand)
+                sleep_n4 = util.sleep_loss(z_prime, zrand)
+                sleep_n5 = util.sleep_loss(z_prime, zrand)
+
+                sleep_loss = bsz * sleep_z + bs0 * sleep_n0 + bs1 * sleep_n1 + bs2 * sleep_n2 + bs3 * sleep_n3 + bs4 * sleep_n4 + bs5 * sleep_n5 
+                assert torch.isnan(sleep_loss).sum() == 0
+                assert torch.isinf(sleep_loss).sum() == 0
                 sleep_loss = sleep_loss.mean()
 
                 # -- Backward pas
