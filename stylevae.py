@@ -132,10 +132,12 @@ def go(arg):
                 assert torch.isinf(xout).sum() == 0
 
                 # -- compute losses
-                rec_loss = rec_criterion(xout, input).view(b, c*h*w)
+                rec_loss_orignal = rec_criterion(xout, input).view(b, c*h*w)
                 if arg.train_recon_with_rn:
                     rec_loss_rn = rec_criterion(xout_rn, input).view(b, c*h*w)
-                    rec_loss += arg.train_recon_with_rn * rec_loss_rn
+                    rec_loss = rec_loss_orignal + arg.train_recon_with_rn * rec_loss_rn
+                else: 
+                    rec_loss = rec_loss_orignal
 
                 assert torch.isnan(rec_loss).sum() == 0
                 assert torch.isinf(rec_loss).sum() == 0
@@ -225,7 +227,7 @@ def go(arg):
                     # -- administration
                 with torch.no_grad():
                     epoch_loss[0] += loss.mean(dim=0).item()
-                    epoch_loss[1] += rec_loss.mean(dim=0).item()
+                    if arg.train_recon_with_rn: epoch_loss[1] += rec_loss_orignal.mean().item() else: epoch_loss[1] += rec_loss.mean(dim=0).item()
                     epoch_loss[2] += kl_loss.mean(dim=0).item()
                     epoch_loss[3] += zkl.mean(dim=0).item()
                     epoch_loss[4] += n0kl.mean(dim=0).item()
