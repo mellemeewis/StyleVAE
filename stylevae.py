@@ -452,8 +452,15 @@ if __name__ == "__main__":
 
     options = parser.parse_args()
 
+
     print('OPTIONS', options)
 
     slack_util.send_message(f"Run Started.\nOPTIONS:\n{options}")
-    go(options)
+
+    try:
+        go(options)
+    except Error as e:
+        slack_util.send_message(f"Run Failed.\nError:\n{e}")
+        sys.exit(1)
+
     print('Finished succesfully')
