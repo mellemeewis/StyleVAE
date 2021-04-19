@@ -168,7 +168,7 @@ def go(arg):
                  # SLEEP UPDATE
 
                     # -- sample random latent
-                zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b, zs, (C, H, W), depth, arg.zchannels, device=dev)
+                zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b, zs, (C, H, W), depth, arg.zchannels, dev)
                 assert torch.isnan(zrand).sum() == 0
                 assert torch.isinf(zrand).sum() == 0
 
