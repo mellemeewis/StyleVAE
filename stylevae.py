@@ -354,9 +354,9 @@ if __name__ == "__main__":
     parser.add_argument('--sleep_betas',
                         dest='sleep_betas',
                         help="Scaling parameters of the sleep losses.",
-                        nargs=6,
+                        nargs=7,
                         type=float,
-                        default=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
+                        default=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
 
     parser.add_argument('--dropouts',
                         dest='dropouts',
