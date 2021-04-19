@@ -289,7 +289,7 @@ def go(arg):
                     # -- save and slack images
                     try:
                         utils.save_image(images, f'images.{depth}.{epoch}.png', nrow=24, padding=2)
-                    except Error as e:
+                    except Exception as e:
                         print("Saving images.{depth}.{epoch}.png failed.")
                     slack_util.send_message(f' Depth {depth}, Epoch {epoch}. \nOptions: {arg}')
                     slack_util.send_message(string)
@@ -458,7 +458,7 @@ if __name__ == "__main__":
 
     try:
         go(options)
-    except:
+    except Exception as e:
         slack_util.send_message("Run Failed.")
         sys.exit(1)
 
