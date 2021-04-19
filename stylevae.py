@@ -235,7 +235,7 @@ def go(arg):
                     if depth >= 4: epoch_loss[8] += n4kl.mean(dim=0).item()
                     if depth >= 5: epoch_loss[9] += n5kl.mean(dim=0).item()
                     epoch_loss[10] += sleep_loss.mean(dim=0).item()
-                    if arg.train_recon_with_rn: epoch_loss[11] += rec_loss_rn
+                    if arg.train_recon_with_rn: epoch_loss[11] += rec_loss_rn.mean().item()
 
    
             print(f'Epoch {epoch}\t','\t'.join([str(int(e)) for e in epoch_loss]))
