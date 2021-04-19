@@ -352,7 +352,7 @@ if __name__ == "__main__":
                         default=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
 
     parser.add_argument('--sleep_betas',
-                        dest='betas',
+                        dest='sleep_betas',
                         help="Scaling parameters of the sleep losses.",
                         nargs=6,
                         type=float,
