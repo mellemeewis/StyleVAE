@@ -113,11 +113,11 @@ def go(arg):
                 n5sample = util.sample_images(n5, 'normal')
                 assert torch.isnan(zsample).sum() == 0; assert torch.isinf(zsample).sum() == 0
                 assert torch.isnan(n0sample).sum() == 0; assert torch.isinf(n0sample).sum() == 0
-                assert torch.isnan(n1sample).sum() == 0; assert torch.isinf(n1sample).sum() == 0
-                assert torch.isnan(n2sample).sum() == 0; assert torch.isinf(n2sample).sum() == 0
-                assert torch.isnan(n3sample).sum() == 0; assert torch.isinf(n3sample).sum() == 0
-                assert torch.isnan(n4sample).sum() == 0; assert torch.isinf(n4sample).sum() == 0
-                assert torch.isnan(n5sample).sum() == 0; assert torch.isinf(n5sample).sum() == 0
+                if n1sample != None: assert torch.isnan(n1sample).sum() == 0 and torch.isinf(n1sample).sum() == 0
+                if n2sample != None: assert torch.isnan(n2sample).sum() == 0 and torch.isinf(n2sample).sum() == 0
+                if n3sample != None: assert torch.isnan(n3sample).sum() == 0 and torch.isinf(n3sample).sum() == 0
+                if n4sample != None: assert torch.isnan(n4sample).sum() == 0 and torch.isinf(n4sample).sum() == 0
+                if n5sample != None: assert torch.isnan(n5sample).sum() == 0 and torch.isinf(n5sample).sum() == 0
 
                 # -- reconstruct input
                 xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
