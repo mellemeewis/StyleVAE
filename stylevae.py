@@ -77,12 +77,12 @@ def go(arg):
         ## CLASSIV VAE
 
         print(f'starting depth {depth}, for {arg.epochs[depth]} epochs')
-        print('\t\tLoss\t\tREC\tKL\tZ\tN0\tN1\tN2\tN3\tN4\tN5\tSleep')
+        print('\t\tLoss\t\tREC\tKL\tZ\tN0\tN1\tN2\tN3\tN4\tN5\tSleep\tREC_RN')
         
         for epoch in range(arg.epochs[depth]):
 
             # bz = bz_list[epoch]
-            epoch_loss = [0,0,0,0,0,0,0,0,0,0,0]
+            epoch_loss = [0,0,0,0,0,0,0,0,0,0,0,0]
 
 
             # Train
@@ -122,11 +122,21 @@ def go(arg):
 
                 # -- reconstruct input
                 xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
+
+                if arg.train_recon_with_rn:
+                    with torch.no_grad():
+                        _, (n0rn, n1rn, n2rn, n3rn, n4rn, n5rn) = util.latent_sample(b, zs, (C, H, W), depth, arg.zchannels, dev)
+                    xout_rn = decoder(zsample, n0rn, n1rn, n2rn, n3rn, n4rn, n5rn)
+
                 assert torch.isnan(xout).sum() == 0
                 assert torch.isinf(xout).sum() == 0
 
                 # -- compute losses
                 rec_loss = rec_criterion(xout, input).view(b, c*h*w)
+                if arg.train_recon_with_rn:
+                    rec_loss_rn = rec_criterion(xout_rn, input)
+                    rec_loss += arg.train_recon_with_rn * rec_loss_rn
+
                 assert torch.isnan(rec_loss).sum() == 0
                 assert torch.isinf(rec_loss).sum() == 0
                 rec_loss = rec_loss.mean(dim=1)
@@ -225,6 +235,7 @@ def go(arg):
                     if depth >= 4: epoch_loss[8] += n4kl.mean(dim=0).item()
                     if depth >= 5: epoch_loss[9] += n5kl.mean(dim=0).item()
                     epoch_loss[10] += sleep_loss.mean(dim=0).item()
+                    if arg.train_recon_with_rn: epoch_loss[11] += rec_loss_rn
 
    
             print(f'Epoch {epoch}\t','\t'.join([str(int(e)) for e in epoch_loss]))
@@ -426,6 +437,11 @@ if __name__ == "__main__":
                     dest="output_distribution",
                     help="Output distribution ",
                     default='siglaplace', type=str)
+
+    parser.add_argument("--train-recon-with-rn",
+                    dest="train_recon_with_rn",
+                    help="Train recon with RN",
+                    default=None, type=int)
 
     options = parser.parse_args()
 
