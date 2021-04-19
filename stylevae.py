@@ -347,9 +347,16 @@ if __name__ == "__main__":
     parser.add_argument('--betas',
                         dest='betas',
                         help="Scaling parameters of the kl losses. The first two are for reconstruction loss and the z parameter, the rest are for the noise parameters in order. Provide exactly 7 floats.",
-                        nargs=9,
+                        nargs=8,
                         type=float,
-                        default=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
+                        default=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
+
+    parser.add_argument('--sleep_betas',
+                        dest='betas',
+                        help="Scaling parameters of the sleep losses.",
+                        nargs=6,
+                        type=float,
+                        default=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
 
     parser.add_argument('--dropouts',
                         dest='dropouts',
