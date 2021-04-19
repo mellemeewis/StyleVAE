@@ -242,8 +242,8 @@ def go(arg):
                     b = 6*12
 
                     # -- sample latents
-                    zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b, zs, (C, H, W), depth, arg.zchannels, device=dev)
-                    zrand, (n0rand_, n1rand_, n2rand_, n3rand_, n4rand_, n5rand_) = util.latent_sample(b, zs, (C, H, W), depth, arg.zchannels, device=dev)
+                    zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b, zs, (C, H, W), depth, arg.zchannels, dev)
+                    zrand, (n0rand_, n1rand_, n2rand_, n3rand_, n4rand_, n5rand_) = util.latent_sample(b, zs, (C, H, W), depth, arg.zchannels, dev)
 
                     # -- construct output
                     sample = decoder(zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand).clamp(0, 1)[:, :C, :, :]
