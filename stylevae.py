@@ -227,7 +227,7 @@ def go(arg):
                     # -- administration
                 with torch.no_grad():
                     epoch_loss[0] += loss.mean(dim=0).item()
-                    epoch_loss[1] += rec_loss.mean(dim=0).item() if not arg.train_recon_with_rn else epoch_loss[1] += rec_loss_orignal.mean().item()
+                    epoch_loss[1] += rec_loss.mean(dim=0).item() if not arg.train_recon_with_rn else + rec_loss_orignal.mean().item()
                     epoch_loss[2] += kl_loss.mean(dim=0).item()
                     epoch_loss[3] += zkl.mean(dim=0).item()
                     epoch_loss[4] += n0kl.mean(dim=0).item()
