@@ -134,7 +134,7 @@ def go(arg):
                 # -- compute losses
                 rec_loss = rec_criterion(xout, input).view(b, c*h*w)
                 if arg.train_recon_with_rn:
-                    rec_loss_rn = rec_criterion(xout_rn, input)
+                    rec_loss_rn = rec_criterion(xout_rn, input).view(b, c*h*w)
                     rec_loss += arg.train_recon_with_rn * rec_loss_rn
 
                 assert torch.isnan(rec_loss).sum() == 0
