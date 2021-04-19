@@ -77,7 +77,7 @@ def go(arg):
         ## CLASSIV VAE
 
         print(f'starting depth {depth}, for {arg.epochs[depth]} epochs')
-        print('\t\tLoss\t\tREC\tKL\tZ\tN0\tN1\tN2\tN3\tN4\tN5\tSleep\tREC_RN')
+        print('\tLoss\t\tREC\tKL\tZ\tN0\tN1\tN2\tN3\tN4\tN5\tSleep\tREC_RN')
         
         for epoch in range(arg.epochs[depth]):
 
