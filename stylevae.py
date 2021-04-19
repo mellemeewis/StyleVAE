@@ -135,7 +135,7 @@ def go(arg):
                 rec_loss_orignal = rec_criterion(xout, input).view(b, c*h*w)
                 if arg.train_recon_with_rn:
                     rec_loss_rn = rec_criterion(xout_rn, input).view(b, c*h*w)
-                    rec_loss = rec_loss_orignal + arg.train_recon_with_rn * rec_loss_rn
+                    rec_loss = rec_loss_orignal / arg.train_recon_with_rn + rec_loss_rn
                 else: 
                     rec_loss = rec_loss_orignal
 
@@ -177,52 +177,52 @@ def go(arg):
                     assert torch.isinf(dp).sum() == 0
 
 
-                # if epoch  > 10:
+                if arg.use_sleep_update:
                  # SLEEP UPDATE
 
-                    # -- sample random latent
-                zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b, zs, (C, H, W), depth, arg.zchannels, dev)
-                assert torch.isnan(zrand).sum() == 0
-                assert torch.isinf(zrand).sum() == 0
+                        # -- sample random latent
+                    zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b, zs, (C, H, W), depth, arg.zchannels, dev)
+                    assert torch.isnan(zrand).sum() == 0
+                    assert torch.isinf(zrand).sum() == 0
 
-                # -- generate x from latent
-                with torch.no_grad():
-                    x = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
-                    assert torch.isnan(x).sum() == 0
-                    assert torch.isinf(x).sum() == 0
-                    xsample = util.sample_images(x, arg.output_distribution)
-                    assert torch.isnan(xsample).sum() == 0
-                    assert torch.isinf(xsample).sum() == 0
+                    # -- generate x from latent
+                    with torch.no_grad():
+                        x = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
+                        assert torch.isnan(x).sum() == 0
+                        assert torch.isinf(x).sum() == 0
+                        xsample = util.sample_images(x, arg.output_distribution)
+                        assert torch.isnan(xsample).sum() == 0
+                        assert torch.isinf(xsample).sum() == 0
 
-                # -- reconstruct latent
-                z_prime, n0prime, n1prime, n2prime, n3prime, n4prime, n5prime = encoder(xsample, depth)
-                assert torch.isnan(z_prime).sum() == 0
-                assert torch.isinf(z_prime).sum() == 0
+                    # -- reconstruct latent
+                    z_prime, n0prime, n1prime, n2prime, n3prime, n4prime, n5prime = encoder(xsample, depth)
+                    assert torch.isnan(z_prime).sum() == 0
+                    assert torch.isinf(z_prime).sum() == 0
 
-                # -- compute loss
-                sleep_z = util.sleep_loss(z_prime, zrand)
-                sleep_n0 = util.sleep_loss(z_prime, zrand)
-                sleep_n1 = util.sleep_loss(z_prime, zrand)
-                sleep_n2 = util.sleep_loss(z_prime, zrand)
-                sleep_n3 = util.sleep_loss(z_prime, zrand)
-                sleep_n4 = util.sleep_loss(z_prime, zrand)
-                sleep_n5 = util.sleep_loss(z_prime, zrand)
+                    # -- compute loss
+                    sleep_z = util.sleep_loss(z_prime, zrand)
+                    sleep_n0 = util.sleep_loss(z_prime, zrand)
+                    sleep_n1 = util.sleep_loss(z_prime, zrand)
+                    sleep_n2 = util.sleep_loss(z_prime, zrand)
+                    sleep_n3 = util.sleep_loss(z_prime, zrand)
+                    sleep_n4 = util.sleep_loss(z_prime, zrand)
+                    sleep_n5 = util.sleep_loss(z_prime, zrand)
 
-                sleep_loss = bsz * sleep_z + bs0 * sleep_n0 + bs1 * sleep_n1 + bs2 * sleep_n2 + bs3 * sleep_n3 + bs4 * sleep_n4 + bs5 * sleep_n5 
-                assert torch.isnan(sleep_loss).sum() == 0
-                assert torch.isinf(sleep_loss).sum() == 0
-                sleep_loss = sleep_loss.mean()
+                    sleep_loss = bsz * sleep_z + bs0 * sleep_n0 + bs1 * sleep_n1 + bs2 * sleep_n2 + bs3 * sleep_n3 + bs4 * sleep_n4 + bs5 * sleep_n5 
+                    assert torch.isnan(sleep_loss).sum() == 0
+                    assert torch.isinf(sleep_loss).sum() == 0
+                    sleep_loss = sleep_loss.mean()
 
-                # -- Backward pas
-                sleep_loss.backward()
-                torch.nn.utils.clip_grad_norm_(encoder.parameters(), 1)
-                opte.step()
-                opte.zero_grad()
+                    # -- Backward pas
+                    sleep_loss.backward()
+                    torch.nn.utils.clip_grad_norm_(encoder.parameters(), 1)
+                    opte.step()
+                    opte.zero_grad()
 
 
-                for ep in encoder.parameters():
-                    assert torch.isnan(ep).sum() == 0
-                    assert torch.isinf(ep).sum() == 0
+                    for ep in encoder.parameters():
+                        assert torch.isnan(ep).sum() == 0
+                        assert torch.isinf(ep).sum() == 0
 
                     # -- administration
                 with torch.no_grad():
@@ -236,7 +236,7 @@ def go(arg):
                     if depth >= 3: epoch_loss[7] += n3kl.mean(dim=0).item()
                     if depth >= 4: epoch_loss[8] += n4kl.mean(dim=0).item()
                     if depth >= 5: epoch_loss[9] += n5kl.mean(dim=0).item()
-                    epoch_loss[10] += sleep_loss.mean(dim=0).item()
+                    if arg.use_sleep_update: epoch_loss[10] += sleep_loss.mean(dim=0).item()
                     if arg.train_recon_with_rn: epoch_loss[11] += rec_loss_rn.mean().item()
 
    
@@ -444,6 +444,11 @@ if __name__ == "__main__":
                     dest="train_recon_with_rn",
                     help="Train recon with RN",
                     default=None, type=int)
+
+    parser.add_argument("--use-sleep-update",
+                    dest="use_sleep_update",
+                    help="Uses sleep update",
+                    action='store_true')
 
     options = parser.parse_args()
 
