@@ -1,3 +1,19 @@
+from torch import nn
+import torch.nn.functional as F
+import torch.distributions as ds
+
+import torch
+from torch.autograd import Variable
+from torchvision.transforms import CenterCrop, ToTensor, Compose, Lambda, Resize, Grayscale, Pad, RandomHorizontalFlip
+from torchvision.datasets import coco
+from torchvision import utils
+
+from torch.nn.functional import binary_cross_entropy, relu, nll_loss, cross_entropy, softmax
+from torch.nn import Embedding, Conv2d, Sequential, BatchNorm2d, ReLU, MSELoss
+from torch.optim import Adam
+
+import util
+
 class Discriminator(nn.Module):
     def __init__(self, in_size, dchannels):
         super(Discriminator, self).__init__()
