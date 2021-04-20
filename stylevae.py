@@ -161,11 +161,11 @@ def go(arg):
                 optdi.step()
                 optdi.zero_grad()
 
-                if i %500 == 0:
-                    print("\n\nREAL. FAKE")
-                    print(real_label, fake_label)
-                    print(discriminator_out_real, discriminator_out_fake)
-                    print(discriminator_loss_real, discriminator_loss_fake)
+                # if i %500 == 0:
+                #     print("\n\nREAL. FAKE")
+                #     print(real_label, fake_label)
+                #     print(discriminator_out_real, discriminator_out_fake)
+                #     print(discriminator_loss_real, discriminator_loss_fake)
 
                 # -- compute losses decoder
                 rec_loss_orignal = rec_criterion(xout, input).view(b, c*h*w)
@@ -180,10 +180,10 @@ def go(arg):
                 with torch.no_grad():
                     discriminator_out_fake = discriminator(xout[:, :C, :, :]).view(-1)
                 generator_loss = discriminator_criterion(discriminator_out_fake, real_label)
-                if i %500 == 0:
-                    print("GENERATOR")
-                    print(discriminator_out_fake)
-                    print(generator_loss)
+                # if i %500 == 0:
+                #     print("GENERATOR")
+                #     print(discriminator_out_fake)
+                #     print(generator_loss)
 
 
 
