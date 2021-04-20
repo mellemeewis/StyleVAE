@@ -43,7 +43,7 @@ def go(arg):
 
     tbw = SummaryWriter(log_dir=arg.tb_dir)
 
-    br, bz, b0, b1, b2, b3, b4, b5 = arg.betas
+    br, bz, b0, b1, b2, b3, b4, b5, bg = arg.betas
     bsz, bs0, bs1, bs2, bs3, bs4, bs5 = arg.sleep_betas
     # bz_list = torch.arange(0, bz, step = bz / torch.sum(torch.tensor(arg.epochs)))
     C, H, W, trainset, trainloader, testset, testloader = return_data(arg.task, arg.data_dir, arg.batch_size)
@@ -402,9 +402,9 @@ if __name__ == "__main__":
     parser.add_argument('--betas',
                         dest='betas',
                         help="Scaling parameters of the kl losses. The first two are for reconstruction loss and the z parameter, the rest are for the noise parameters in order. Provide exactly 7 floats.",
-                        nargs=8,
+                        nargs=9,
                         type=float,
-                        default=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
+                        default=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
 
     parser.add_argument('--sleep-betas',
                         dest='sleep_betas',
