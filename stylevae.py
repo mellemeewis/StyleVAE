@@ -445,7 +445,7 @@ if __name__ == "__main__":
     parser.add_argument("-l", "--learn-rate",
                         dest="lr",
                         help="Learning rate.",
-                        nargs=2,
+                        nargs=3,
                         default=[0.0001, 0.0001, 0.001], type=float)
 
     parser.add_argument("-D", "--data-directory",
