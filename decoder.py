@@ -140,13 +140,13 @@ class StyleDecoder(nn.Module):
             x1 = util.adain(z1, x1)
 
         # if n0 is not None:
-        #     if x1 is None:
-        #         x1 = self.x1
+        if x1 is None:
+            x1 = self.x1
 
-            x0 = F.upsample(self.block1(x1), scale_factor=2)
-            # x0 = x0 + self.tonoise0(n0)
-            z0 = self.affine0(z).view(-1, 2 * c, h, w)
-            x0 = util.adain(z0, x0)
+        x0 = F.upsample(self.block1(x1), scale_factor=2)
+        # x0 = x0 + self.tonoise0(n0)
+        z0 = self.affine0(z).view(-1, 2 * c, h, w)
+        x0 = util.adain(z0, x0)
 
         return self.conv0(x0)
 
