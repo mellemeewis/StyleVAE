@@ -275,7 +275,7 @@ def go(arg):
                     if arg.use_sleep_update: epoch_loss[10] += sleep_loss.mean(dim=0).item()
                     if arg.train_recon_with_rn: epoch_loss[11] += rec_loss_rn.mean().item()
                     epoch_loss[12] += discriminator_loss.mean(dim=0).item()
-                    epoch_loss[12] += generator_loss.mean(dim=0).item()
+                    epoch_loss[13] += generator_loss.mean(dim=0).item()
 
 
    
