@@ -133,7 +133,8 @@ def go(arg):
                 # xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
                 xout = decoder(zsample, n1sample, n2sample, n3sample, n4sample, n5sample)
                 with torch.no_grad():
-                    xout_for_disc = xout
+                    xout_for_disc = decoder(zsample, n1sample, n2sample, n3sample, n4sample, n5sample)
+                    
                 if arg.train_recon_with_rn:
                     with torch.no_grad():
                         _, (n0rn, n1rn, n2rn, n3rn, n4rn, n5rn) = util.latent_sample(b, zs, (C, H, W), depth, arg.zchannels, dev)
