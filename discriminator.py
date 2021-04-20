@@ -21,24 +21,24 @@ class Discriminator(nn.Module):
         d1, d2, d3, d4 = dchannels
         self.main = nn.Sequential(
             # input is (nc) x 64 x 64
-            print(1)
+            print(1),
             nn.Conv2d(C, d1, 4, 2, 1, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
 
             # state size. (ndf) x 32 x 32
-            print(2)
+            print(2),
             nn.Conv2d(d1, d2, 4, 2, 1, bias=False),
             nn.BatchNorm2d(d2),
             nn.LeakyReLU(0.2, inplace=True),
 
             # state size. (ndf*2) x 16 x 16
-            print(3)
+            print(3),
             nn.Conv2d(d2, d3, 4, 2, 1, bias=False),
             nn.BatchNorm2d(d3),
             nn.LeakyReLU(0.2, inplace=True),
 
             # state size. (ndf*4) x 8 x 8
-            print(4)
+            print(4),
             nn.Conv2d(d3, d4, 4, 2, 1, bias=False),
             nn.BatchNorm2d(d4),
             nn.LeakyReLU(0.2, inplace=True),
