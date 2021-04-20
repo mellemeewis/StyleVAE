@@ -70,7 +70,7 @@ def go(arg):
 
     opte = Adam(list(encoder.parameters()), lr=arg.lr[0])
     optd = Adam(list(decoder.parameters()), lr=arg.lr[1])
-    optdi = Adam(list(discriminator.parameters()), lr=arg.lr[1])
+    optdi = Adam(list(discriminator.parameters()), lr=arg.lr[2])
 
     if torch.cuda.is_available():
         encoder.cuda()
@@ -446,7 +446,7 @@ if __name__ == "__main__":
                         dest="lr",
                         help="Learning rate.",
                         nargs=2,
-                        default=[0.0001, 0.0001], type=float)
+                        default=[0.0001, 0.0001, 0.001], type=float)
 
     parser.add_argument("-D", "--data-directory",
                         dest="data_dir",
