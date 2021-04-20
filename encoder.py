@@ -65,7 +65,7 @@ class StyleEncoder(nn.Module):
 
         z0 = self.affine0(x0.view(b, -1))
         x0 = util.F.instance_norm(x0)
-        n0 = self.tonoise0(x0)
+        # n0 = self.tonoise0(x0)
 
         if depth <= 0:
             z=z0
