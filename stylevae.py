@@ -180,6 +180,10 @@ def go(arg):
                 with torch.no_grad():
                     discriminator_out_fake = discriminator(xout[:, :C, :, :]).view(-1)
                 generator_loss = discriminator_criterion(discriminator_out_fake, real_label)
+                if i %500 == 0:
+                    print("GENERATOR")
+                    print(discriminator_out_fake)
+                    print(generator_loss)
 
 
 
