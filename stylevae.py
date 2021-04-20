@@ -132,6 +132,8 @@ def go(arg):
                 # -- reconstruct input
                 # xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
                 xout = decoder(zsample, n1sample, n2sample, n3sample, n4sample, n5sample)
+                with torch.no_grad():
+                    xout_for_disc = xout
                 if arg.train_recon_with_rn:
                     with torch.no_grad():
                         _, (n0rn, n1rn, n2rn, n3rn, n4rn, n5rn) = util.latent_sample(b, zs, (C, H, W), depth, arg.zchannels, dev)
@@ -145,7 +147,7 @@ def go(arg):
                 real_label = torch.full((b,), 1, dtype=torch.float, device=dev)
                 fake_label = torch.full((b,), 0, dtype=torch.float, device=dev)
                 discriminator_out_real = discriminator(input).view(-1)
-                discriminator_out_fake = discriminator(xout[:, :C, :, :]).view(-1)
+                discriminator_out_fake = discriminator(xout_for_disc[:, :C, :, :]).view(-1)
 
                 # -- compute losses discriminator
                 discriminator_loss_real = discriminator_criterion(discriminator_out_real, real_label)
