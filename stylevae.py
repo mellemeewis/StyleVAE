@@ -164,9 +164,9 @@ def go(arg):
 
                 if i %500 == 0:
                     print("\n\nREAL. FAKE")
-                    print(real_label.item(), fake_label.item())
-                    print(discriminator_out_real.item(), discriminator_out_fake.item())
-                    print(discriminator_loss_real.item(), discriminator_loss_fake.item())
+                    print(real_label, fake_label)
+                    print(discriminator_out_real, discriminator_out_fake)
+                    print(discriminator_loss_real, discriminator_loss_fake)
 
                 # -- compute losses decoder
                 rec_loss_orignal = rec_criterion(xout, input).view(b, c*h*w)
