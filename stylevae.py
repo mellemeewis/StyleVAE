@@ -152,7 +152,7 @@ def go(arg):
                 print(real_label, fake_label)
                 discriminator_out_real = discriminator(input).view(-1)
                 discriminator_out_fake = discriminator(xout_no_grad[:, :C, :, :]).view(-1)
-                print(discriminator_loss_real, discriminator_out_fake)
+                print(discriminator_out_real, discriminator_out_fake)
 
                 # -- compute losses discriminator
                 discriminator_loss_real = discriminator_criterion(discriminator_out_real, real_label)
