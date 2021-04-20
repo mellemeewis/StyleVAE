@@ -87,7 +87,7 @@ def go(arg):
         for epoch in range(arg.epochs[depth]):
 
             # bz = bz_list[epoch]
-            epoch_loss = [0,0,0,0,0,0,0,0,0,0,0,0]
+            epoch_loss = [0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 
             # Train
@@ -273,6 +273,9 @@ def go(arg):
                     if depth >= 5: epoch_loss[9] += n5kl.mean(dim=0).item()
                     if arg.use_sleep_update: epoch_loss[10] += sleep_loss.mean(dim=0).item()
                     if arg.train_recon_with_rn: epoch_loss[11] += rec_loss_rn.mean().item()
+                    epoch_loss[12] += discriminator_loss.mean(dim=0).item()
+                    epoch_loss[12] += generator_loss.mean(dim=0).item()
+
 
    
             print(f'Epoch {epoch}\t','\t'.join([str(int(e)) for e in epoch_loss]))
