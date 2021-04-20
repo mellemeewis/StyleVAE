@@ -149,15 +149,15 @@ def go(arg):
                 print("\n\nREAL. FAKE")
                 real_label = torch.full((b,), 1, dtype=torch.float, device=dev)
                 fake_label = torch.full((b,), 0, dtype=torch.float, device=dev)
-                print(real_label, fake_label)
+                print(real_label.item(), fake_label.item())
                 discriminator_out_real = discriminator(input).view(-1)
                 discriminator_out_fake = discriminator(xout_no_grad[:, :C, :, :]).view(-1)
-                print(discriminator_out_real, discriminator_out_fake)
+                print(discriminator_out_real.item(), discriminator_out_fake.item())
 
                 # -- compute losses discriminator
                 discriminator_loss_real = discriminator_criterion(discriminator_out_real, real_label)
                 discriminator_loss_fake = discriminator_criterion(discriminator_out_fake, fake_label)
-                print(discriminator_loss_real, discriminator_loss_fake)
+                print(discriminator_loss_real.item(), discriminator_loss_fake.item())
                 discriminator_loss_real.backward()
                 discriminator_loss_fake.backward()
                 discriminator_loss = discriminator_loss_real.mean() + discriminator_loss_fake.mean()
