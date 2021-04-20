@@ -149,20 +149,24 @@ def go(arg):
                 print("\n\nREAL. FAKE")
                 real_label = torch.full((b,), 1, dtype=torch.float, device=dev)
                 fake_label = torch.full((b,), 0, dtype=torch.float, device=dev)
-                print(real_label.item(), fake_label.item())
                 discriminator_out_real = discriminator(input).view(-1)
                 discriminator_out_fake = discriminator(xout_no_grad[:, :C, :, :]).view(-1)
-                print(discriminator_out_real.item(), discriminator_out_fake.item())
+                
 
                 # -- compute losses discriminator
                 discriminator_loss_real = discriminator_criterion(discriminator_out_real, real_label)
                 discriminator_loss_fake = discriminator_criterion(discriminator_out_fake, fake_label)
-                print(discriminator_loss_real.item(), discriminator_loss_fake.item())
                 discriminator_loss_real.backward()
                 discriminator_loss_fake.backward()
                 discriminator_loss = discriminator_loss_real.mean() + discriminator_loss_fake.mean()
                 optdi.step()
                 optdi.zero_grad()
+
+                if i %500 == 0:
+                    print("\n\nREAL. FAKE")
+                    print(real_label.item(), fake_label.item())
+                    print(discriminator_out_real.item(), discriminator_out_fake.item())
+                    print(discriminator_loss_real.item(), discriminator_loss_fake.item())
 
                 # -- compute losses decoder
                 rec_loss_orignal = rec_criterion(xout, input).view(b, c*h*w)
@@ -174,7 +178,8 @@ def go(arg):
                 rec_loss = rec_loss.mean(dim=1)
 
                     #disc updates, so second pass trough disc.
-                discriminator_out_fake = discriminator(xout[:, :C, :, :]).view(-1)
+                with torch.no_grad():
+                    discriminator_out_fake = discriminator(xout[:, :C, :, :]).view(-1)
                 generator_loss = discriminator_criterion(discriminator_out_fake, real_label)
 
 
