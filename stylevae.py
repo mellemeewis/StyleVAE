@@ -172,6 +172,7 @@ def go(arg):
                     #disc updates, so second pass trough disc.
                 discriminator_out_fake = discriminator(xout[:, :C, :, :]).view(-1)
                 generator_loss = discriminator_criterion(discriminator_out_fake, real_label)
+                print(generator_loss)
 
 
 
