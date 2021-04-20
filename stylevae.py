@@ -145,7 +145,7 @@ def go(arg):
                 real_label = torch.full((b,), 1, dtype=torch.float, device=dev)
                 fake_label = torch.full((b,), 0, dtype=torch.float, device=dev)
                 discriminator_out_real = discriminator(input).view(-1)
-                discriminator_out_fake = discriminator(xout).view(-1)
+                discriminator_out_fake = discriminator(xout[:, :C, :, :]).view(-1)
 
                 # -- compute losses discriminator
                 discriminator_loss_real = discriminator_criterion(discriminator_out_real, real_label)
@@ -166,7 +166,7 @@ def go(arg):
                 rec_loss = rec_loss.mean(dim=1)
 
                     #disc updates, so second pass trough disc.
-                discriminator_out_fake = discriminator(xout).view(-1)
+                discriminator_out_fake = discriminator(xout[:, :C, :, :]).view(-1)
                 generator_loss = discriminator_criterion(discriminator_out_fake, real_label)
 
 
