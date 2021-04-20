@@ -66,7 +66,9 @@ class StyleDecoder(nn.Module):
         self.x2 = nn.Parameter(torch.randn(1, c2, h//4, w//4))
         self.x1 = nn.Parameter(torch.randn(1, c1, h//2, w//2))
 
-    def forward(self, z, n0, n1, n2, n3, n4, n5):
+    # def forward(self, z, n0, n1, n2, n3, n4, n5):
+    def forward(self, z, n1, n2, n3, n4, n5):
+
         """
         z, n0 are never none all others can be, depending on the depth
         :param z:
@@ -137,12 +139,12 @@ class StyleDecoder(nn.Module):
             z1 = self.affine1(z).view(-1, 2 * c1, h//2, w//2)
             x1 = util.adain(z1, x1)
 
-        if n0 is not None:
-            if x1 is None:
-                x1 = self.x1
+        # if n0 is not None:
+        #     if x1 is None:
+        #         x1 = self.x1
 
             x0 = F.upsample(self.block1(x1), scale_factor=2)
-            x0 = x0 + self.tonoise0(n0)
+            # x0 = x0 + self.tonoise0(n0)
             z0 = self.affine0(z).view(-1, 2 * c, h, w)
             x0 = util.adain(z0, x0)
 

@@ -99,20 +99,22 @@ def go(arg):
 
                 ## NORMAL VAE
                 # -- encoding
-                z, n0, n1, n2, n3, n4, n5 = encoder(input, depth)
+                z, n1, n2, n3, n4, n5 = encoder(input, depth)
+
+                # z, n0, n1, n2, n3, n4, n5 = encoder(input, depth)
                 assert torch.isnan(z).sum() == 0
                 assert torch.isinf(z).sum() == 0
 
                 # -- take sample
                 zsample  = util.sample(z[:, :zs], z[:, zs:])
-                n0sample = util.sample_images(n0, 'normal')
+                # n0sample = util.sample_images(n0, 'normal')
                 n1sample = util.sample_images(n1, 'normal')
                 n2sample = util.sample_images(n2, 'normal')
                 n3sample = util.sample_images(n3, 'normal')
                 n4sample = util.sample_images(n4, 'normal')
                 n5sample = util.sample_images(n5, 'normal')
                 assert torch.isnan(zsample).sum() == 0; assert torch.isinf(zsample).sum() == 0
-                assert torch.isnan(n0sample).sum() == 0; assert torch.isinf(n0sample).sum() == 0
+                # assert torch.isnan(n0sample).sum() == 0; assert torch.isinf(n0sample).sum() == 0
                 if n1sample != None: assert torch.isnan(n1sample).sum() == 0 and torch.isinf(n1sample).sum() == 0
                 if n2sample != None: assert torch.isnan(n2sample).sum() == 0 and torch.isinf(n2sample).sum() == 0
                 if n3sample != None: assert torch.isnan(n3sample).sum() == 0 and torch.isinf(n3sample).sum() == 0
@@ -120,13 +122,14 @@ def go(arg):
                 if n5sample != None: assert torch.isnan(n5sample).sum() == 0 and torch.isinf(n5sample).sum() == 0
 
                 # -- reconstruct input
-                xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
+                # xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
+                xout = decoder(zsample, n1sample, n2sample, n3sample, n4sample, n5sample)
 
                 if arg.train_recon_with_rn:
                     with torch.no_grad():
                         _, (n0rn, n1rn, n2rn, n3rn, n4rn, n5rn) = util.latent_sample(b, zs, (C, H, W), depth, arg.zchannels, dev)
-                    xout_rn = decoder(zsample, n0rn, n1rn, n2rn, n3rn, n4rn, n5rn)
-
+                    xout_rn = decoder(zsample, n1rn, n2rn, n3rn, n4rn, n5rn)
+                    # xout_rn = decoder(zsample, n0rn, n1rn, n2rn, n3rn, n4rn, n5rn)
                 assert torch.isnan(xout).sum() == 0
                 assert torch.isinf(xout).sum() == 0
 
@@ -142,13 +145,14 @@ def go(arg):
                 assert torch.isinf(rec_loss).sum() == 0
                 rec_loss = rec_loss.mean(dim=1)
                 zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
-                n0kl = util.kl_loss_image(n0)
+                # n0kl = util.kl_loss_image(n0)
                 n1kl = util.kl_loss_image(n1)
                 n2kl = util.kl_loss_image(n2)
                 n3kl = util.kl_loss_image(n3)
                 n4kl = util.kl_loss_image(n4)
                 n5kl = util.kl_loss_image(n5)
-                kl_loss = bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl  
+                # kl_loss = bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl  
+                kl_loss = bz * zkl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl  
 
                 assert torch.isnan(kl_loss).sum() == 0
                 assert torch.isinf(kl_loss).sum() == 0
@@ -180,13 +184,15 @@ def go(arg):
                  # SLEEP UPDATE
 
                         # -- sample random latent
-                    zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b, zs, (C, H, W), depth, arg.zchannels, dev)
+                    zrand, (n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b, zs, (C, H, W), depth, arg.zchannels, dev)
+                    # zrand, (n0rand, n1rand, n2rand, n3rand, n4rand, n5rand) = util.latent_sample(b, zs, (C, H, W), depth, arg.zchannels, dev)
                     assert torch.isnan(zrand).sum() == 0
                     assert torch.isinf(zrand).sum() == 0
 
                     # -- generate x from latent
                     with torch.no_grad():
-                        x = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
+                        x = decoder(zsample, n1sample, n2sample, n3sample, n4sample, n5sample)
+                        # x = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
                         assert torch.isnan(x).sum() == 0
                         assert torch.isinf(x).sum() == 0
                         xsample = util.sample_images(x, arg.output_distribution)
@@ -194,20 +200,22 @@ def go(arg):
                         assert torch.isinf(xsample).sum() == 0
 
                     # -- reconstruct latent
-                    z_prime, n0prime, n1prime, n2prime, n3prime, n4prime, n5prime = encoder(xsample, depth)
+                    z_prime, n1prime, n2prime, n3prime, n4prime, n5prime = encoder(xsample, depth)
+                    # z_prime, n0prime, n1prime, n2prime, n3prime, n4prime, n5prime = encoder(xsample, depth)
                     assert torch.isnan(z_prime).sum() == 0
                     assert torch.isinf(z_prime).sum() == 0
 
                     # -- compute loss
                     sleep_z = util.sleep_loss(z_prime, zrand)
-                    sleep_n0 = util.sleep_loss(z_prime, zrand)
-                    sleep_n1 = util.sleep_loss(z_prime, zrand)
-                    sleep_n2 = util.sleep_loss(z_prime, zrand)
-                    sleep_n3 = util.sleep_loss(z_prime, zrand)
-                    sleep_n4 = util.sleep_loss(z_prime, zrand)
-                    sleep_n5 = util.sleep_loss(z_prime, zrand)
+                    # sleep_n0 = util.sleep_loss(n0prime, zrand)
+                    sleep_n1 = util.sleep_loss(n1prime, zrand)
+                    sleep_n2 = util.sleep_loss(n2prime, zrand)
+                    sleep_n3 = util.sleep_loss(n3prime, zrand)
+                    sleep_n4 = util.sleep_loss(n4prime, zrand)
+                    sleep_n5 = util.sleep_loss(n5prime, zrand)
 
-                    sleep_loss = bsz * sleep_z + bs0 * sleep_n0 + bs1 * sleep_n1 + bs2 * sleep_n2 + bs3 * sleep_n3 + bs4 * sleep_n4 + bs5 * sleep_n5 
+                    sleep_loss = bsz * sleep_z + bs1 * sleep_n1 + bs2 * sleep_n2 + bs3 * sleep_n3 + bs4 * sleep_n4 + bs5 * sleep_n5 
+                    # sleep_loss = bsz * sleep_z + bs0 * sleep_n0 + bs1 * sleep_n1 + bs2 * sleep_n2 + bs3 * sleep_n3 + bs4 * sleep_n4 + bs5 * sleep_n5 
                     assert torch.isnan(sleep_loss).sum() == 0
                     assert torch.isinf(sleep_loss).sum() == 0
                     sleep_loss = sleep_loss.mean()
@@ -229,7 +237,7 @@ def go(arg):
                     epoch_loss[1] += rec_loss.mean(dim=0).item() if not arg.train_recon_with_rn else + rec_loss_orignal.mean().item()
                     epoch_loss[2] += kl_loss.mean(dim=0).item()
                     epoch_loss[3] += zkl.mean(dim=0).item()
-                    epoch_loss[4] += n0kl.mean(dim=0).item()
+                    # epoch_loss[4] += n0kl.mean(dim=0).item()
                     if depth >= 1: epoch_loss[5] += n1kl.mean(dim=0).item()
                     if depth >= 2: epoch_loss[6] += n2kl.mean(dim=0).item()
                     if depth >= 3: epoch_loss[7] += n3kl.mean(dim=0).item()
@@ -259,7 +267,8 @@ def go(arg):
                     zrand, (n0rand_, n1rand_, n2rand_, n3rand_, n4rand_, n5rand_) = util.latent_sample(b, zs, (C, H, W), depth, arg.zchannels, dev)
 
                     # -- construct output
-                    sample = decoder(zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand).clamp(0, 1)[:, :C, :, :]
+                    # sample = decoder(zrand, n0rand, n1rand, n2rand, n3rand, n4rand, n5rand).clamp(0, 1)[:, :C, :, :]
+                    sample = decoder(zrand, n1rand, n2rand, n3rand, n4rand, n5rand).clamp(0, 1)[:, :C, :, :]
 
                     ## reconstruct 6x12 images from the testset
                     input = util.readn(testloader, n=6*12)
@@ -267,11 +276,12 @@ def go(arg):
                         input = input.cuda()
 
                     # -- encoding
-                    z, n0, n1, n2, n3, n4, n5 = encoder(input, depth)
+                    # z, n0, n1, n2, n3, n4, n5 = encoder(input, depth)
+                    z, n1, n2, n3, n4, n5 = encoder(input, depth)
 
                     # -- take samples
                     zsample = util.sample(z[:, :zs], z[:, zs:])
-                    n0sample = util.sample_images(n0, 'normal')
+                    # n0sample = util.sample_images(n0, 'normal')
                     n1sample = util.sample_images(n1, 'normal')
                     n2sample = util.sample_images(n2, 'normal')
                     n3sample = util.sample_images(n3, 'normal')
@@ -279,8 +289,10 @@ def go(arg):
                     n5sample = util.sample_images(n5, 'normal')
 
                     # -- decoding
-                    xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample).clamp(0, 1)[:, :C, :, :]
-                    xout_ = decoder(zsample, n0rand_, n1rand_, n2rand_, n3rand_, n4rand_, n5rand_).clamp(0, 1)[:, :C, :, :]
+                    # xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample).clamp(0, 1)[:, :C, :, :]
+                    # xout_ = decoder(zsample, n0rand_, n1rand_, n2rand_, n3rand_, n4rand_, n5rand_).clamp(0, 1)[:, :C, :, :]
+                    xout = decoder(zsample, n1sample, n2sample, n3sample, n4sample, n5sample).clamp(0, 1)[:, :C, :, :]
+                    xout_ = decoder(zsample, n1rand_, n2rand_, n3rand_, n4rand_, n5rand_).clamp(0, 1)[:, :C, :, :]
 
                     images = torch.cat([input.cpu()[:24,:,:], xout.cpu()[:24,:,:], xout_.cpu()[:24,:,:], sample.cpu()[:24,:,:],
                                         input.cpu()[24:48,:,:], xout.cpu()[24:48,:,:], xout_.cpu()[24:48,:,:], sample.cpu()[24:48,:,:],
