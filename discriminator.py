@@ -19,6 +19,8 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         C, H, W = in_size
         d1, d2, d3, d4 = dchannels
+        kern_size = H // 2**4
+        print(kern_size)
         self.main = nn.Sequential(
             # input is (nc) x 64 x 64
             nn.Conv2d(C, d1, 4, 2, 1, bias=False),
@@ -40,7 +42,8 @@ class Discriminator(nn.Module):
             nn.LeakyReLU(0.2, inplace=True),
 
             # state size. (ndf*8) x 4 x 4
-            nn.Conv2d(d4, 1, 4, 1, 0, bias=False),
+
+            nn.Conv2d(d4, 1, kern_size, 1, 0, bias=False),
             nn.Sigmoid()
         )
 
