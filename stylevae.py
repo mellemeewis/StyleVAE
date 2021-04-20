@@ -146,7 +146,6 @@ def go(arg):
 
 
                 ## DISCRIMINATOR
-                print("\n\nREAL. FAKE")
                 real_label = torch.full((b,), 1, dtype=torch.float, device=dev)
                 fake_label = torch.full((b,), 0, dtype=torch.float, device=dev)
                 discriminator_out_real = discriminator(input).view(-1)
