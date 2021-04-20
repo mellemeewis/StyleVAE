@@ -29,6 +29,7 @@ from models.densenet import DenseNet
 from data import return_data
 from encoder import StyleEncoder, StyleEncoder2
 from decoder import StyleDecoder, StyleDecoder2
+from discriminator import Discriminator
 import slack_util
 
 from tensorboardX import SummaryWriter
@@ -58,18 +59,23 @@ def go(arg):
     elif arg.decoder_type == 2:
         decoder = StyleDecoder2((C, H, W), arg.channels, arg.zchannels, zs=zs, k=arg.kernel_size, mapping=arg.mapping_layers, batch_norm=arg.batch_norm, dropouts=arg.dropouts)
 
+    discriminator = Discriminator((C,H,W), arg.dchannels)
 
     if arg.output_distribution == 'siglaplace':
         rec_criterion = util.siglaplace
     elif arg.output_distribution == 'signorm':
         rec_criterion = util.signorm
 
+    discriminator_criterion = nn.BCELoss()
+
     opte = Adam(list(encoder.parameters()), lr=arg.lr[0])
     optd = Adam(list(decoder.parameters()), lr=arg.lr[1])
+    optdi = Adam(list(discriminator.parameters()), lr=arg.lr[1])
 
     if torch.cuda.is_available():
         encoder.cuda()
         decoder.cuda()
+        discriminator.cuda()
 
     for depth in range(6):
 
@@ -87,6 +93,7 @@ def go(arg):
             # Train
             encoder.train(True)
             decoder.train(True)
+            discriminator.train(True)
 
             for i, (input, _) in enumerate(trainloader):
                 assert torch.isnan(input).sum() == 0
@@ -95,7 +102,8 @@ def go(arg):
                 # Prepare the input
                 b, c, w, h = input.size()
                 if torch.cuda.is_available():
-                    input = input.cuda()
+                    input = input.cuda()               
+
 
                 ## NORMAL VAE
                 # -- encoding
@@ -124,7 +132,6 @@ def go(arg):
                 # -- reconstruct input
                 # xout = decoder(zsample, n0sample, n1sample, n2sample, n3sample, n4sample, n5sample)
                 xout = decoder(zsample, n1sample, n2sample, n3sample, n4sample, n5sample)
-
                 if arg.train_recon_with_rn:
                     with torch.no_grad():
                         _, (n0rn, n1rn, n2rn, n3rn, n4rn, n5rn) = util.latent_sample(b, zs, (C, H, W), depth, arg.zchannels, dev)
@@ -133,17 +140,38 @@ def go(arg):
                 assert torch.isnan(xout).sum() == 0
                 assert torch.isinf(xout).sum() == 0
 
-                # -- compute losses
+
+                ## DISCRIMINATOR
+                real_label = torch.full((b,), 1, dtype=torch.float, device=dev)
+                fake_label = torch.full((b,), 0, dtype=torch.float, device=dev)
+                discriminator_out_real = discriminator(input).view(-1)
+                discriminator_out_fake = discriminator(xout).view(-1)
+
+                # -- compute losses discriminator
+                discriminator_loss_real = discriminator_criterion(discriminator_out_real, real_label)
+                discriminator_loss_fake = discriminator_criterion(discriminator_out_fake, fake_label)
+                discriminator_loss_real.backward()
+                discriminator_loss_fake.backward()
+                discriminator_loss = discriminator_loss_real.mean() + discriminator_loss_fake.mean()
+                optdi.step()
+                optdi.zero_grad()
+
+                # -- compute losses decoder
                 rec_loss_orignal = rec_criterion(xout, input).view(b, c*h*w)
                 if arg.train_recon_with_rn:
                     rec_loss_rn = rec_criterion(xout_rn, input).view(b, c*h*w)
                     rec_loss = rec_loss_orignal / arg.train_recon_with_rn + rec_loss_rn
                 else: 
                     rec_loss = rec_loss_orignal
-
-                assert torch.isnan(rec_loss).sum() == 0
-                assert torch.isinf(rec_loss).sum() == 0
                 rec_loss = rec_loss.mean(dim=1)
+
+                    #disc updates, so second pass trough disc.
+                discriminator_out_fake = discriminator(xout).view(-1)
+                generator_loss = discriminator_criterion(discriminator_out_fake, real_label)
+
+
+
+                # --compute losses encoder
                 zkl  = util.kl_loss(z[:, :zs], z[:, zs:])
                 # n0kl = util.kl_loss_image(n0)
                 n1kl = util.kl_loss_image(n1)
@@ -154,11 +182,7 @@ def go(arg):
                 # kl_loss = bz * zkl + b0 * n0kl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl  
                 kl_loss = bz * zkl + b1 * n1kl + b2 * n2kl + b3 * n3kl + b4 * n4kl + b5 * n5kl  
 
-                assert torch.isnan(kl_loss).sum() == 0
-                assert torch.isinf(kl_loss).sum() == 0
-                loss = br*rec_loss + kl_loss
-                assert torch.isnan(loss).sum() == 0
-                assert torch.isinf(loss).sum() == 0
+                loss = br*rec_loss + kl_loss + bg * generator_loss
                 loss = loss.mean(dim=0)
 
                 # -- backward pass and update
@@ -330,6 +354,12 @@ if __name__ == "__main__":
                         help="Number of channels per block (list of 5 integers).",
                         nargs=5,
                         default=[32, 64, 128, 256, 512],
+                        type=int)
+    parser.add_argument("--dchannels",
+                        dest="dchannels",
+                        help="Number of channels discriminator(list of 4 integers).",
+                        nargs=4,
+                        default=[32, 64, 128, 256],
                         type=int)
 
     parser.add_argument("--zchannels",
