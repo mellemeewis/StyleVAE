@@ -55,7 +55,7 @@ def go(arg):
         encoder = StyleEncoder2((C, H, W), arg.channels, arg.zchannels, zs=zs, k=arg.kernel_size, unmapping=arg.mapping_layers, batch_norm=arg.batch_norm)
 
     if arg.decoder_type == 1:
-        decoder = StyleDecoder((C, H, W), arg.channels, arg.zchannels, zs=zs, k=arg.kernel_size, mapping=arg.mapping_layers, batch_norm=arg.batch_norm, dropouts=arg.dropouts)
+        decoder = StyleDecoder2((C, H, W), arg.channels, arg.zchannels, zs=zs, k=arg.kernel_size, mapping=arg.mapping_layers, batch_norm=arg.batch_norm, dropouts=arg.dropouts)
     elif arg.decoder_type == 2:
         decoder = StyleDecoder2((C, H, W), arg.channels, arg.zchannels, zs=zs, k=arg.kernel_size, mapping=arg.mapping_layers, batch_norm=arg.batch_norm, dropouts=arg.dropouts)
 
@@ -118,9 +118,9 @@ def go(arg):
                 assert torch.isnan(zsample).sum() == 0; assert torch.isinf(zsample).sum() == 0
 
                 # -- reconstruct input
-                xout = decoder(zsample, n1sample, n2sample, n3sample, n4sample, n5sample)
+                xout = decoder(zsample)
                 with torch.no_grad():
-                    xout_no_grad = decoder(zsample, n1sample, n2sample, n3sample, n4sample, n5sample)
+                    xout_no_grad = decoder(zsample)
 
                 assert torch.isnan(xout).sum() == 0
                 assert torch.isinf(xout).sum() == 0
