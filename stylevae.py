@@ -119,18 +119,17 @@ def go(arg):
 
                 # -- reconstruct input
                 xout = decoder(zsample, depth)
-                with torch.no_grad():
-                    xout_no_grad = decoder(zsample, depth)
 
                 assert torch.isnan(xout).sum() == 0
                 assert torch.isinf(xout).sum() == 0
 
 
                 ## DISCRIMINATOR
+                optdi.zero_grad()
                 real_label = torch.full((b,), 1, dtype=torch.float, device=dev)
                 fake_label = torch.full((b,), 0, dtype=torch.float, device=dev)
                 discriminator_out_real = discriminator(input).view(-1)
-                discriminator_out_fake = discriminator(xout_no_grad[:, :C, :, :]).view(-1)
+                discriminator_out_fake = discriminator(xout.detach()[:, :C, :, :]).view(-1)
                 
 
                 # -- compute losses discriminator
@@ -140,15 +139,13 @@ def go(arg):
                 discriminator_loss_fake.backward()
                 discriminator_loss = discriminator_loss_real.mean() + discriminator_loss_fake.mean()
                 optdi.step()
-                optdi.zero_grad()
 
                 # -- compute losses decoder
                 rec_loss = rec_criterion(xout, input).view(b, c*h*w)
                 rec_loss = rec_loss.mean(dim=1)
 
                     #disc updated, so second pass trough disc.
-                with torch.no_grad():
-                    discriminator_out_fake = discriminator(xout[:, :C, :, :]).view(-1)
+                discriminator_out_fake = discriminator(xout[:, :C, :, :]).view(-1)
                 generator_loss = discriminator_criterion(discriminator_out_fake, real_label)
 
                 # --compute losses encoder
