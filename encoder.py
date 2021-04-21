@@ -41,12 +41,12 @@ class StyleEncoder(nn.Module):
 
         # 1x1 convolution to distribution on "noise space"
         # (mean and sigma)
-        self.tonoise0 = nn.Conv2d(c,  z0*2, kernel_size=1, padding=0)
-        self.tonoise1 = nn.Conv2d(c1, z1*2, kernel_size=1, padding=0)
-        self.tonoise2 = nn.Conv2d(c2, z2*2, kernel_size=1, padding=0)
-        self.tonoise3 = nn.Conv2d(c3, z3*2, kernel_size=1, padding=0)
-        self.tonoise4 = nn.Conv2d(c4, z4*2, kernel_size=1, padding=0)
-        self.tonoise5 = nn.Conv2d(c5, z5*2, kernel_size=1, padding=0)
+        # self.tonoise0 = nn.Conv2d(c,  z0*2, kernel_size=1, padding=0)
+        # self.tonoise1 = nn.Conv2d(c1, z1*2, kernel_size=1, padding=0)
+        # self.tonoise2 = nn.Conv2d(c2, z2*2, kernel_size=1, padding=0)
+        # self.tonoise3 = nn.Conv2d(c3, z3*2, kernel_size=1, padding=0)
+        # self.tonoise4 = nn.Conv2d(c4, z4*2, kernel_size=1, padding=0)
+        # self.tonoise5 = nn.Conv2d(c5, z5*2, kernel_size=1, padding=0)
 
         self.z_dropout = nn.Dropout2d(p=z_dropout, inplace=False)
 
@@ -70,13 +70,13 @@ class StyleEncoder(nn.Module):
         if depth <= 0:
             z=z0
             z = self.unmapping(z)
-            return z, n1, n2, n3, n4, n5
+            return z
             # return z, n0, n1, n2, n3, n4, n5
 
         x1 = F.avg_pool2d(self.block1(x0), 2)
         z1 = self.affine1(x1.view(b, -1))
         x1 = util.F.instance_norm(x1)
-        n1 = self.tonoise1(x1)
+        # n1 = self.tonoise1(x1)
 
         if depth <= 1:
             zbatch = torch.cat([z0[:, None, :],z1[:, None, :]], dim=1)
@@ -85,13 +85,13 @@ class StyleEncoder(nn.Module):
                 z = zbatch
             z = z.sum(dim=1)
             z = self.unmapping(z)
-            return z, n1, n2, n3, n4, n5
+            return z
             # return z, n0, n1, n2, n3, n4, n5
 
         x2 = F.avg_pool2d(self.block2(x1), 2)
         z2 = self.affine2(x2.view(b, -1))
         x2 = util.F.instance_norm(x2)
-        n2 = self.tonoise2(x2)
+        # n2 = self.tonoise2(x2)
 
         if depth <= 2:
             zbatch = torch.cat([z0[:, None, :],z1[:, None, :],z2[:, None, :]], dim=1)
@@ -100,13 +100,13 @@ class StyleEncoder(nn.Module):
                 z = zbatch       
             z = z.sum(dim=1)
             z = self.unmapping(z)
-            return z, n1, n2, n3, n4, n5
+            return z
             # return z, n0, n1, n2, n3, n4, n5
 
         x3 = F.avg_pool2d(self.block3(x2), 2)
         z3 = self.affine3(x3.view(b, -1))
         x3 = util.F.instance_norm(x3)
-        n3 = self.tonoise3(x3)
+        # n3 = self.tonoise3(x3)
 
         if depth <= 3:
             zbatch = torch.cat([z0[:, None, :],z1[:, None, :],z2[:, None, :], z3[:, None, :]], dim=1)
@@ -115,7 +115,7 @@ class StyleEncoder(nn.Module):
                 z = zbatch   
             z = z.sum(dim=1)
             z = self.unmapping(z)
-            return z, n1, n2, n3, n4, n5
+            return z
             # return z, n0, n1, n2, n3, n4, n5
 
         x4 = F.avg_pool2d(self.block4(x3), 2)
@@ -130,13 +130,13 @@ class StyleEncoder(nn.Module):
                 z = zbatch
             z = z.sum(dim=1)
             z = self.unmapping(z)
-            return z, n1, n2, n3, n4, n5
+            return z
             # return z, n0, n1, n2, n3, n4, n5
 
         x5 = F.avg_pool2d(self.block5(x4), 2)
         z5 = self.affine5(x5.view(b, -1))
         x5 = util.F.instance_norm(x5)
-        n5 = self.tonoise5(x5)
+        # n5 = self.tonoise5(x5)
 
         # combine the z vectors
 
@@ -153,7 +153,7 @@ class StyleEncoder(nn.Module):
             z = zbatch   
         z = z.sum(dim=1)
         z = self.unmapping(z)
-        return z, n1, n2, n3, n4, n5
+        return z
         # return z, n0, n1, n2, n3, n4, n5
 
 
