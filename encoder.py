@@ -121,7 +121,7 @@ class StyleEncoder(nn.Module):
         x4 = F.avg_pool2d(self.block4(x3), 2)
         z4 = self.affine4(x4.view(b, -1))
         x4 = util.F.instance_norm(x4)
-        n4 = self.tonoise4(x4)
+        # n4 = self.tonoise4(x4)
 
         if depth <= 4:
             zbatch = torch.cat([z0[:, None, :],z1[:, None, :],z2[:, None, :], z3[:, None, :], z4[:, None, :]], dim=1)
