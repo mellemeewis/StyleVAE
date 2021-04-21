@@ -118,9 +118,9 @@ def go(arg):
                 assert torch.isnan(zsample).sum() == 0; assert torch.isinf(zsample).sum() == 0
 
                 # -- reconstruct input
-                xout = decoder(zsample)
+                xout = decoder(zsample, depth)
                 with torch.no_grad():
-                    xout_no_grad = decoder(zsample)
+                    xout_no_grad = decoder(zsample, depth)
 
                 assert torch.isnan(xout).sum() == 0
                 assert torch.isinf(xout).sum() == 0
@@ -187,7 +187,7 @@ def go(arg):
 
                     # -- generate x from latent
                     with torch.no_grad():
-                        x = decoder(zsample)
+                        x = decoder(zsample, depth)
                         assert torch.isnan(x).sum() == 0
                         assert torch.isinf(x).sum() == 0
                         xsample = util.sample_images(x, arg.output_distribution)
@@ -256,7 +256,7 @@ def go(arg):
                     zrand, (_, _, _, _, _, _) = util.latent_sample(b, zs, (C, H, W), depth, arg.zchannels, dev)
 
                     # -- construct output
-                    sample = decoder(zrand).clamp(0, 1)[:, :C, :, :]
+                    sample = decoder(zrand, depth).clamp(0, 1)[:, :C, :, :]
 
                     ## reconstruct 6x12 images from the testset
                     input = util.readn(testloader, n=6*12)
@@ -270,7 +270,7 @@ def go(arg):
                     zsample = util.sample(z[:, :zs], z[:, zs:])
 
                     # -- decoding
-                    xout = decoder(zsample).clamp(0, 1)[:, :C, :, :]
+                    xout = decoder(zsample, depth).clamp(0, 1)[:, :C, :, :]
 
                     images = torch.cat([input.cpu()[:24,:,:], xout.cpu()[:24,:,:], sample.cpu()[:24,:,:],
                                         input.cpu()[24:48,:,:], xout.cpu()[24:48,:,:], sample.cpu()[24:48,:,:],
